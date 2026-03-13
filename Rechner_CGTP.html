@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Scientific Physics Calculator</title>
+
+<style>
+
+body{
+background:#0b0f14;
+color:white;
+font-family:Arial;
+text-align:center;
+margin:0;
+padding:20px;
+}
+
+#display{
+width:90%;
+max-width:700px;
+font-size:28px;
+padding:12px;
+margin:10px;
+background:#111;
+color:#0ff;
+border:1px solid #444;
+}
+
+#result{
+font-size:24px;
+margin:10px;
+color:#8fff8f;
+}
+
+button{
+font-size:18px;
+padding:12px;
+margin:4px;
+width:70px;
+background:#1b2430;
+color:white;
+border:none;
+border-radius:6px;
+cursor:pointer;
+}
+
+button:hover{
+background:#334;
+}
+
+.row{
+margin:5px;
+}
+
+#fullscreen{
+position:absolute;
+top:10px;
+right:10px;
+padding:10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<button id="fullscreen" onclick="toggleFullscreen()">⛶ Vollbild</button>
+
+<h2>Scientific Physics Calculator</h2>
+
+<input id="display" placeholder="Expression">
+
+<div id="result"></div>
+
+<div class="row">
+<button onclick="add('7')">7</button>
+<button onclick="add('8')">8</button>
+<button onclick="add('9')">9</button>
+<button onclick="add('/')">÷</button>
+<button onclick="add('sqrt(')">√</button>
+</div>
+
+<div class="row">
+<button onclick="add('4')">4</button>
+<button onclick="add('5')">5</button>
+<button onclick="add('6')">6</button>
+<button onclick="add('*')">×</button>
+<button onclick="add('pow(')">xʸ</button>
+</div>
+
+<div class="row">
+<button onclick="add('1')">1</button>
+<button onclick="add('2')">2</button>
+<button onclick="add('3')">3</button>
+<button onclick="add('-')">−</button>
+<button onclick="add('sin(')">sin</button>
+</div>
+
+<div class="row">
+<button onclick="add('0')">0</button>
+<button onclick="add('.')">.</button>
+<button onclick="calc()">=</button>
+<button onclick="add('+')">+</button>
+<button onclick="add('cos(')">cos</button>
+</div>
+
+<div class="row">
+<button onclick="add('tan(')">tan</button>
+<button onclick="add('log(')">log</button>
+<button onclick="add('exp(')">exp</button>
+<button onclick="clearDisplay()">C</button>
+</div>
+
+<script>
+
+const constants = {
+
+pi: Math.PI,
+e: Math.E,
+
+c: 299792458,
+h: 6.62607015e-34,
+hbar: 1.054571817e-34,
+G: 6.67430e-11,
+me: 9.1093837015e-31,
+mp: 1.67262192369e-27,
+kB: 1.380649e-23,
+NA: 6.02214076e23,
+alpha: 7.2973525693e-3
+
+};
+
+const functions = {
+
+sin:Math.sin,
+cos:Math.cos,
+tan:Math.tan,
+sqrt:Math.sqrt,
+log:Math.log,
+exp:Math.exp,
+pow:Math.pow
+
+};
+
+function add(v){
+document.getElementById("display").value += v;
+}
+
+function clearDisplay(){
+document.getElementById("display").value="";
+document.getElementById("result").innerText="";
+}
+
+function calc(){
+
+let expr = document.getElementById("display").value;
+
+try{
+
+let scope = {
+
+pi: Math.PI,
+e: Math.E,
+
+sin: Math.sin,
+cos: Math.cos,
+tan: Math.tan,
+
+sqrt: Math.sqrt,
+log: Math.log,
+exp: Math.exp,
+pow: Math.pow,
+
+c: 299792458,
+h: 6.62607015e-34,
+hbar: 1.054571817e-34,
+G: 6.67430e-11,
+me: 9.1093837015e-31
+
+};
+
+let names = Object.keys(scope);
+let values = Object.values(scope);
+
+let f = new Function(...names, "return " + expr);
+
+let result = f(...values);
+
+document.getElementById("result").innerText = result;
+
+}catch(err){
+
+document.getElementById("result").innerText = err;
+
+}
+
+}
+
+function toggleFullscreen(){
+
+if(!document.fullscreenElement){
+
+document.documentElement.requestFullscreen();
+
+}else{
+
+document.exitFullscreen();
+
+}
+
+}
+
+document.addEventListener("keydown",function(e){
+
+if(e.key==="Enter"){
+calc();
+}
+
+});
+
+</script>
+
+</body>
+</html>

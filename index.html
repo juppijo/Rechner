@@ -1,0 +1,2379 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhysCalc Pro — Wissenschaftlicher Taschenrechner</title>
+<link rel="icon" href="favicon.jpg" type="image/png">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #07090d;
+  --panel: #0d1017;
+  --panel2: #131820;
+  --panel3: #181f2a;
+  --border: #1e2a38;
+  --border2: #253040;
+  --accent: #00cfff;
+  --accent-dim: rgba(0,207,255,0.15);
+  --accent2: #ff6b35;
+  --accent2-dim: rgba(255,107,53,0.12);
+  --accent3: #6dff8a;
+  --accent3-dim: rgba(109,255,138,0.12);
+  --accent4: #ffcc00;
+  --accent4-dim: rgba(255,204,0,0.12);
+  --text: #b8ccd8;
+  --text2: #7a90a0;
+  --text-dim: #3a4a58;
+  --display-bg: #03050a;
+  --shadow: 0 8px 32px rgba(0,0,0,0.7);
+  --glow: 0 0 16px rgba(0,207,255,0.25);
+  --glow2: 0 0 12px rgba(109,255,138,0.2);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  font-family: 'Exo 2', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+  background-image:
+    radial-gradient(ellipse 60% 40% at 15% 10%, rgba(0,207,255,0.05) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 85% 90%, rgba(109,255,138,0.04) 0%, transparent 70%),
+    repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(30,42,56,0.15) 40px, rgba(30,42,56,0.15) 41px),
+    repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(30,42,56,0.15) 40px, rgba(30,42,56,0.15) 41px);
+}
+
+/* ── HEADER ── */
+header {
+  text-align: center;
+  margin-bottom: 14px;
+  animation: fadeDown 0.6s ease;
+}
+@keyframes fadeDown { from { opacity:0; transform:translateY(-12px); } to { opacity:1; transform:none; } }
+
+header h1 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.7rem;
+  font-weight: 900;
+  letter-spacing: 0.35em;
+  color: var(--accent);
+  text-shadow: 0 0 20px rgba(0,207,255,0.5), 0 0 60px rgba(0,207,255,0.2);
+}
+header p {
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+
+/* ── MAIN LAYOUT ── */
+.app {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 14px;
+  width: 100%;
+  max-width: 1100px;
+  animation: fadeIn 0.5s ease 0.1s both;
+}
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+
+/* ── LEFT PANEL ── */
+.left-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Display */
+.display-wrap {
+  background: var(--display-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+.display-wrap::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--accent) 40%, var(--accent3) 60%, transparent 100%);
+  opacity: 0.5;
+}
+.display-top {
+  padding: 10px 14px 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.display-badges { display: flex; gap: 6px; }
+.badge {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  padding: 2px 7px;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+.badge-angle { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(0,207,255,0.25); }
+.badge-mem { background: var(--accent3-dim); color: var(--accent3); border: 1px solid rgba(109,255,138,0.2); display:none; }
+.badge-mem.active { display:block; }
+.badge-err { background: var(--accent2-dim); color: var(--accent2); border: 1px solid rgba(255,107,53,0.25); display:none; }
+.badge-err.show { display:block; }
+
+.display-expr {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  padding: 0 14px 2px;
+  min-height: 16px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  direction: rtl;
+  text-align: left;
+}
+.display-main {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 2.2rem;
+  color: var(--accent);
+  text-align: right;
+  padding: 4px 14px 10px;
+  text-shadow: var(--glow);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color 0.2s, text-shadow 0.2s;
+  min-height: 50px;
+  line-height: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+.display-main.error { color: var(--accent2); text-shadow: 0 0 10px rgba(255,107,53,0.4); }
+.display-main.result-flash { animation: flash 0.3s ease; }
+@keyframes flash { 0%{opacity:.5} 100%{opacity:1} }
+
+/* Buttons */
+.btn-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+}
+
+button {
+  font-family: 'Exo 2', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 9px 2px;
+  cursor: pointer;
+  transition: background 0.1s, border-color 0.1s, transform 0.07s, box-shadow 0.1s;
+  color: var(--text);
+  background: var(--panel2);
+  white-space: nowrap;
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+}
+button::after {
+  content:'';
+  position:absolute;
+  inset:0;
+  background:radial-gradient(circle at center, rgba(255,255,255,0.08) 0%, transparent 70%);
+  opacity:0;
+  transition:opacity 0.1s;
+}
+button:hover::after { opacity:1; }
+button:hover { border-color: var(--border2); }
+button:active { transform: scale(0.94); }
+
+.btn-fn { background: rgba(0,207,255,0.05); color: #7fc8e0; font-size:0.7rem; }
+.btn-fn:hover { background: rgba(0,207,255,0.1); border-color: rgba(0,207,255,0.3); }
+
+.btn-op { background: rgba(255,107,53,0.06); color: var(--accent2); }
+.btn-op:hover { background: rgba(255,107,53,0.12); border-color: rgba(255,107,53,0.3); }
+
+.btn-eq {
+  background: linear-gradient(135deg, rgba(0,80,100,0.8), rgba(0,60,80,0.9));
+  color: var(--accent);
+  border-color: rgba(0,207,255,0.4);
+  box-shadow: 0 0 10px rgba(0,207,255,0.15);
+  font-size: 1.2rem;
+}
+.btn-eq:hover { box-shadow: 0 0 18px rgba(0,207,255,0.3); border-color: var(--accent); }
+
+.btn-clr { color: #ff4a4a; }
+.btn-clr:hover { background: rgba(255,74,74,0.1); border-color: rgba(255,74,74,0.3); }
+
+.btn-shift {
+  background: var(--accent3-dim);
+  color: var(--accent3);
+  border-color: rgba(109,255,138,0.2);
+}
+.btn-shift.active {
+  background: rgba(109,255,138,0.15);
+  box-shadow: var(--glow2);
+  border-color: var(--accent3);
+}
+
+.btn-const { background: rgba(109,255,138,0.05); color: var(--accent3); font-size:0.68rem; }
+.btn-const:hover { background: rgba(109,255,138,0.1); border-color: rgba(109,255,138,0.3); }
+
+.span2 { grid-column: span 2; }
+.span3 { grid-column: span 3; }
+
+/* ── RIGHT PANEL ── */
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Tab bar */
+.tab-bar {
+  display: flex;
+  background: var(--panel2);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tab-bar::-webkit-scrollbar { display: none; }
+
+.tab {
+  font-family: 'Exo 2', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 10px 16px;
+  cursor: pointer;
+  color: var(--text-dim);
+  border: none;
+  background: none;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+  border-radius: 0;
+}
+.tab:hover { color: var(--text); background: none; border-color: transparent; transform:none; }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* Tab content */
+.tab-content { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+.tab-content.active { display: flex; }
+.tab-inner { flex: 1; overflow-y: auto; padding: 14px; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+
+/* Section labels */
+.sec-title {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  padding-bottom: 7px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 10px;
+}
+
+/* ── CONSTANTS TAB ── */
+.cat-tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 10px; }
+.cat-btn {
+  font-family:'Exo 2',sans-serif;
+  font-size: 0.62rem; font-weight:700;
+  letter-spacing:0.1em;
+  border: 1px solid var(--border);
+  border-radius: 4px; padding: 4px 9px;
+  cursor: pointer; background: var(--panel2); color: var(--text-dim);
+  transition: all 0.13s; user-select:none;
+  text-transform:uppercase;
+}
+.cat-btn.active { background: var(--accent-dim); color: var(--accent); border-color: rgba(0,207,255,0.3); }
+.cat-btn:hover { color: var(--text); }
+
+.const-list { display: flex; flex-direction: column; gap: 3px; }
+.const-item {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 7px; padding: 7px 10px;
+  cursor: pointer;
+  transition: all 0.12s;
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  gap: 0 8px;
+  align-items: center;
+}
+.const-item:hover { background: var(--panel3); border-color: var(--accent3); transform: translateX(2px); }
+.const-sym {
+  font-family:'Share Tech Mono',monospace;
+  font-size: 0.8rem; color: var(--accent3); font-weight:bold;
+  text-align:center;
+}
+.const-info { overflow: hidden; }
+.const-name { font-size: 0.67rem; color: var(--text); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.const-val { font-family:'Share Tech Mono',monospace; font-size:0.6rem; color: var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+/* ── UNIT CONVERTER TAB ── */
+.unit-grid { display: flex; flex-direction: column; gap: 12px; }
+.unit-category { display: flex; flex-direction: column; gap: 8px; }
+.unit-cat-label {
+  font-size: 0.6rem; font-weight:700; letter-spacing:0.2em;
+  color: var(--accent4); text-transform:uppercase;
+  border-bottom: 1px solid rgba(255,204,0,0.15);
+  padding-bottom: 4px;
+}
+.unit-row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; }
+.unit-input {
+  background: var(--display-bg);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 8px 10px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.82rem;
+  color: var(--accent);
+  outline: none;
+  width: 100%;
+  transition: border-color 0.15s;
+}
+.unit-input:focus { border-color: var(--accent); }
+.unit-sel {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 8px;
+  color: var(--text);
+  font-family: 'Exo 2', sans-serif;
+  font-size: 0.72rem;
+  outline: none;
+  cursor: pointer;
+  width: 100%;
+}
+.unit-arrow {
+  color: var(--accent2);
+  font-size: 1rem;
+  text-align:center;
+  font-family: 'Share Tech Mono', monospace;
+}
+.unit-result {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 8px 10px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.82rem;
+  color: var(--accent3);
+  min-height: 36px;
+  word-break: break-all;
+}
+
+/* ── STATS TAB ── */
+.stats-area { display: flex; flex-direction: column; gap: 10px; }
+.stats-input {
+  background: var(--display-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--accent3);
+  outline: none; resize: vertical;
+  min-height: 60px; width: 100%;
+}
+.stats-input:focus { border-color: var(--accent3); }
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.stat-card {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 8px 10px;
+}
+.stat-label { font-size:0.58rem; font-weight:700; letter-spacing:0.15em; color:var(--text-dim); text-transform:uppercase; }
+.stat-value { font-family:'Share Tech Mono',monospace; font-size:0.85rem; color:var(--accent); margin-top:2px; }
+.btn-analyze {
+  background: rgba(0,207,255,0.08); color:var(--accent);
+  border: 1px solid rgba(0,207,255,0.3);
+  border-radius:7px; padding:9px;
+  font-family:'Exo 2',sans-serif; font-size:0.75rem;
+  font-weight:700; letter-spacing:0.1em;
+  cursor:pointer; transition:all 0.15s;
+  text-transform:uppercase;
+}
+.btn-analyze:hover { background:rgba(0,207,255,0.15); box-shadow:var(--glow); }
+
+/* Histogram */
+.histogram { display: flex; align-items: flex-end; gap: 2px; height: 60px; margin-top: 8px; padding: 0 2px; }
+.hist-bar {
+  flex: 1;
+  background: rgba(0,207,255,0.25);
+  border-radius: 2px 2px 0 0;
+  border: 1px solid rgba(0,207,255,0.4);
+  transition: height 0.4s ease;
+  min-width: 4px;
+}
+
+/* ── MATRIX TAB ── */
+.matrix-area { display: flex; flex-direction: column; gap: 12px; }
+.matrix-size-row { display:flex; gap:8px; align-items:center; }
+.matrix-size-row label { font-size:0.68rem; color:var(--text2); letter-spacing:0.1em; }
+.mx-sel {
+  background:var(--panel2); border:1px solid var(--border);
+  border-radius:5px; padding:4px 8px;
+  color:var(--text); font-family:'Exo 2',sans-serif; font-size:0.72rem;
+  outline:none; cursor:pointer;
+}
+.matrix-inputs { display: grid; gap: 5px; }
+.matrix-inputs input {
+  background: var(--display-bg);
+  border: 1px solid var(--border);
+  border-radius: 5px; padding: 7px 5px;
+  font-family:'Share Tech Mono',monospace; font-size:0.78rem;
+  color: var(--accent4); text-align:center; outline:none;
+  transition: border-color 0.15s;
+}
+.matrix-inputs input:focus { border-color: var(--accent4); }
+.mx-ops { display:flex; gap:5px; flex-wrap:wrap; }
+.mx-btn {
+  background: var(--accent4-dim); color:var(--accent4);
+  border: 1px solid rgba(255,204,0,0.25);
+  border-radius:6px; padding:7px 12px;
+  font-family:'Exo 2',sans-serif; font-size:0.7rem; font-weight:700;
+  cursor:pointer; letter-spacing:0.1em; text-transform:uppercase;
+  transition:all 0.13s;
+}
+.mx-btn:hover { background:rgba(255,204,0,0.15); border-color:var(--accent4); }
+.mx-result {
+  background: var(--display-bg); border:1px solid var(--border);
+  border-radius:8px; padding:10px 12px;
+  font-family:'Share Tech Mono',monospace; font-size:0.78rem;
+  color: var(--accent4); min-height:50px; white-space:pre;
+}
+
+/* ── GRAPH TAB ── */
+.graph-area { display: flex; flex-direction: column; gap: 10px; }
+.graph-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.fn-row { grid-column: span 2; display: flex; gap: 6px; align-items: center; }
+.fn-label { font-family:'Share Tech Mono',monospace; font-size:0.75rem; flex-shrink:0; }
+.graph-input {
+  background: var(--display-bg);
+  border: 1px solid var(--border);
+  border-radius: 7px; padding: 8px 10px;
+  font-family:'Share Tech Mono',monospace; font-size:0.8rem;
+  color: var(--accent); outline:none; width:100%;
+  transition:border-color 0.15s;
+}
+.graph-input:focus { border-color:var(--accent); }
+.range-row { display:flex; gap:8px; align-items:center; }
+.range-label { font-size:0.65rem; color:var(--text-dim); letter-spacing:0.1em; flex-shrink:0; }
+.range-input {
+  background:var(--display-bg); border:1px solid var(--border);
+  border-radius:5px; padding:5px 8px;
+  font-family:'Share Tech Mono',monospace; font-size:0.75rem;
+  color:var(--text); outline:none; width:70px;
+  text-align:center;
+}
+.btn-plot {
+  background: linear-gradient(135deg,rgba(0,80,100,0.8),rgba(0,60,80,0.9));
+  color:var(--accent); border:1px solid rgba(0,207,255,0.4);
+  border-radius:7px; padding:9px;
+  font-family:'Exo 2',sans-serif; font-size:0.75rem; font-weight:700;
+  letter-spacing:0.12em; text-transform:uppercase;
+  cursor:pointer; transition:all 0.15s;
+}
+.btn-plot:hover { box-shadow:var(--glow); border-color:var(--accent); }
+#plot-canvas {
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  cursor: crosshair;
+  width: 100%;
+}
+.plot-info {
+  font-family:'Share Tech Mono',monospace; font-size:0.65rem;
+  color:var(--text-dim); text-align:center; min-height:14px;
+}
+
+/* ── PROGRAM TAB ── */
+.prog-area { display:flex; flex-direction:column; gap:10px; }
+.prog-editor {
+  background: var(--display-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px;
+  font-family:'Share Tech Mono',monospace; font-size:0.75rem;
+  color: var(--accent3); resize:vertical; min-height:200px;
+  outline:none; width:100%; line-height:1.6;
+  tab-size:2;
+}
+.prog-editor:focus { border-color:var(--accent3); }
+.prog-btns { display:flex; gap:6px; }
+.btn-run {
+  background:rgba(109,255,138,0.08); color:var(--accent3);
+  border:1px solid rgba(109,255,138,0.3); border-radius:7px;
+  padding:9px 18px; font-family:'Exo 2',sans-serif;
+  font-size:0.75rem; font-weight:700; letter-spacing:0.1em;
+  cursor:pointer; transition:all 0.15s; text-transform:uppercase;
+  flex:1;
+}
+.btn-run:hover { background:rgba(109,255,138,0.15); box-shadow:var(--glow2); }
+.btn-clr-prog {
+  background:var(--panel2); color:var(--text2);
+  border:1px solid var(--border); border-radius:7px;
+  padding:9px 14px; font-family:'Exo 2',sans-serif;
+  font-size:0.75rem; cursor:pointer; transition:all 0.15s;
+}
+.prog-output {
+  background: var(--display-bg); border:1px solid var(--border);
+  border-radius:8px; padding:10px;
+  font-family:'Share Tech Mono',monospace; font-size:0.73rem;
+  color:var(--text); min-height:60px; white-space:pre-wrap;
+  word-break:break-all; max-height:200px; overflow-y:auto;
+}
+.prog-examples { display:flex; flex-direction:column; gap:5px; }
+.example-item {
+  background:var(--panel2); border:1px solid var(--border);
+  border-radius:6px; padding:7px 10px; cursor:pointer;
+  font-size:0.65rem; color:var(--text2);
+  transition: all 0.12s;
+}
+.example-item:hover { background:var(--panel3); color:var(--text); border-color:var(--border2); }
+.example-item code { color:var(--accent3); font-family:'Share Tech Mono',monospace; }
+
+/* ── HISTORY STRIP ── */
+.history-strip {
+  display: flex; flex-direction:column; gap: 2px;
+  padding: 6px 14px; background: var(--panel2);
+  border-top: 1px solid var(--border);
+  max-height: 80px; overflow-y:auto;
+  scrollbar-width:thin; scrollbar-color:var(--border) transparent;
+}
+.hist-item {
+  font-family:'Share Tech Mono',monospace; font-size:0.63rem;
+  color:var(--text-dim); padding:2px 4px; cursor:pointer;
+  border-radius:3px; display:flex; justify-content:space-between; gap:10px;
+  transition: background 0.1s;
+}
+.hist-item:hover { background:var(--panel3); color:var(--text); }
+.hist-expr { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.hist-res { color:var(--accent); flex-shrink:0; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width:5px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+
+@media (max-width: 700px) {
+  .app { grid-template-columns: 1fr; }
+  .right-panel { max-height: 420px; }
+}
+
+/* ── FULLSCREEN BUTTON ── */
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  position: relative;
+  width: 100%;
+  max-width: 1100px;
+  margin-bottom: 14px;
+}
+.header-row header { margin-bottom: 0; flex: 1; }
+.btn-fullscreen {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,207,255,0.07);
+  border: 1px solid rgba(0,207,255,0.25);
+  border-radius: 8px;
+  color: var(--accent);
+  font-family: 'Exo 2', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.btn-fullscreen:hover { background: rgba(0,207,255,0.14); box-shadow: var(--glow); transform: translateY(-50%) scale(1.02); }
+.btn-fullscreen svg { width:14px; height:14px; fill:currentColor; }
+
+/* Fullscreen mode */
+body.is-fullscreen {
+  padding: 8px;
+  justify-content: flex-start;
+}
+body.is-fullscreen .header-row { margin-bottom: 8px; }
+body.is-fullscreen header h1 { font-size: 1.2rem; }
+body.is-fullscreen header p { display: none; }
+body.is-fullscreen .app { max-width: 100%; }
+
+/* ── VARIABLES TAB ── */
+.vars-area { display: flex; flex-direction: column; gap: 10px; }
+.var-add-row {
+  display: grid;
+  grid-template-columns: 90px 1fr auto;
+  gap: 7px;
+  align-items: center;
+}
+.var-name-input, .var-val-input {
+  background: var(--display-bg);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 8px 10px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--accent4);
+  outline: none;
+  width: 100%;
+  transition: border-color 0.15s;
+}
+.var-name-input:focus, .var-val-input:focus { border-color: var(--accent4); }
+.var-name-input { color: var(--accent3); }
+.btn-var-add {
+  background: var(--accent3-dim); color: var(--accent3);
+  border: 1px solid rgba(109,255,138,0.3); border-radius: 7px;
+  padding: 8px 14px; font-family:'Exo 2',sans-serif;
+  font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em;
+  cursor: pointer; transition: all 0.13s; white-space:nowrap;
+}
+.btn-var-add:hover { background: rgba(109,255,138,0.18); border-color: var(--accent3); }
+
+.var-list { display: flex; flex-direction: column; gap: 4px; max-height: 280px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+.var-item {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 7px 10px;
+  display: grid;
+  grid-template-columns: 80px 1fr auto auto;
+  gap: 8px;
+  align-items: center;
+  transition: all 0.12s;
+}
+.var-item:hover { border-color: var(--border2); }
+.var-item-name {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.78rem; color: var(--accent3); font-weight: bold;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.var-item-val {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem; color: var(--accent4);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.var-item-use {
+  background: var(--accent-dim); color: var(--accent);
+  border: 1px solid rgba(0,207,255,0.2); border-radius: 5px;
+  padding: 4px 9px; font-family:'Exo 2',sans-serif; font-size:0.65rem;
+  font-weight:700; cursor:pointer; transition:all 0.12s; white-space:nowrap;
+}
+.var-item-use:hover { background:rgba(0,207,255,0.2); border-color:var(--accent); }
+.var-item-del {
+  background: rgba(255,74,74,0.08); color:#ff6666;
+  border: 1px solid rgba(255,74,74,0.2); border-radius: 5px;
+  padding: 4px 8px; font-size:0.75rem;
+  cursor:pointer; transition:all 0.12s;
+}
+.var-item-del:hover { background:rgba(255,74,74,0.18); }
+
+.var-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.var-slot {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.var-slot-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.var-slot-name-input {
+  background: transparent;
+  border: none;
+  font-family: 'Exo 2', sans-serif;
+  font-size: 0.72rem; font-weight: 700;
+  color: var(--text2); letter-spacing: 0.1em;
+  outline: none; width: 130px;
+  text-transform: uppercase;
+}
+.var-slot-name-input:focus { color: var(--text); }
+.var-slot-btns { display: flex; gap: 5px; }
+.btn-slot {
+  font-family: 'Exo 2', sans-serif;
+  font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em;
+  border-radius: 5px; padding: 4px 10px; cursor: pointer;
+  transition: all 0.12s; text-transform: uppercase;
+}
+.btn-slot-save { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(0,207,255,0.25); }
+.btn-slot-save:hover { background: rgba(0,207,255,0.2); border-color:var(--accent); }
+.btn-slot-load { background: var(--accent3-dim); color: var(--accent3); border: 1px solid rgba(109,255,138,0.25); }
+.btn-slot-load:hover { background: rgba(109,255,138,0.2); border-color:var(--accent3); }
+.btn-slot-clear { background: rgba(255,74,74,0.07); color:#ff6666; border: 1px solid rgba(255,74,74,0.2); }
+.btn-slot-clear:hover { background:rgba(255,74,74,0.15); }
+.var-slot-preview {
+  padding: 6px 12px 8px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.62rem; color: var(--text-dim);
+  min-height: 22px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.var-slot-preview.has-data { color: var(--text2); }
+
+.var-export-row { display: flex; gap: 6px; }
+.btn-export {
+  flex: 1;
+  background: var(--panel2); color: var(--text2);
+  border: 1px solid var(--border); border-radius:7px;
+  padding:8px; font-family:'Exo 2',sans-serif;
+  font-size:0.68rem; font-weight:700; letter-spacing:0.08em;
+  cursor:pointer; transition:all 0.13s; text-align:center;
+  text-transform:uppercase;
+}
+.btn-export:hover { background:var(--panel3); color:var(--text); border-color:var(--border2); }
+
+.toast {
+  position: fixed;
+  bottom: 24px; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--panel3);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-family: 'Exo 2', sans-serif;
+  font-size: 0.78rem; font-weight: 600;
+  color: var(--accent);
+  box-shadow: var(--glow), var(--shadow);
+  opacity: 0;
+  transition: all 0.3s ease;
+  pointer-events: none;
+  z-index: 9999;
+  letter-spacing: 0.05em;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── GREEK QUICK-INPUT BAR ── */
+.greek-bar {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 10px;
+}
+.greek-bar-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding-top: 2px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.greek-keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+.gk {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.82rem;
+  background: var(--panel3);
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  padding: 3px 6px;
+  cursor: pointer;
+  color: var(--accent3);
+  transition: all 0.1s;
+  user-select: none;
+  min-width: 26px;
+  text-align: center;
+  line-height: 1.3;
+}
+.gk:hover { background: rgba(109,255,138,0.12); border-color: var(--accent3); transform: scale(1.1); }
+.gk:active { transform: scale(0.95); }
+.gk.upper { color: var(--accent); border-color: rgba(0,207,255,0.2); }
+.gk.upper:hover { background: rgba(0,207,255,0.1); border-color: var(--accent); }
+
+.header-img {
+  width: 245px;        /* Breite des Bildes */
+  height: 140px;        /* Höhe des Bildes */
+  object-fit: cover;   /* Verhindert Verzerrung */
+  border-radius: 15%;  /* Macht das Bild rund */
+  border: 2px solid var(--clr-primary); /* Ein feiner Rahmen in der aktuellen Themenfarbe */
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  transition: border-color 1s linear; /* Damit der Rahmen mit dem Auto-Hue mitfließt */
+  float: left;
+  margin-right: 100px;
+}
+</style>
+</head>
+<body>
+<div class="header-row">
+  <header>
+    <img src="Zami_Calc.jpg" alt="Zaminia" class="header-img">
+        <button class="btn-fullscreen" id="btn-fs" onclick="toggleFullscreen()">
+      <svg id="fs-icon-expand" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+      <svg id="fs-icon-shrink" viewBox="0 0 24 24" style="display:none"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
+      <span id="fs-label">Vollbild</span>
+    </button>
+    <h1>ZAMI PHYSCALC PRO</h1>
+    <p>Wissenschaftlicher Rechner · CODATA 2022 · SI-Einheiten · Analyse &amp; Grafik</p>
+
+  </header>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<div class="app">
+  <!-- ═══════════════ LEFT ═══════════════ -->
+  <div class="left-panel">
+    <div class="display-wrap">
+      <div class="display-top">
+        <div class="display-badges">
+          <span class="badge badge-angle" id="badge-angle">RAD</span>
+          <span class="badge badge-mem" id="badge-mem">MEM</span>
+          <span class="badge badge-err" id="badge-err">ERR</span>
+        </div>
+        <div style="font-size:0.6rem;color:var(--text-dim);font-family:'Share Tech Mono',monospace;" id="badge-mem-val"></div>
+      </div>
+      <div class="display-expr" id="expr-display">&#8203;</div>
+      <div class="display-main" id="main-display">0</div>
+    </div>
+
+    <div class="btn-grid">
+      <!-- Row 1: Mode / clear -->
+      <button class="btn-shift" id="shift-btn" onclick="toggleShift()">2nd</button>
+      <button class="btn-fn" onclick="toggleAngle()" title="Winkeleinheit umschalten">DEG/RAD</button>
+      <button class="btn-fn" id="fn-log" onclick="inputFn('log(')">log₁₀</button>
+      <button class="btn-fn" id="fn-ln"  onclick="inputFn('ln(')">ln</button>
+      <button class="btn-clr btn-op" onclick="clearAll()">AC</button>
+
+      <!-- Row 2: Trig -->
+      <button class="btn-fn" id="fn-sin" onclick="inputFn('sin(')">sin</button>
+      <button class="btn-fn" id="fn-cos" onclick="inputFn('cos(')">cos</button>
+      <button class="btn-fn" id="fn-tan" onclick="inputFn('tan(')">tan</button>
+      <button class="btn-fn" onclick="inputFn('sqrt(')">√x</button>
+      <button class="btn-op" onclick="deleteLast()">⌫</button>
+
+      <!-- Row 3: Inverse trig -->
+      <button class="btn-fn" id="fn-asin" onclick="inputFn('asin(')">asin</button>
+      <button class="btn-fn" id="fn-acos" onclick="inputFn('acos(')">acos</button>
+      <button class="btn-fn" id="fn-atan" onclick="inputFn('atan(')">atan</button>
+      <button class="btn-fn" onclick="inputFn('cbrt(')">∛x</button>
+      <button class="btn-fn" onclick="inputFn('abs(')">|x|</button>
+
+      <!-- Row 4: Hyp + pow -->
+      <button class="btn-fn" onclick="inputFn('sinh(')">sinh</button>
+      <button class="btn-fn" onclick="inputFn('cosh(')">cosh</button>
+      <button class="btn-fn" onclick="inputFn('tanh(')">tanh</button>
+      <button class="btn-fn" onclick="inputFn('pow(',',')">xʸ</button>
+      <button class="btn-fn" onclick="inputFn('factorial(')">n!</button>
+
+      <!-- Row 5: exp/log special -->
+      <button class="btn-fn" onclick="inputFn('exp(')">eˣ</button>
+      <button class="btn-fn" onclick="inputFn('log2(')">log₂</button>
+      <button class="btn-fn" onclick="negate()">±</button>
+      <button class="btn-op" onclick="appendChar('(')">(</button>
+      <button class="btn-op" onclick="appendChar(')')">)</button>
+
+      <!-- Row 6: 7 8 9 ÷ MS -->
+      <button onclick="appendChar('7')">7</button>
+      <button onclick="appendChar('8')">8</button>
+      <button onclick="appendChar('9')">9</button>
+      <button class="btn-op" onclick="appendChar('/')">÷</button>
+      <button class="btn-fn" onclick="memStore()" title="Memory Store">MS</button>
+
+      <!-- Row 7: 4 5 6 × MR -->
+      <button onclick="appendChar('4')">4</button>
+      <button onclick="appendChar('5')">5</button>
+      <button onclick="appendChar('6')">6</button>
+      <button class="btn-op" onclick="appendChar('*')">×</button>
+      <button class="btn-fn" onclick="memRecall()" title="Memory Recall">MR</button>
+
+      <!-- Row 8: 1 2 3 - M+ -->
+      <button onclick="appendChar('1')">1</button>
+      <button onclick="appendChar('2')">2</button>
+      <button onclick="appendChar('3')">3</button>
+      <button class="btn-op" onclick="appendChar('-')">−</button>
+      <button class="btn-fn" onclick="memAdd()" title="Memory Add">M+</button>
+
+      <!-- Row 9: 0 . EE + MC -->
+      <button onclick="appendChar('0')">0</button>
+      <button onclick="appendChar('.')">.</button>
+      <button class="btn-fn" onclick="appendChar('e')">×10ⁿ</button>
+      <button class="btn-op" onclick="appendChar('+')">+</button>
+      <button class="btn-fn" onclick="memClear()" title="Memory Clear">MC</button>
+
+      <!-- Row 10: constants + = -->
+      <button class="btn-const" onclick="appendConst('PI')" title="Pi">π</button>
+      <button class="btn-const" onclick="appendConst('E')" title="Euler">e</button>
+      <button class="btn-const" onclick="appendConst('kB')" title="Boltzmann">k_B</button>
+      <button class="btn-op" onclick="percent()">%</button>
+      <button class="btn-eq" onclick="calculate()">=</button>
+    </div>
+
+    <!-- History -->
+    <div class="history-strip" id="history-strip" style="display:none;"></div>
+  </div>
+
+  <!-- ═══════════════ RIGHT ═══════════════ -->
+  <div class="right-panel">
+    <div class="tab-bar">
+      <button class="tab active" onclick="switchTab('constants')">Konstanten</button>
+      <button class="tab" onclick="switchTab('units')">Einheiten</button>
+      <button class="tab" onclick="switchTab('stats')">Statistik</button>
+      <button class="tab" onclick="switchTab('matrix')">Matrix</button>
+      <button class="tab" onclick="switchTab('graph')">Grafik</button>
+      <button class="tab" onclick="switchTab('program')">Programm</button>
+      <button class="tab" onclick="switchTab('variables')" id="tab-btn-variables" style="color:var(--accent4)">Variablen</button>
+    </div>
+
+    <!-- CONSTANTS -->
+    <div class="tab-content active" id="tab-constants">
+      <div class="tab-inner">
+        <div class="sec-title">CODATA 2022 — Physikalische Konstanten</div>
+        <div class="cat-tabs" id="cat-tabs">
+          <button class="cat-btn active" onclick="showCat('universal',this)">Universal</button>
+          <button class="cat-btn" onclick="showCat('electro',this)">Elektro</button>
+          <button class="cat-btn" onclick="showCat('atomic',this)">Atom</button>
+          <button class="cat-btn" onclick="showCat('thermo',this)">Thermo</button>
+          <button class="cat-btn" onclick="showCat('nuclear',this)">Nuklear</button>
+        </div>
+        <div class="const-list" id="const-list"></div>
+      </div>
+    </div>
+
+    <!-- UNITS -->
+    <div class="tab-content" id="tab-units">
+      <div class="tab-inner">
+        <div class="sec-title">Einheitenumrechner</div>
+        <div class="unit-grid" id="unit-grid"></div>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="tab-content" id="tab-stats">
+      <div class="tab-inner">
+        <div class="sec-title">Statistikanalyse</div>
+        <div class="stats-area">
+          <div style="font-size:0.68rem;color:var(--text2);">Werte eingeben (kommagetrennt oder Zeilenweise):</div>
+          <textarea class="stats-input" id="stats-input" placeholder="z.B.: 1.2, 3.4, 5.6, 7.8, 9.0"></textarea>
+          <button class="btn-analyze" onclick="analyzeStats()">Analysieren</button>
+          <div class="stats-grid" id="stats-grid"></div>
+          <div class="histogram" id="histogram"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MATRIX -->
+    <div class="tab-content" id="tab-matrix">
+      <div class="tab-inner">
+        <div class="sec-title">Matrizenrechner</div>
+        <div class="matrix-area">
+          <div class="matrix-size-row">
+            <label>Matrix A:</label>
+            <select class="mx-sel" id="mx-size-a" onchange="buildMatrixInputs('a')">
+              <option value="2">2×2</option>
+              <option value="3">3×3</option>
+              <option value="4">4×4</option>
+            </select>
+            <label style="margin-left:12px;">Matrix B:</label>
+            <select class="mx-sel" id="mx-size-b" onchange="buildMatrixInputs('b')">
+              <option value="2">2×2</option>
+              <option value="3">3×3</option>
+              <option value="4">4×4</option>
+            </select>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div>
+              <div style="font-size:0.62rem;color:var(--accent4);letter-spacing:0.1em;margin-bottom:5px;">MATRIX A</div>
+              <div class="matrix-inputs" id="mx-a"></div>
+            </div>
+            <div>
+              <div style="font-size:0.62rem;color:var(--accent4);letter-spacing:0.1em;margin-bottom:5px;">MATRIX B</div>
+              <div class="matrix-inputs" id="mx-b"></div>
+            </div>
+          </div>
+          <div class="mx-ops">
+            <button class="mx-btn" onclick="matOp('add')">A + B</button>
+            <button class="mx-btn" onclick="matOp('sub')">A − B</button>
+            <button class="mx-btn" onclick="matOp('mul')">A × B</button>
+            <button class="mx-btn" onclick="matOp('det')">det(A)</button>
+            <button class="mx-btn" onclick="matOp('tr')">tr(A)</button>
+            <button class="mx-btn" onclick="matOp('inv')">A⁻¹</button>
+            <button class="mx-btn" onclick="matOp('tpose')">Aᵀ</button>
+          </div>
+          <div class="mx-result" id="mx-result">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GRAPH -->
+    <div class="tab-content" id="tab-graph">
+      <div class="tab-inner">
+        <div class="sec-title">Funktionsplotter</div>
+        <div class="graph-area">
+          <div>
+            <div class="fn-row">
+              <span class="fn-label" style="color:var(--accent);">f(x) =</span>
+              <input class="graph-input" id="gfn1" value="sin(x)" onkeydown="if(event.key==='Enter')plotGraph()">
+            </div>
+            <div class="fn-row" style="margin-top:6px;">
+              <span class="fn-label" style="color:var(--accent2);">g(x) =</span>
+              <input class="graph-input" id="gfn2" placeholder="optional z.B. cos(x)" onkeydown="if(event.key==='Enter')plotGraph()">
+            </div>
+            <div class="fn-row" style="margin-top:6px;">
+              <span class="fn-label" style="color:var(--accent3);">h(x) =</span>
+              <input class="graph-input" id="gfn3" placeholder="optional z.B. x**2/10" onkeydown="if(event.key==='Enter')plotGraph()">
+            </div>
+          </div>
+          <div class="range-row">
+            <span class="range-label">x von</span>
+            <input class="range-input" id="xmin" value="-10">
+            <span class="range-label">bis</span>
+            <input class="range-input" id="xmax" value="10">
+            <span class="range-label">y von</span>
+            <input class="range-input" id="ymin" value="-2">
+            <span class="range-label">bis</span>
+            <input class="range-input" id="ymax" value="2">
+          </div>
+          <button class="btn-plot" onclick="plotGraph()">▶ Plotten</button>
+          <canvas id="plot-canvas" width="560" height="320"></canvas>
+          <div class="plot-info" id="plot-info"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROGRAM -->
+    <div class="tab-content" id="tab-program">
+      <div class="tab-inner">
+        <div class="sec-title">Programmierumgebung</div>
+        <div class="prog-area">
+          <div style="font-size:0.65rem;color:var(--text2);">
+            Alle physik. Konstanten und Math-Funktionen stehen zur Verfügung.<br>
+            <code style="color:var(--accent3);font-family:monospace;">print(wert)</code> oder <code style="color:var(--accent3);font-family:monospace;">result(wert)</code> für Ausgaben.
+          </div>
+          <textarea class="prog-editor" id="prog-editor" spellcheck="false"
+>// Schwarzkörperstrahlung — Wien-Verschiebungsgesetz
+// Maximale Wellenlänge bei Temperatur T
+let T = 5778;          // Sonnenoberfläche in Kelvin
+let lam_max = b / T;   // b = Wien-Konstante
+print("λ_max = " + (lam_max * 1e9).toFixed(2) + " nm");
+print("(sichtbares Licht: 380–700 nm)");</textarea>
+          <div class="prog-btns">
+            <button class="btn-run" onclick="runProgram()">▶ Ausführen</button>
+            <button class="btn-clr-prog" onclick="clearProgram()">Löschen</button>
+          </div>
+          <div class="prog-output" id="prog-output">Ausgabe erscheint hier…</div>
+
+          <div class="sec-title" style="margin-top:8px;">Beispielprogramme</div>
+          <div class="prog-examples">
+            <div class="example-item" onclick="loadExample('planck')">
+              <code>Planck-Strahlung</code> — Energie des Photons für Wellenlänge λ
+            </div>
+            <div class="example-item" onclick="loadExample('relativity')">
+              <code>Relativität</code> — Lorentz-Faktor &amp; kinetische Energie
+            </div>
+            <div class="example-item" onclick="loadExample('hydrogen')">
+              <code>Wasserstoff</code> — Energieniveaus &amp; Spektrallinien (Balmer)
+            </div>
+            <div class="example-item" onclick="loadExample('gravity')">
+              <code>Gravitation</code> — Fluchtgeschwindigkeit &amp; Schwarzschildradius
+            </div>
+            <div class="example-item" onclick="loadExample('quantum')">
+              <code>Quantenmechanik</code> — Heisenberg-Unschärfe &amp; de-Broglie-Wellenlänge
+            </div>
+            <div class="example-item" onclick="loadExample('thermo')">
+              <code>Thermodynamik</code> — Boltzmann-Verteilung &amp; mittlere Geschwindigkeit
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- VARIABLES -->
+    <div class="tab-content" id="tab-variables">
+      <div class="tab-inner">
+        <div class="sec-title">Eigene Variablen</div>
+        <div class="vars-area">
+          <div style="font-size:0.67rem;color:var(--text2);">Variablen stehen in Rechner &amp; Programm zur Verfügung.</div>
+          <div class="var-add-row">
+            <input class="var-name-input" id="var-new-name" placeholder="z.B. λ, ω, α₀" maxlength="24" onkeydown="if(event.key==='Enter')addVar()">
+            <input class="var-val-input"  id="var-new-val"  placeholder="Wert oder Ausdruck (z.B. 2*pi)" onkeydown="if(event.key==='Enter')addVar()">
+            <button class="btn-var-add" onclick="addVar()">+ Hinzufügen</button>
+          </div>
+          <div class="greek-bar">
+            <span class="greek-bar-label">Griechisch:</span>
+            <div class="greek-keys" id="greek-keys"></div>
+          </div>
+          <div class="var-list" id="var-list"></div>
+
+          <div class="sec-title" style="margin-top:6px;">Speicherplätze (6 Slots)</div>
+          <div class="var-slots" id="var-slots"></div>
+
+          <div class="sec-title" style="margin-top:6px;">Import / Export</div>
+          <div class="var-export-row">
+            <button class="btn-export" onclick="exportVars()">⬇ Export JSON</button>
+            <label class="btn-export" style="cursor:pointer;">
+              ⬆ Import JSON
+              <input type="file" accept=".json" style="display:none" onchange="importVars(event)">
+            </label>
+            <button class="btn-export" onclick="clearAllVars()" style="color:#ff6666;">✕ Alle löschen</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  PHYSICAL CONSTANTS – CODATA 2022 / NIST
+// ═══════════════════════════════════════════════════════════════
+const PHYS_CONST = {
+  universal: [
+    {sym:'c',   name:'Lichtgeschwindigkeit',       val:299792458,            unit:'m/s',      desc:'2.99792458×10⁸'},
+    {sym:'G',   name:'Gravitationskonstante',      val:6.67430e-11,          unit:'m³/(kg·s²)',desc:'6.67430×10⁻¹¹'},
+    {sym:'h',   name:'Planck-Konstante',           val:6.62607015e-34,       unit:'J·s',      desc:'6.62607015×10⁻³⁴'},
+    {sym:'ℏ',   name:'Red. Planck-Konstante',      val:1.054571817e-34,      unit:'J·s',      desc:'1.054571817×10⁻³⁴'},
+    {sym:'NA',  name:'Avogadro-Konstante',         val:6.02214076e23,        unit:'1/mol',    desc:'6.02214076×10²³'},
+    {sym:'R',   name:'Gaskonstante',               val:8.314462618,          unit:'J/(mol·K)',desc:'8.314462618'},
+    {sym:'kB',  name:'Boltzmann-Konstante',        val:1.380649e-23,         unit:'J/K',      desc:'1.380649×10⁻²³'},
+    {sym:'σ',   name:'Stefan-Boltzmann',           val:5.670374419e-8,       unit:'W/(m²K⁴)', desc:'5.6704×10⁻⁸'},
+    {sym:'μ₀',  name:'Magn. Permeabilität',        val:1.25663706212e-6,     unit:'N/A²',     desc:'1.25664×10⁻⁶'},
+    {sym:'ε₀',  name:'Elekt. Permittivität',       val:8.8541878128e-12,     unit:'F/m',      desc:'8.85419×10⁻¹²'},
+    {sym:'b',   name:'Wien-Konstante',              val:2.897771955e-3,       unit:'m·K',      desc:'2.89777×10⁻³'},
+    {sym:'c₁',  name:'1. Strahlungskonstante',     val:3.741771852e-16,      unit:'W·m²',     desc:'3.74177×10⁻¹⁶'},
+    {sym:'c₂',  name:'2. Strahlungskonstante',     val:1.438776877e-2,       unit:'m·K',      desc:'1.43878×10⁻²'},
+  ],
+  electro: [
+    {sym:'e',   name:'Elementarladung',            val:1.602176634e-19,      unit:'C',        desc:'1.602176634×10⁻¹⁹'},
+    {sym:'me',  name:'Elektronenmasse',            val:9.1093837139e-31,     unit:'kg',       desc:'9.10938×10⁻³¹'},
+    {sym:'mp',  name:'Protonenmasse',              val:1.67262192595e-27,    unit:'kg',       desc:'1.67262×10⁻²⁷'},
+    {sym:'mn',  name:'Neutronenmasse',             val:1.67492750056e-27,    unit:'kg',       desc:'1.67493×10⁻²⁷'},
+    {sym:'α',   name:'Feinstrukturkonstante',      val:7.2973525643e-3,      unit:'—',        desc:'7.29736×10⁻³'},
+    {sym:'μB',  name:'Bohr-Magneton',              val:9.2740100657e-24,     unit:'J/T',      desc:'9.27401×10⁻²⁴'},
+    {sym:'μN',  name:'Kernmagneton',               val:5.0507837393e-27,     unit:'J/T',      desc:'5.05078×10⁻²⁷'},
+    {sym:'Φ₀',  name:'Magnetisches Flussquant',    val:2.067833848e-15,      unit:'Wb',       desc:'2.06783×10⁻¹⁵'},
+    {sym:'KJ',  name:'Josephson-Konstante',        val:483597.9e9,           unit:'Hz/V',     desc:'4.83598×10¹⁴'},
+    {sym:'RK',  name:'v.-Klitzing-Konstante',      val:25812.80745,          unit:'Ω',        desc:'25812.80745'},
+    {sym:'F',   name:'Faraday-Konstante',          val:96485.33212,          unit:'C/mol',    desc:'96485.33212'},
+    {sym:'re',  name:'Klassischer e⁻-Radius',      val:2.8179403205e-15,     unit:'m',        desc:'2.81794×10⁻¹⁵'},
+  ],
+  atomic: [
+    {sym:'a₀',  name:'Bohrscher Radius',           val:5.29177210544e-11,    unit:'m',        desc:'5.29177×10⁻¹¹'},
+    {sym:'Ry',  name:'Rydberg-Energie',            val:2.1798723611e-18,     unit:'J',        desc:'2.17987×10⁻¹⁸'},
+    {sym:'R∞',  name:'Rydberg-Konstante',          val:10973731.568157,      unit:'1/m',      desc:'1.09737×10⁷'},
+    {sym:'u',   name:'Atomare Masseneinheit',      val:1.66053906660e-27,    unit:'kg',       desc:'1.66054×10⁻²⁷'},
+    {sym:'Eh',  name:'Hartree-Energie',            val:4.3597447222071e-18,  unit:'J',        desc:'4.35974×10⁻¹⁸'},
+    {sym:'λC',  name:'Compton-Wellenlänge',        val:2.42631023538e-12,    unit:'m',        desc:'2.42631×10⁻¹²'},
+    {sym:'eV',  name:'Elektronenvolt',             val:1.602176634e-19,      unit:'J',        desc:'1.60218×10⁻¹⁹'},
+    {sym:'mμ',  name:'Muonmasse',                  val:1.883531627e-28,      unit:'kg',       desc:'1.88353×10⁻²⁸'},
+    {sym:'ge',  name:'Elektron g-Faktor',          val:2.00231930436256,     unit:'—',        desc:'2.00231930436256'},
+  ],
+  thermo: [
+    {sym:'T₀',  name:'0°C in Kelvin',              val:273.15,               unit:'K',        desc:'273.15'},
+    {sym:'atm', name:'Normaldruck',                val:101325,               unit:'Pa',       desc:'101325'},
+    {sym:'g₀',  name:'Normfallbeschleunigung',     val:9.80665,              unit:'m/s²',     desc:'9.80665'},
+    {sym:'VM',  name:'Molvolumen (STP)',            val:22.41396954e-3,       unit:'m³/mol',   desc:'22.414×10⁻³'},
+    {sym:'Cp',  name:'Wärmekapazität Luft',        val:1005.0,               unit:'J/(kg·K)', desc:'1005'},
+    {sym:'Hv',  name:'Verdampfungsenthalpie H₂O',  val:2.257e6,              unit:'J/kg',     desc:'2.257×10⁶'},
+    {sym:'Hf',  name:'Schmelzenthalpie Eis',       val:333500,               unit:'J/kg',     desc:'3.335×10⁵'},
+    {sym:'nA',  name:'Normaldichte Luft (0°C)',    val:1.2929,               unit:'kg/m³',    desc:'1.2929'},
+  ],
+  nuclear: [
+    {sym:'mn',  name:'Neutronenmasse',             val:1.67492750056e-27,    unit:'kg',       desc:'1.67493×10⁻²⁷'},
+    {sym:'mp',  name:'Protonenmasse',              val:1.67262192595e-27,    unit:'kg',       desc:'1.67262×10⁻²⁷'},
+    {sym:'mα',  name:'Alpha-Teilchenmasse',        val:6.6446573357e-27,     unit:'kg',       desc:'6.64466×10⁻²⁷'},
+    {sym:'mD',  name:'Deuteronmasse',              val:3.3435837768e-27,     unit:'kg',       desc:'3.34358×10⁻²⁷'},
+    {sym:'EB',  name:'Bindungsenergie D (MeV)',    val:3.56418e-13,          unit:'J',        desc:'2.224 MeV'},
+    {sym:'r₀',  name:'Kernradius-Konstante',       val:1.2e-15,              unit:'m',        desc:'1.2×10⁻¹⁵'},
+    {sym:'τn',  name:'Neutron Halbwertszeit',      val:879.4,                unit:'s',        desc:'879.4 s'},
+    {sym:'σT',  name:'Thomson-Querschnitt',        val:6.6524587158e-29,     unit:'m²',       desc:'6.65246×10⁻²⁹'},
+  ]
+};
+
+// ═══════════════════════════════════════════════════════════════
+//  UNIT CONVERSIONS
+// ═══════════════════════════════════════════════════════════════
+const UNIT_CATS = [
+  {
+    name:'Länge', units:[
+      {n:'Meter (m)', f:1},
+      {n:'Kilometer (km)', f:1000},
+      {n:'Zentimeter (cm)', f:0.01},
+      {n:'Millimeter (mm)', f:0.001},
+      {n:'Mikrometer (μm)', f:1e-6},
+      {n:'Nanometer (nm)', f:1e-9},
+      {n:'Ångström (Å)', f:1e-10},
+      {n:'Meile (mi)', f:1609.344},
+      {n:'Yard (yd)', f:0.9144},
+      {n:'Fuß (ft)', f:0.3048},
+      {n:'Zoll (in)', f:0.0254},
+      {n:'Seemeile (nmi)', f:1852},
+      {n:'Lichtjahr (ly)', f:9.4607304725808e15},
+      {n:'Parsec (pc)', f:3.085677581e16},
+      {n:'Astron. Einheit (AU)', f:1.495978707e11},
+    ]
+  },
+  {
+    name:'Masse', units:[
+      {n:'Kilogramm (kg)', f:1},
+      {n:'Gramm (g)', f:0.001},
+      {n:'Milligramm (mg)', f:1e-6},
+      {n:'Mikrogramm (μg)', f:1e-9},
+      {n:'Tonne (t)', f:1000},
+      {n:'Pfund (lb)', f:0.45359237},
+      {n:'Unze (oz)', f:0.028349523125},
+      {n:'Atomare Masseneinheit (u)', f:1.66053906660e-27},
+      {n:'Elektronenmasse (mₑ)', f:9.1093837139e-31},
+      {n:'Karat (ct)', f:2e-4},
+    ]
+  },
+  {
+    name:'Energie', units:[
+      {n:'Joule (J)', f:1},
+      {n:'Kilojoule (kJ)', f:1000},
+      {n:'Megajoule (MJ)', f:1e6},
+      {n:'Kalorie (cal)', f:4.184},
+      {n:'Kilokalorie (kcal)', f:4184},
+      {n:'Kilowattstunde (kWh)', f:3.6e6},
+      {n:'Elektronenvolt (eV)', f:1.602176634e-19},
+      {n:'Mega-eV (MeV)', f:1.602176634e-13},
+      {n:'Giga-eV (GeV)', f:1.602176634e-10},
+      {n:'Erg', f:1e-7},
+      {n:'BTU', f:1055.06},
+      {n:'Hartree (Eₕ)', f:4.3597447222071e-18},
+    ]
+  },
+  {
+    name:'Druck', units:[
+      {n:'Pascal (Pa)', f:1},
+      {n:'Kilopascal (kPa)', f:1000},
+      {n:'Megapascal (MPa)', f:1e6},
+      {n:'Bar', f:1e5},
+      {n:'Millibar (mbar)', f:100},
+      {n:'Atmosphäre (atm)', f:101325},
+      {n:'Torr (mmHg)', f:133.322},
+      {n:'psi', f:6894.757},
+    ]
+  },
+  {
+    name:'Temperatur', units:[
+      {n:'Kelvin (K)', f:null, toK:v=>v, fromK:v=>v},
+      {n:'Celsius (°C)', f:null, toK:v=>v+273.15, fromK:v=>v-273.15},
+      {n:'Fahrenheit (°F)', f:null, toK:v=>(v-32)*5/9+273.15, fromK:v=>(v-273.15)*9/5+32},
+      {n:'Rankine (°R)', f:null, toK:v=>v*5/9, fromK:v=>v*9/5},
+    ]
+  },
+  {
+    name:'Zeit', units:[
+      {n:'Sekunde (s)', f:1},
+      {n:'Millisekunde (ms)', f:0.001},
+      {n:'Mikrosekunde (μs)', f:1e-6},
+      {n:'Nanosekunde (ns)', f:1e-9},
+      {n:'Minute (min)', f:60},
+      {n:'Stunde (h)', f:3600},
+      {n:'Tag (d)', f:86400},
+      {n:'Woche', f:604800},
+      {n:'Jahr (a)', f:31557600},
+    ]
+  },
+  {
+    name:'Geschwindigkeit', units:[
+      {n:'m/s', f:1},
+      {n:'km/h', f:1/3.6},
+      {n:'mph', f:0.44704},
+      {n:'Knoten (kn)', f:0.514444},
+      {n:'ft/s', f:0.3048},
+      {n:'Mach (≈ 340 m/s)', f:340.29},
+      {n:'% Lichtgeschw.', f:2997924.58},
+    ]
+  },
+];
+
+// ═══════════════════════════════════════════════════════════════
+//  CALCULATOR STATE
+// ═══════════════════════════════════════════════════════════════
+let expr = '';
+let memory = 0;
+let memHasValue = false;
+let angleMode = 'rad';
+let history = [];
+let currentCat = 'universal';
+
+// ─── Display ───
+function updateDisplay(main, isError=false) {
+  const d = document.getElementById('main-display');
+  d.textContent = (main === '' || main === undefined) ? '0' : main;
+  d.classList.toggle('error', isError);
+  document.getElementById('badge-err').classList.toggle('show', isError);
+  const exprEl = document.getElementById('expr-display');
+  const pretty = formatExpr(expr);
+  exprEl.textContent = pretty || '\u200b';
+}
+
+function flashResult() {
+  const d = document.getElementById('main-display');
+  d.classList.remove('result-flash');
+  void d.offsetWidth;
+  d.classList.add('result-flash');
+}
+
+// ─── Input ───
+function appendChar(ch) {
+  const ops = ['+','-','*','/','(',')','.','e'];
+  const last = expr.slice(-1);
+  if (ch === '.' && expr.slice(expr.lastIndexOf(/[+\-*/()e]/.exec(expr)?.index??-1)+1).includes('.')) return;
+  expr += ch;
+  updateDisplay(formatExpr(expr));
+}
+
+function appendConst(name) {
+  const map = {PI:'Math.PI', E:'Math.E', kB:'1.380649e-23'};
+  expr += map[name] || name;
+  updateDisplay(formatExpr(expr));
+}
+
+function inputFn(fn) {
+  expr += fn;
+  updateDisplay(formatExpr(expr));
+}
+
+function deleteLast() {
+  if (!expr) return;
+  // If ends with a keyword, delete the whole keyword
+  const keywords = ['Math.PI','Math.E','sin(','cos(','tan(','asin(','acos(','atan(','sqrt(','cbrt(','abs(','log(','ln(','log2(','exp(','sinh(','cosh(','tanh(','pow(','factorial('];
+  for (const kw of keywords) {
+    if (expr.endsWith(kw)) { expr = expr.slice(0,-kw.length); updateDisplay(formatExpr(expr)||'0'); return; }
+  }
+  expr = expr.slice(0,-1);
+  updateDisplay(formatExpr(expr) || '0');
+}
+
+function clearAll() {
+  expr = '';
+  updateDisplay('0');
+  document.getElementById('badge-err').classList.remove('show');
+}
+
+function negate() {
+  if (!expr) return;
+  if (expr.startsWith('-(') && expr.endsWith(')')) {
+    expr = expr.slice(2,-1);
+  } else {
+    expr = `-(${expr})`;
+  }
+  updateDisplay(formatExpr(expr));
+}
+
+function percent() {
+  if (!expr) return;
+  expr = `(${expr})/100`;
+  updateDisplay(formatExpr(expr));
+}
+
+function formatExpr(e) {
+  return e
+    .replace(/Math\.PI/g,'π')
+    .replace(/Math\.E(?![0-9])/g,'e')
+    .replace(/\*/g,'×')
+    .replace(/\//g,'÷');
+}
+
+// ─── Scope ───
+function buildScope() {
+  const deg = angleMode === 'deg';
+  const toR = deg ? x=>x*Math.PI/180 : x=>x;
+  const frR = deg ? x=>x*180/Math.PI : x=>x;
+  return {
+    sin:x=>Math.sin(toR(x)), cos:x=>Math.cos(toR(x)), tan:x=>Math.tan(toR(x)),
+    asin:x=>frR(Math.asin(x)), acos:x=>frR(Math.acos(x)), atan:x=>frR(Math.atan(x)),
+    atan2:(y,x)=>frR(Math.atan2(y,x)),
+    sinh:Math.sinh, cosh:Math.cosh, tanh:Math.tanh,
+    asinh:Math.asinh, acosh:Math.acosh, atanh:Math.atanh,
+    sqrt:Math.sqrt, cbrt:Math.cbrt, abs:Math.abs,
+    log:Math.log10, ln:Math.log, log2:Math.log2, log10:Math.log10,
+    exp:Math.exp, pow:Math.pow,
+    floor:Math.floor, ceil:Math.ceil, round:Math.round,
+    min:Math.min, max:Math.max, sign:Math.sign,
+    factorial:n=>{if(n<0)return NaN;if(n===0||n===1)return 1;let r=1;for(let i=2;i<=n;i++)r*=i;return r;},
+    gamma:n=>{ /* Stirling approx */ if(n<0.5)return Math.PI/(Math.sin(Math.PI*n)*arguments.callee(1-n)); n--;let x=0.99999999999980993;const c=[676.5203681218851,-1259.1392167224028,771.3234287776531,-176.6150291621406,12.507343278686905,-0.13857109526572012,9.984369578019572e-6,1.5056327351493116e-7];for(let i=0;i<8;i++)x+=c[i]/(n+i+1);const t=n+8-0.5;return Math.sqrt(2*Math.PI)*Math.pow(t,n+0.5)*Math.exp(-t)*x; },
+    // constants
+    pi:Math.PI, PI:Math.PI, e:Math.E, E:Math.E,
+    c:299792458, G:6.67430e-11,
+    h:6.62607015e-34, hbar:1.054571817e-34,
+    mu0:1.25663706212e-6, eps0:8.8541878128e-12,
+    NA:6.02214076e23, R:8.314462618, kB:1.380649e-23,
+    sigma:5.670374419e-8, q:1.602176634e-19,
+    me:9.1093837139e-31, mp:1.67262192595e-27,
+    mn:1.67492750056e-27, u:1.66053906660e-27,
+    muB:9.2740100657e-24, muN:5.0507837393e-27,
+    a0:5.29177210544e-11, Ry:2.1798723611e-18,
+    Rinf:10973731.568157, Eh:4.3597447222071e-18,
+    F:96485.33212, eV:1.602176634e-19,
+    alpha:7.2973525643e-3, re:2.8179403205e-15,
+    lambdaC:2.42631023538e-12, ge:2.00231930436256,
+    T0:273.15, atm:101325, g0:9.80665,
+    VM:22.41396954e-3, b:2.897771955e-3,
+    c1:3.741771852e-16, c2:1.438776877e-2,
+    Hv:2.257e6, Hf:333500, nA:1.2929,
+    Phi0:2.067833848e-15, KJ:483597.9e9, RK:25812.80745, Cp:1005,
+    r0:1.2e-15, taun:879.4, sigmaT:6.6524587158e-29,
+    malpha:6.6446573357e-27, mD:3.3435837768e-27,
+  };
+}
+
+function safeEval(code) {
+  const scope = buildScope();
+  const fn = new Function(...Object.keys(scope), `"use strict"; return (${code});`);
+  return fn(...Object.values(scope));
+}
+
+function formatResult(n) {
+  if (typeof n !== 'number') return String(n);
+  if (Number.isNaN(n)) return 'NaN';
+  if (!isFinite(n)) return n>0?'+∞':'−∞';
+  const abs = Math.abs(n);
+  if (abs === 0) return '0';
+  if (abs >= 1e-4 && abs < 1e13) return parseFloat(n.toPrecision(10)).toString();
+  return n.toExponential(6).replace('e+','e').replace('e-','e−');
+}
+
+function calculate() {
+  if (!expr.trim()) return;
+  const raw = expr
+    .replace(/×/g,'*').replace(/÷/g,'/')
+    .replace(/π/g,'Math.PI')
+    .replace(/−/g,'-');
+  try {
+    const res = safeEval(raw);
+    const fmt = formatResult(res);
+    addHistory(formatExpr(expr), fmt);
+    expr = fmt.replace('−','-').replace('∞','Infinity');
+    updateDisplay(fmt);
+    flashResult();
+  } catch(err) {
+    const msg = err.message.slice(0,50);
+    updateDisplay('Fehler: '+msg, true);
+  }
+}
+
+// ─── Memory ───
+function tryGetVal() {
+  const raw = expr.replace(/×/g,'*').replace(/÷/g,'/').replace(/π/g,'Math.PI').replace(/−/g,'-');
+  try { return safeEval(raw); } catch(e) { return null; }
+}
+function memStore() {
+  const v = tryGetVal();
+  if (typeof v === 'number') {
+    memory = v; memHasValue = true;
+    const b = document.getElementById('badge-mem');
+    b.classList.add('active');
+    document.getElementById('badge-mem-val').textContent = formatResult(v);
+  }
+}
+function memRecall() {
+  if (!memHasValue) return;
+  expr += memory.toString();
+  updateDisplay(formatExpr(expr));
+}
+function memAdd() {
+  const v = tryGetVal();
+  if (typeof v === 'number') {
+    memory += v; memHasValue = true;
+    document.getElementById('badge-mem').classList.add('active');
+    document.getElementById('badge-mem-val').textContent = formatResult(memory);
+  }
+}
+function memClear() {
+  memory = 0; memHasValue = false;
+  document.getElementById('badge-mem').classList.remove('active');
+  document.getElementById('badge-mem-val').textContent = '';
+}
+
+// ─── Mode ───
+function toggleAngle() {
+  angleMode = angleMode === 'rad' ? 'deg' : 'rad';
+  document.getElementById('badge-angle').textContent = angleMode.toUpperCase();
+}
+
+let shiftActive = false;
+function toggleShift() {
+  shiftActive = !shiftActive;
+  document.getElementById('shift-btn').classList.toggle('active', shiftActive);
+}
+
+// ─── History ───
+function addHistory(e,r) {
+  history.unshift({e,r});
+  if (history.length > 30) history.pop();
+  renderHistory();
+}
+function renderHistory() {
+  const s = document.getElementById('history-strip');
+  if (!history.length) { s.style.display='none'; return; }
+  s.style.display='flex';
+  s.innerHTML = '';
+  history.slice(0,10).forEach(h=>{
+    const d = document.createElement('div');
+    d.className = 'hist-item';
+    d.innerHTML = `<span class="hist-expr">${h.e}</span><span class="hist-res">${h.r}</span>`;
+    d.onclick = ()=>{ expr=h.r.replace('−','-'); updateDisplay(h.r); };
+    s.appendChild(d);
+  });
+}
+
+// ─── Keyboard ───
+document.addEventListener('keydown', ev => {
+  // Skip ALL input fields and textareas — never steal keys from them
+  const tag = document.activeElement?.tagName;
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+
+  const k = ev.key;
+  if ('0123456789'.includes(k)) appendChar(k);
+  else if (k==='.') appendChar('.');
+  else if (k==='+') appendChar('+');
+  else if (k==='-') appendChar('-');
+  else if (k==='*') appendChar('*');
+  else if (k==='/') { ev.preventDefault(); appendChar('/'); }
+  else if (k==='(') appendChar('(');
+  else if (k===')') appendChar(')');
+  else if (k==='Enter'||k==='=') { ev.preventDefault(); calculate(); }
+  else if (k==='Backspace') { ev.preventDefault(); deleteLast(); }
+  else if (k==='Escape') clearAll();
+});
+
+// ═══════════════════════════════════════════════════════════════
+//  TABS
+// ═══════════════════════════════════════════════════════════════
+function switchTab(id) {
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('.tab-bar .tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  CONSTANTS
+// ═══════════════════════════════════════════════════════════════
+function showCat(cat, btn) {
+  currentCat = cat;
+  document.querySelectorAll('#cat-tabs .cat-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderConstants();
+}
+function renderConstants() {
+  const list = document.getElementById('const-list');
+  list.innerHTML = '';
+  (PHYS_CONST[currentCat]||[]).forEach(c=>{
+    const item = document.createElement('div');
+    item.className = 'const-item';
+    item.title = `${c.name}: ${c.val} ${c.unit}\nKlicken zum Einfügen`;
+    item.innerHTML = `<span class="const-sym">${c.sym}</span>
+      <div class="const-info">
+        <div class="const-name">${c.name}</div>
+        <div class="const-val">${c.desc} <span style="color:var(--accent4)">${c.unit}</span></div>
+      </div>`;
+    item.onclick = ()=>{ expr += c.val.toString(); updateDisplay(formatExpr(expr)); };
+    list.appendChild(item);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  UNIT CONVERTER
+// ═══════════════════════════════════════════════════════════════
+function buildUnitConverter() {
+  const grid = document.getElementById('unit-grid');
+  grid.innerHTML = '';
+  UNIT_CATS.forEach((cat,ci)=>{
+    const sec = document.createElement('div');
+    sec.className = 'unit-category';
+    sec.innerHTML = `<div class="unit-cat-label">${cat.name}</div>`;
+
+    const row = document.createElement('div');
+    row.className = 'unit-row';
+
+    const inp = document.createElement('input');
+    inp.className = 'unit-input'; inp.type='text'; inp.value='1';
+    inp.placeholder='Wert'; inp.id=`unit-inp-${ci}`;
+
+    const sel1 = document.createElement('select');
+    sel1.className='unit-sel'; sel1.id=`unit-from-${ci}`;
+    cat.units.forEach((u,i)=>{ const o=document.createElement('option');o.value=i;o.textContent=u.n;sel1.appendChild(o); });
+
+    const arrow = document.createElement('div');
+    arrow.className='unit-arrow'; arrow.textContent='→';
+
+    const sel2 = document.createElement('select');
+    sel2.className='unit-sel'; sel2.id=`unit-to-${ci}`;
+    cat.units.forEach((u,i)=>{ const o=document.createElement('option');o.value=i;o.textContent=u.n;sel2.appendChild(o); });
+    sel2.selectedIndex = Math.min(1, cat.units.length-1);
+
+    const res = document.createElement('div');
+    res.className='unit-result'; res.id=`unit-res-${ci}`;
+    res.textContent='—';
+
+    function doConvert() {
+      const v = parseFloat(inp.value);
+      if (isNaN(v)) { res.textContent='—'; return; }
+      const from = cat.units[+sel1.value];
+      const to   = cat.units[+sel2.value];
+      let result;
+      if (from.toK) {
+        // temperature
+        const kelvin = from.toK(v);
+        result = to.fromK(kelvin);
+      } else {
+        result = v * from.f / to.f;
+      }
+      res.textContent = formatResult(result);
+    }
+
+    inp.addEventListener('input', doConvert);
+    sel1.addEventListener('change', doConvert);
+    sel2.addEventListener('change', doConvert);
+
+    const leftCol = document.createElement('div');
+    leftCol.style.cssText='display:flex;flex-direction:column;gap:5px;';
+    leftCol.appendChild(inp);
+    leftCol.appendChild(sel1);
+
+    const rightCol = document.createElement('div');
+    rightCol.style.cssText='display:flex;flex-direction:column;gap:5px;';
+    rightCol.appendChild(res);
+    rightCol.appendChild(sel2);
+
+    row.appendChild(leftCol);
+    row.appendChild(arrow);
+    row.appendChild(rightCol);
+
+    sec.appendChild(row);
+    grid.appendChild(sec);
+    doConvert();
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  STATISTICS
+// ═══════════════════════════════════════════════════════════════
+function parseNums(str) {
+  return str.split(/[\s,;\n]+/).map(s=>parseFloat(s.trim())).filter(n=>!isNaN(n));
+}
+function analyzeStats() {
+  const nums = parseNums(document.getElementById('stats-input').value);
+  if (nums.length === 0) return;
+  const n = nums.length;
+  const sorted = [...nums].sort((a,b)=>a-b);
+  const sum = nums.reduce((a,b)=>a+b,0);
+  const mean = sum/n;
+  const variance = nums.reduce((a,b)=>a+(b-mean)**2,0)/(n-1||1);
+  const std = Math.sqrt(variance);
+  const min = sorted[0], max = sorted[n-1];
+  const range = max-min;
+  const median = n%2===0 ? (sorted[n/2-1]+sorted[n/2])/2 : sorted[Math.floor(n/2)];
+  const q1 = sorted[Math.floor(n/4)];
+  const q3 = sorted[Math.floor(3*n/4)];
+  const skew = nums.reduce((a,b)=>a+((b-mean)/std)**3,0)/n;
+  const kurtosis = nums.reduce((a,b)=>a+((b-mean)/std)**4,0)/n - 3;
+  const geomMean = Math.exp(nums.reduce((a,b)=>a+Math.log(Math.abs(b)),0)/n);
+
+  const cards = [
+    {l:'Anzahl n', v:n},
+    {l:'Summe', v:formatResult(sum)},
+    {l:'Mittelwert (μ)', v:formatResult(mean)},
+    {l:'Median', v:formatResult(median)},
+    {l:'Standardabw. (σ)', v:formatResult(std)},
+    {l:'Varianz (σ²)', v:formatResult(variance)},
+    {l:'Minimum', v:formatResult(min)},
+    {l:'Maximum', v:formatResult(max)},
+    {l:'Spannweite', v:formatResult(range)},
+    {l:'Q1 (25%)', v:formatResult(q1)},
+    {l:'Q3 (75%)', v:formatResult(q3)},
+    {l:'Geometr. Mittel', v:formatResult(geomMean)},
+    {l:'Schiefe', v:formatResult(skew)},
+    {l:'Exz. Kurtosis', v:formatResult(kurtosis)},
+  ];
+
+  const grid = document.getElementById('stats-grid');
+  grid.innerHTML = cards.map(c=>`
+    <div class="stat-card">
+      <div class="stat-label">${c.l}</div>
+      <div class="stat-value">${c.v}</div>
+    </div>`).join('');
+
+  // Histogram
+  const bins = Math.max(5, Math.min(20, Math.ceil(Math.sqrt(n))));
+  const step = range/bins;
+  const counts = Array(bins).fill(0);
+  nums.forEach(v=>{ const i=Math.min(bins-1,Math.floor((v-min)/step)); counts[i]++; });
+  const maxCount = Math.max(...counts);
+  const histEl = document.getElementById('histogram');
+  histEl.innerHTML = counts.map(cnt=>{
+    const h = maxCount ? Math.max(4,(cnt/maxCount)*58) : 4;
+    const opacity = 0.3 + 0.7*(cnt/maxCount);
+    return `<div class="hist-bar" style="height:${h}px;opacity:${opacity}" title="${cnt}"></div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  MATRIX CALCULATOR
+// ═══════════════════════════════════════════════════════════════
+function buildMatrixInputs(which) {
+  const size = parseInt(document.getElementById(`mx-size-${which}`).value);
+  const cont = document.getElementById(`mx-${which}`);
+  cont.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+  cont.innerHTML = '';
+  for (let i=0; i<size*size; i++) {
+    const inp = document.createElement('input');
+    inp.type='text'; inp.value='0';
+    inp.placeholder='0';
+    cont.appendChild(inp);
+  }
+}
+
+function getMatrix(which) {
+  const size = parseInt(document.getElementById(`mx-size-${which}`).value);
+  const inputs = document.getElementById(`mx-${which}`).querySelectorAll('input');
+  const M = [];
+  for (let i=0;i<size;i++){
+    const row=[];
+    for(let j=0;j<size;j++) row.push(parseFloat(inputs[i*size+j].value)||0);
+    M.push(row);
+  }
+  return M;
+}
+
+function matStr(M) {
+  const w = M[0].length;
+  return M.map(row=>'[ ' + row.map(v=>formatResult(v).padStart(12)).join('  ') + ' ]').join('\n');
+}
+
+function matAdd(A,B) { return A.map((r,i)=>r.map((v,j)=>v+B[i][j])); }
+function matSub(A,B) { return A.map((r,i)=>r.map((v,j)=>v-B[i][j])); }
+function matMul(A,B) {
+  const n=A.length, m=B[0].length, p=B.length;
+  const C=Array.from({length:n},()=>Array(m).fill(0));
+  for(let i=0;i<n;i++) for(let j=0;j<m;j++) for(let k=0;k<p;k++) C[i][j]+=A[i][k]*B[k][j];
+  return C;
+}
+function matTr(A) { return A[0].map((_,i)=>A.map(r=>r[i])); }
+function matTrace(A) { return A.reduce((s,r,i)=>s+r[i],0); }
+function matDet(A) {
+  const n=A.length;
+  if(n===1) return A[0][0];
+  if(n===2) return A[0][0]*A[1][1]-A[0][1]*A[1][0];
+  let det=0;
+  for(let j=0;j<n;j++) {
+    const sub=A.slice(1).map(r=>[...r.slice(0,j),...r.slice(j+1)]);
+    det+=((j%2===0)?1:-1)*A[0][j]*matDet(sub);
+  }
+  return det;
+}
+function matInv(A) {
+  const n=A.length;
+  const det=matDet(A);
+  if(Math.abs(det)<1e-12) return null;
+  if(n===1) return [[1/A[0][0]]];
+  if(n===2) {
+    const d=det;
+    return [[A[1][1]/d,-A[0][1]/d],[-A[1][0]/d,A[0][0]/d]];
+  }
+  // Cofactor method
+  const C=A.map((r,i)=>r.map((_,j)=>{
+    const sub=A.filter((_,ri)=>ri!==i).map(r=>r.filter((_,ci)=>ci!==j));
+    return (((i+j)%2===0)?1:-1)*matDet(sub);
+  }));
+  const adj=matTr(C);
+  return adj.map(r=>r.map(v=>v/det));
+}
+
+function matOp(op) {
+  const res = document.getElementById('mx-result');
+  try {
+    const A=getMatrix('a'), B=getMatrix('b');
+    let out;
+    switch(op) {
+      case 'add': out='A + B =\n'+matStr(matAdd(A,B)); break;
+      case 'sub': out='A − B =\n'+matStr(matSub(A,B)); break;
+      case 'mul': out='A × B =\n'+matStr(matMul(A,B)); break;
+      case 'det': out='det(A) = '+formatResult(matDet(A)); break;
+      case 'tr':  out='tr(A) = '+formatResult(matTrace(A)); break;
+      case 'tpose': out='Aᵀ =\n'+matStr(matTr(A)); break;
+      case 'inv':
+        const inv=matInv(A);
+        out = inv ? 'A⁻¹ =\n'+matStr(inv) : 'Nicht invertierbar (det = 0)';
+        break;
+    }
+    res.textContent = out;
+  } catch(e) { res.textContent = 'Fehler: '+e.message; }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  GRAPH PLOTTER
+// ═══════════════════════════════════════════════════════════════
+function plotGraph() {
+  const canvas = document.getElementById('plot-canvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const xmin = parseFloat(document.getElementById('xmin').value)||(-10);
+  const xmax = parseFloat(document.getElementById('xmax').value)||(10);
+  const ymin = parseFloat(document.getElementById('ymin').value)||(-2);
+  const ymax = parseFloat(document.getElementById('ymax').value)||(2);
+  const fns = [
+    {id:'gfn1', color:'#00cfff'},
+    {id:'gfn2', color:'#ff6b35'},
+    {id:'gfn3', color:'#6dff8a'},
+  ];
+
+  ctx.clearRect(0,0,W,H);
+
+  // Background
+  ctx.fillStyle = '#03050a';
+  ctx.fillRect(0,0,W,H);
+
+  function toCanvasX(x) { return (x-xmin)/(xmax-xmin)*W; }
+  function toCanvasY(y) { return H - (y-ymin)/(ymax-ymin)*H; }
+
+  // Grid
+  ctx.strokeStyle = 'rgba(30,42,56,0.8)';
+  ctx.lineWidth = 1;
+  const gridStepX = niceStep((xmax-xmin)/8);
+  const gridStepY = niceStep((ymax-ymin)/6);
+
+  for (let x=Math.ceil(xmin/gridStepX)*gridStepX; x<=xmax; x+=gridStepX) {
+    const cx = toCanvasX(x);
+    ctx.beginPath(); ctx.moveTo(cx,0); ctx.lineTo(cx,H); ctx.stroke();
+    ctx.fillStyle='rgba(74,90,106,0.7)'; ctx.font='9px monospace'; ctx.textAlign='center';
+    ctx.fillText(parseFloat(x.toPrecision(4)), cx, H-3);
+  }
+  for (let y=Math.ceil(ymin/gridStepY)*gridStepY; y<=ymax; y+=gridStepY) {
+    const cy = toCanvasY(y);
+    ctx.beginPath(); ctx.moveTo(0,cy); ctx.lineTo(W,cy); ctx.stroke();
+    ctx.fillStyle='rgba(74,90,106,0.7)'; ctx.font='9px monospace'; ctx.textAlign='right';
+    ctx.fillText(parseFloat(y.toPrecision(4)), 34, cy-2);
+  }
+
+  // Axes
+  const cx0 = toCanvasX(0), cy0 = toCanvasY(0);
+  ctx.strokeStyle = 'rgba(100,120,140,0.6)'; ctx.lineWidth = 1.5;
+  if (cx0>=0&&cx0<=W) { ctx.beginPath();ctx.moveTo(cx0,0);ctx.lineTo(cx0,H);ctx.stroke(); }
+  if (cy0>=0&&cy0<=H) { ctx.beginPath();ctx.moveTo(0,cy0);ctx.lineTo(W,cy0);ctx.stroke(); }
+
+  // Functions
+  const scope = buildScope();
+  const N = W*2;
+  let plotted = 0;
+
+  fns.forEach(({id,color})=>{
+    const fnStr = document.getElementById(id).value.trim();
+    if (!fnStr) return;
+    try {
+      const keys = Object.keys(scope);
+      const vals = Object.values(scope);
+      const fn = new Function(...keys,'x',`"use strict"; return (${fnStr});`);
+
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2.5;
+      ctx.shadowColor = color;
+      ctx.shadowBlur = 6;
+      ctx.beginPath();
+      let first = true, prevY = null;
+
+      for (let i=0; i<=N; i++) {
+        const x = xmin + i/N*(xmax-xmin);
+        let y;
+        try { y = fn(...vals, x); } catch(e) { first=true; continue; }
+        if (!isFinite(y)||isNaN(y)) { first=true; prevY=null; continue; }
+        const cx=toCanvasX(x), cy=toCanvasY(y);
+        // Discontinuity detection
+        if (prevY!==null && Math.abs(cy-prevY)>H*0.8) { first=true; }
+        if (first) { ctx.moveTo(cx,cy); first=false; } else { ctx.lineTo(cx,cy); }
+        prevY=cy;
+      }
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+      plotted++;
+    } catch(e) {
+      document.getElementById('plot-info').textContent = `Fehler in ${id}: ${e.message}`;
+    }
+  });
+
+  // Legend
+  fns.forEach(({id,color},i)=>{
+    const fnStr = document.getElementById(id).value.trim();
+    if (!fnStr) return;
+    const label = ['f(x)','g(x)','h(x)'][i];
+    ctx.fillStyle = color; ctx.font = 'bold 11px monospace';
+    ctx.fillText(`${label} = ${fnStr}`, 40, 18+i*16);
+  });
+
+  if (plotted===0) document.getElementById('plot-info').textContent = 'Keine gültige Funktion eingegeben.';
+  else document.getElementById('plot-info').textContent = `x: [${xmin}, ${xmax}] · y: [${ymin}, ${ymax}]`;
+}
+
+function niceStep(v) {
+  const e = Math.pow(10, Math.floor(Math.log10(v)));
+  const f = v/e;
+  if (f<1.5) return e; if (f<3) return 2*e; if (f<7) return 5*e; return 10*e;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  PROGRAMMER
+// ═══════════════════════════════════════════════════════════════
+const EXAMPLES = {
+  planck: `// Planck-Strahlung: Energie eines Photons
+// E = h·f = h·c / λ
+let lambda_nm = 500;          // Wellenlänge in nm (grünes Licht)
+let lambda = lambda_nm * 1e-9;  // in Meter
+let E = h * c / lambda;
+print("λ = " + lambda_nm + " nm");
+print("E = " + E.toExponential(4) + " J");
+print("E = " + (E/eV).toFixed(2) + " eV");`,
+
+  relativity: `// Spezielle Relativitätstheorie
+// Lorentz-Faktor und relativistische kinetische Energie
+let v_percent = 90;             // Geschwindigkeit in % von c
+let v = v_percent/100 * c;
+let gamma = 1 / sqrt(1 - (v/c)**2);
+let m = 1;                      // Ruhemasse in kg
+let Ekin = (gamma - 1) * m * c**2;
+let Erest = m * c**2;
+print("v = " + v_percent + "% · c");
+print("γ (Lorentz-Faktor) = " + gamma.toFixed(4));
+print("E_Ruhe = " + Erest.toExponential(4) + " J");
+print("E_kin  = " + Ekin.toExponential(4) + " J");
+print("E_ges  = " + (gamma * m * c**2).toExponential(4) + " J");`,
+
+  hydrogen: `// Wasserstoff-Atom: Energieniveaus (Bohr-Modell)
+// E_n = -13.6 eV / n²
+print("=== Balmer-Serie (sichtbares Licht) ===");
+let E_ground = -13.6;  // eV
+for (let n = 3; n <= 7; n++) {
+  let E_n = E_ground / (n**2);
+  let E_2 = E_ground / 4;
+  let delta_E = E_n - E_2;             // in eV (Hα, Hβ, ...)
+  let lambda = h*c / (abs(delta_E)*eV); // Wellenlänge in m
+  print("n=" + n + " → n=2: ΔE=" + abs(delta_E).toFixed(2) + " eV, λ=" + (lambda*1e9).toFixed(1) + " nm");
+}`,
+
+  gravity: `// Gravitation: Fluchtgeschwindigkeit & Schwarzschild-Radius
+function flucht(M, R) {
+  return sqrt(2*G*M/R);
+}
+function rs(M) {
+  return 2*G*M/(c**2);
+}
+let bodies = [
+  {name:"Erde",     M:5.972e24, R:6.371e6},
+  {name:"Mond",     M:7.342e22, R:1.737e6},
+  {name:"Sonne",    M:1.989e30, R:6.957e8},
+  {name:"Neutronst",M:2.0*1.989e30, R:12000},
+];
+bodies.forEach(b => {
+  let v_f = flucht(b.M, b.R);
+  let R_s = rs(b.M);
+  print(b.name + ": v_flucht=" + (v_f/1000).toFixed(1) + " km/s, R_Schwarz=" + R_s.toExponential(3) + " m");
+});`,
+
+  quantum: `// Quantenmechanik
+// Heisenberg-Unschärferelation: Δx·Δp ≥ ℏ/2
+// de-Broglie-Wellenlänge
+print("=== de-Broglie-Wellenlängen ===");
+let particles = [
+  {name:"Elektron (50 keV)",  m:me,    Ek:50e3*eV},
+  {name:"Proton (1 MeV)",     m:mp,    Ek:1e6*eV},
+  {name:"Neutron (0.025 eV)", m:mn,    Ek:0.025*eV},
+  {name:"Mensch (70 kg, 1 m/s)", m:70, Ek:0.5*70*1**2},
+];
+particles.forEach(p => {
+  let v = sqrt(2*p.Ek/p.m);
+  let lam = h/(p.m*v);
+  print(p.name + ": λ = " + lam.toExponential(3) + " m");
+});
+print("");
+print("=== Nullpunktsenergie (Teilchen im Kasten) ===");
+let L = 1e-10;  // Bohrradius-Größe
+let E0 = (hbar**2 * Math.PI**2) / (2 * me * L**2);
+print("E₀ (e⁻ in L=1Å) = " + (E0/eV).toFixed(2) + " eV");`,
+
+  thermo: `// Thermodynamik: Maxwell-Boltzmann-Verteilung
+// Mittlere, wahrscheinlichste und quadratische Mittelgeschwindigkeit
+function v_mean(M_mol, T) { return sqrt(8*R*T/(Math.PI*M_mol)); }
+function v_mp(M_mol, T)   { return sqrt(2*R*T/M_mol); }
+function v_rms(M_mol, T)  { return sqrt(3*R*T/M_mol); }
+
+let gases = [
+  {name:"H₂",  M:2.016e-3},
+  {name:"N₂",  M:28.014e-3},
+  {name:"O₂",  M:31.998e-3},
+  {name:"CO₂", M:44.010e-3},
+];
+let T = 293.15; // 20°C
+print("Gasgeschwindigkeiten bei T=20°C:");
+gases.forEach(g => {
+  print(g.name + ": v̄=" + v_mean(g.M,T).toFixed(0) + "  vmp=" + v_mp(g.M,T).toFixed(0) + "  vrms=" + v_rms(g.M,T).toFixed(0) + " m/s");
+});`,
+};
+
+function loadExample(key) {
+  document.getElementById('prog-editor').value = EXAMPLES[key] || '';
+  document.getElementById('prog-output').textContent = '';
+}
+
+function runProgram() {
+  const code = document.getElementById('prog-editor').value;
+  const out = document.getElementById('prog-output');
+  const outputs = [];
+  const scope = buildScope();
+  scope.result = v=>outputs.push(formatResult(typeof v==='number'?v:v));
+  scope.print  = v=>outputs.push(String(v));
+  scope.log    = scope.print;
+  scope.format = formatResult;
+
+  try {
+    const fn = new Function(...Object.keys(scope), `"use strict";\n${code}`);
+    const ret = fn(...Object.values(scope));
+    if (ret!==undefined && outputs.length===0) outputs.push(formatResult(ret));
+    out.textContent = outputs.length ? outputs.join('\n') : '✓ Ausgeführt (kein Ergebnis)';
+    out.style.color = 'var(--accent3)';
+  } catch(e) {
+    out.textContent = '✗ Fehler: '+e.message;
+    out.style.color = 'var(--accent2)';
+  }
+}
+
+function clearProgram() {
+  document.getElementById('prog-editor').value='';
+  document.getElementById('prog-output').textContent='';
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  FULLSCREEN
+// ═══════════════════════════════════════════════════════════════
+function toggleFullscreen() {
+  const el = document.documentElement;
+  const isFs = !!document.fullscreenElement;
+  if (!isFs) {
+    (el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen).call(el);
+  } else {
+    (document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen).call(document);
+  }
+}
+document.addEventListener('fullscreenchange', updateFsBtn);
+document.addEventListener('webkitfullscreenchange', updateFsBtn);
+function updateFsBtn() {
+  const isFs = !!document.fullscreenElement;
+  document.getElementById('fs-icon-expand').style.display = isFs ? 'none' : '';
+  document.getElementById('fs-icon-shrink').style.display = isFs ? '' : 'none';
+  document.getElementById('fs-label').textContent = isFs ? 'Verkleinern' : 'Vollbild';
+  document.body.classList.toggle('is-fullscreen', isFs);
+}
+document.addEventListener('keydown', ev => {
+  if (ev.key === 'F11') { ev.preventDefault(); toggleFullscreen(); }
+});
+
+// ═══════════════════════════════════════════════════════════════
+//  TOAST NOTIFICATION
+// ═══════════════════════════════════════════════════════════════
+let toastTimer;
+function showToast(msg, color='var(--accent)') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.color = color;
+  t.style.borderColor = color;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  VARIABLES SYSTEM
+// ═══════════════════════════════════════════════════════════════
+const LS_VARS  = 'physcalc_vars';
+const LS_SLOTS = 'physcalc_slots';
+const NUM_SLOTS = 6;
+
+let userVars = {};   // { name: {val, expr} }
+let varSlots = [];   // array of {name, vars}
+
+function loadVarStorage() {
+  try { userVars = JSON.parse(localStorage.getItem(LS_VARS))||{}; } catch(e){ userVars={}; }
+  try {
+    const raw = JSON.parse(localStorage.getItem(LS_SLOTS));
+    varSlots = Array.isArray(raw) ? raw : [];
+  } catch(e){ varSlots=[]; }
+  // Ensure NUM_SLOTS slots
+  while (varSlots.length < NUM_SLOTS) varSlots.push({name:'Slot '+(varSlots.length+1), vars:{}});
+}
+
+function saveVarStorage() {
+  try { localStorage.setItem(LS_VARS, JSON.stringify(userVars)); } catch(e){}
+  try { localStorage.setItem(LS_SLOTS, JSON.stringify(varSlots)); } catch(e){}
+}
+
+// Greek Unicode range: \u0370-\u03FF (Greek and Coptic block)
+const VALID_VAR = /^[a-zA-Z_\u0370-\u03FF][a-zA-Z0-9_\u0370-\u03FF]*$/;
+
+function addVar() {
+  const nameEl = document.getElementById('var-new-name');
+  const valEl  = document.getElementById('var-new-val');
+  let name = nameEl.value.trim();
+  // Strip anything that is NOT: latin letters, digits, underscore, Greek letters
+  name = name.replace(/[^a-zA-Z0-9_\u0370-\u03FF]/g, '');
+  const rawExpr = valEl.value.trim();
+  if (!name || !rawExpr) { showToast('Name und Wert erforderlich', 'var(--accent2)'); return; }
+  if (/^[0-9]/.test(name)) { showToast('Name darf nicht mit Ziffer beginnen', 'var(--accent2)'); return; }
+  if (!VALID_VAR.test(name)) { showToast('Ungültiger Variablenname', 'var(--accent2)'); return; }
+  // Evaluate expression
+  let val;
+  try {
+    const scope = buildScope();
+    // Inject existing user vars
+    Object.entries(userVars).forEach(([k,v])=>{ scope[k]=v.val; });
+    const fn = new Function(...Object.keys(scope), `"use strict"; return (${rawExpr});`);
+    val = fn(...Object.values(scope));
+    if (typeof val !== 'number') throw new Error('Kein numerischer Wert');
+  } catch(e) {
+    showToast('Ausdruck-Fehler: '+e.message.slice(0,40), 'var(--accent2)');
+    return;
+  }
+  userVars[name] = { val, expr: rawExpr };
+  saveVarStorage();
+  renderVarList();
+  nameEl.value=''; valEl.value='';
+  showToast(`${name} = ${formatResult(val)} gespeichert`, 'var(--accent3)');
+}
+
+function deleteVar(name) {
+  delete userVars[name];
+  saveVarStorage();
+  renderVarList();
+  showToast(`${name} gelöscht`, 'var(--accent2)');
+}
+
+function useVar(name) {
+  expr += name;
+  updateDisplay(formatExpr(expr));
+  showToast(`${name} eingefügt`, 'var(--accent)');
+}
+
+function renderVarList() {
+  const list = document.getElementById('var-list');
+  const entries = Object.entries(userVars);
+  if (!entries.length) {
+    list.innerHTML = `<div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);padding:12px;text-align:center;">Noch keine Variablen definiert</div>`;
+    return;
+  }
+  list.innerHTML = entries.map(([name,{val,expr:ex}])=>`
+    <div class="var-item">
+      <span class="var-item-name">${name}</span>
+      <span class="var-item-val" title="${ex}">${formatResult(val)}</span>
+      <button class="var-item-use" onclick="useVar('${name}')">Einfügen</button>
+      <button class="var-item-del" onclick="deleteVar('${name}')">✕</button>
+    </div>`).join('');
+}
+
+// ─── Slots ───
+function buildVarSlots() {
+  const cont = document.getElementById('var-slots');
+  cont.innerHTML = '';
+  varSlots.forEach((slot, i) => {
+    const names = Object.keys(slot.vars||{});
+    const preview = names.length
+      ? names.slice(0,4).map(n=>`${n}=${formatResult(slot.vars[n].val)}`).join(' · ')+(names.length>4?` +${names.length-4}`:'')
+      : 'Leer';
+    const div = document.createElement('div');
+    div.className = 'var-slot';
+    div.innerHTML = `
+      <div class="var-slot-header">
+        <input class="var-slot-name-input" value="${slot.name}" onchange="renameSlot(${i},this.value)" maxlength="24">
+        <div class="var-slot-btns">
+          <button class="btn-slot btn-slot-save" onclick="saveSlot(${i})">Speichern</button>
+          <button class="btn-slot btn-slot-load" onclick="loadSlot(${i})">Laden</button>
+          <button class="btn-slot btn-slot-clear" onclick="clearSlot(${i})">✕</button>
+        </div>
+      </div>
+      <div class="var-slot-preview ${names.length?'has-data':''}" id="slot-preview-${i}">${preview}</div>`;
+    cont.appendChild(div);
+  });
+}
+
+function updateSlotPreview(i) {
+  const slot = varSlots[i];
+  const names = Object.keys(slot.vars||{});
+  const el = document.getElementById(`slot-preview-${i}`);
+  if (!el) return;
+  if (names.length) {
+    el.textContent = names.slice(0,5).map(n=>`${n}=${formatResult(slot.vars[n].val)}`).join(' · ')+(names.length>5?` +${names.length-5}`:'');
+    el.classList.add('has-data');
+  } else {
+    el.textContent = 'Leer';
+    el.classList.remove('has-data');
+  }
+}
+
+function saveSlot(i) {
+  if (!Object.keys(userVars).length) { showToast('Keine Variablen zum Speichern', 'var(--accent2)'); return; }
+  varSlots[i].vars = JSON.parse(JSON.stringify(userVars));
+  saveVarStorage();
+  updateSlotPreview(i);
+  showToast(`✓ In "${varSlots[i].name}" gespeichert`, 'var(--accent3)');
+}
+
+function loadSlot(i) {
+  const slot = varSlots[i];
+  if (!Object.keys(slot.vars||{}).length) { showToast('Slot ist leer', 'var(--accent2)'); return; }
+  userVars = JSON.parse(JSON.stringify(slot.vars));
+  saveVarStorage();
+  renderVarList();
+  showToast(`✓ "${slot.name}" geladen — ${Object.keys(userVars).length} Variablen`, 'var(--accent)');
+}
+
+function clearSlot(i) {
+  varSlots[i].vars = {};
+  saveVarStorage();
+  updateSlotPreview(i);
+  showToast(`Slot "${varSlots[i].name}" geleert`, 'var(--accent2)');
+}
+
+function renameSlot(i, name) {
+  varSlots[i].name = name;
+  saveVarStorage();
+}
+
+// ─── Export / Import ───
+function exportVars() {
+  const data = JSON.stringify({vars: userVars, slots: varSlots}, null, 2);
+  const blob = new Blob([data], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download='physcalc_variablen.json';
+  a.click(); URL.revokeObjectURL(url);
+  showToast('Export abgeschlossen', 'var(--accent)');
+}
+
+function importVars(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (data.vars) userVars = data.vars;
+      if (Array.isArray(data.slots)) {
+        varSlots = data.slots;
+        while (varSlots.length < NUM_SLOTS) varSlots.push({name:'Slot '+(varSlots.length+1), vars:{}});
+      }
+      saveVarStorage();
+      renderVarList();
+      buildVarSlots();
+      showToast(`✓ ${Object.keys(userVars).length} Variablen importiert`, 'var(--accent3)');
+    } catch(e) {
+      showToast('Import-Fehler: Ungültige JSON-Datei', 'var(--accent2)');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value='';
+}
+
+function clearAllVars() {
+  if (!confirm('Alle Variablen löschen?')) return;
+  userVars = {};
+  saveVarStorage();
+  renderVarList();
+  showToast('Alle Variablen gelöscht', 'var(--accent2)');
+}
+
+// Patch buildScope to include user vars
+const _origBuildScope = buildScope;
+buildScope = function() {
+  const scope = _origBuildScope();
+  Object.entries(userVars).forEach(([k,v])=>{ scope[k]=v.val; });
+  return scope;
+};
+
+// ═══════════════════════════════════════════════════════════════
+//  GREEK LETTER KEYBOARD
+// ═══════════════════════════════════════════════════════════════
+const GREEK_LETTERS = [
+  // [display, char, isUpper]
+  ['α','α',false],['β','β',false],['γ','γ',false],['δ','δ',false],
+  ['ε','ε',false],['ζ','ζ',false],['η','η',false],['θ','θ',false],
+  ['ι','ι',false],['κ','κ',false],['λ','λ',false],['μ','μ',false],
+  ['ν','ν',false],['ξ','ξ',false],['π','π',false],['ρ','ρ',false],
+  ['σ','σ',false],['τ','τ',false],['υ','υ',false],['φ','φ',false],
+  ['χ','χ',false],['ψ','ψ',false],['ω','ω',false],
+  ['Γ','Γ',true], ['Δ','Δ',true], ['Θ','Θ',true], ['Λ','Λ',true],
+  ['Ξ','Ξ',true], ['Π','Π',true], ['Σ','Σ',true], ['Φ','Φ',true],
+  ['Ψ','Ψ',true], ['Ω','Ω',true],
+];
+
+function buildGreekBar() {
+  const cont = document.getElementById('greek-keys');
+  GREEK_LETTERS.forEach(([disp, ch, upper]) => {
+    const btn = document.createElement('button');
+    btn.className = 'gk' + (upper ? ' upper' : '');
+    btn.textContent = disp;
+    btn.title = ch + (upper ? ' (Großbuchstabe)' : ' (Kleinbuchstabe)');
+    btn.onclick = () => insertGreek(ch);
+    cont.appendChild(btn);
+  });
+}
+
+function insertGreek(ch) {
+  // Insert into whichever var input is focused, or default to name input
+  const nameEl = document.getElementById('var-new-name');
+  const valEl  = document.getElementById('var-new-val');
+  const target = (document.activeElement === valEl) ? valEl : nameEl;
+  const start = target.selectionStart;
+  const end   = target.selectionEnd;
+  const val   = target.value;
+  target.value = val.slice(0, start) + ch + val.slice(end);
+  target.selectionStart = target.selectionEnd = start + ch.length;
+  target.focus();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════════
+renderConstants();
+buildUnitConverter();
+buildMatrixInputs('a');
+buildMatrixInputs('b');
+plotGraph();
+loadVarStorage();
+renderVarList();
+buildVarSlots();
+buildGreekBar();
+</script>
+</body>
+</html>

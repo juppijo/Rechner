@@ -1,0 +1,1641 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CODEX — Online Editor</title>
+
+  <!-- CodeMirror -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/comment/comment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/search/searchcursor.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/foldcode.min.js"></script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d0d0f;
+      --surface:   #111115;
+      --panel:     #16161b;
+      --border:    #252530;
+      --accent:    #f0a500;
+      --accent2:   #e05a00;
+      --text:      #d4d0c8;
+      --muted:     #55535a;
+      --success:   #4ade80;
+      --error:     #f87171;
+      --radius:    6px;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      overflow: hidden;
+    }
+
+    /* ── LAYOUT ─────────────────────────────────── */
+    .app {
+      display: grid;
+      grid-template-rows: 52px 1fr 28px;
+      grid-template-columns: 220px 1fr 340px;
+      height: 100vh;
+      gap: 0;
+    }
+
+    /* ── TOP BAR ─────────────────────────────────── */
+    .topbar {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 0 20px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      z-index: 10;
+    }
+
+    .logo {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      color: var(--accent);
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .logo-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
+
+    .lang-tabs {
+      display: flex;
+      gap: 2px;
+      flex: 1;
+    }
+    .lang-tab {
+      padding: 5px 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: .06em;
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .18s ease;
+      text-transform: uppercase;
+    }
+    .lang-tab:hover { color: var(--text); border-color: var(--border); }
+    .lang-tab.active {
+      background: #1e1a0d;
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .topbar-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      font-family: 'Syne', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      cursor: pointer;
+      transition: all .15s ease;
+    }
+    .btn:hover { border-color: var(--muted); color: #fff; }
+    .btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #0d0d0f;
+    }
+    .btn.primary:hover { background: #ffb820; }
+    .btn svg { width: 13px; height: 13px; }
+
+    /* ── SIDEBAR ─────────────────────────────────── */
+    .sidebar {
+      grid-row: 2;
+      grid-column: 1;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 16px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      overflow-y: auto;
+    }
+
+    .sidebar-section {
+      padding: 6px 16px 2px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .file-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 7px 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .12s ease;
+      border-left: 2px solid transparent;
+    }
+    .file-item:hover { color: var(--text); background: rgba(255,255,255,.03); }
+    .file-item.active {
+      color: var(--accent);
+      border-left-color: var(--accent);
+      background: rgba(240,165,0,.05);
+    }
+    .file-icon { font-size: 13px; }
+
+    .sidebar-snippet {
+      margin: 8px 10px 0;
+      padding: 10px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .sidebar-snippet span { color: var(--accent); }
+
+    /* ── EDITOR AREA ─────────────────────────────── */
+    .editor-wrap {
+      grid-row: 2;
+      grid-column: 2;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .editor-chrome {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .chrome-dots { display: flex; gap: 5px; }
+    .chrome-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--border);
+    }
+    .chrome-dot.r { background: #f87171; }
+    .chrome-dot.y { background: #fbbf24; }
+    .chrome-dot.g { background: #4ade80; }
+
+    .file-tab {
+      margin-left: 8px;
+      padding: 3px 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      border-bottom: 2px solid var(--accent);
+      color: var(--text);
+    }
+
+    #editor-container {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .CodeMirror {
+      height: 100% !important;
+      font-family: 'JetBrains Mono', monospace !important;
+      font-size: 13.5px !important;
+      line-height: 1.7 !important;
+      background: var(--bg) !important;
+    }
+
+    .CodeMirror-scroll { padding-bottom: 60px; }
+
+    /* Custom dracula overrides */
+    .cm-s-dracula .CodeMirror-selected { background: rgba(240,165,0,.18) !important; }
+    .CodeMirror-cursor { border-left: 2px solid var(--accent) !important; }
+    .CodeMirror-gutters { background: var(--bg) !important; border-right: 1px solid var(--border) !important; }
+    .CodeMirror-linenumber { color: #3a383f !important; font-size: 11px !important; }
+
+    /* floating line info */
+    .editor-info {
+      position: absolute;
+      bottom: 12px;
+      right: 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      z-index: 5;
+      pointer-events: none;
+      display: flex;
+      gap: 14px;
+    }
+
+    /* ── OUTPUT PANEL ────────────────────────────── */
+    .output-panel {
+      grid-row: 2;
+      grid-column: 3;
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .panel-tabs { display: flex; gap: 2px; }
+    .panel-tab {
+      padding: 3px 10px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 9px;
+      letter-spacing: .1em;
+      transition: all .15s;
+      border: 1px solid transparent;
+    }
+    .panel-tab.active { background: rgba(240,165,0,.12); color: var(--accent); border-color: rgba(240,165,0,.3); }
+    .panel-tab:not(.active):hover { color: var(--text); }
+
+    .console-output {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+    .console-output::-webkit-scrollbar { width: 4px; }
+    .console-output::-webkit-scrollbar-track { background: transparent; }
+    .console-output::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .log-line {
+      display: flex;
+      gap: 10px;
+      padding: 3px 0;
+      border-bottom: 1px solid rgba(255,255,255,.03);
+      animation: fadeIn .2s ease;
+    }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
+
+    .log-line.error .log-msg { color: var(--error); }
+    .log-line.warn .log-msg { color: #fbbf24; }
+    .log-line.success .log-msg { color: var(--success); }
+    .log-line.info .log-msg { color: #60a5fa; }
+
+    .log-num {
+      color: var(--muted);
+      min-width: 22px;
+      text-align: right;
+      font-size: 10px;
+      padding-top: 2px;
+    }
+    .log-icon { width: 14px; font-size: 11px; }
+    .log-msg { flex: 1; word-break: break-all; white-space: pre-wrap; color: var(--text); }
+
+    .console-input-bar {
+      display: flex;
+      align-items: center;
+      padding: 10px 16px;
+      border-top: 1px solid var(--border);
+      gap: 8px;
+    }
+    .console-prompt { color: var(--accent); font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+    .console-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--text);
+    }
+    .console-input::placeholder { color: var(--muted); }
+
+    /* Preview iframe */
+    .preview-frame {
+      flex: 1;
+      border: none;
+      background: #fff;
+      display: none;
+    }
+    .preview-frame.active { display: block; }
+
+    /* ── STATUSBAR ───────────────────────────────── */
+    .statusbar {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 0 16px;
+      background: var(--accent);
+      color: #0d0d0f;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .08em;
+    }
+    .status-item { display: flex; align-items: center; gap: 5px; }
+    .status-sep { opacity: .35; }
+    .status-right { margin-left: auto; }
+
+    /* ── BTN DIVIDER ─────────────────────────────── */
+    .btn-divider {
+      width: 1px;
+      height: 22px;
+      background: var(--border);
+      margin: 0 2px;
+    }
+
+    /* ── UNSAVED INDICATOR ───────────────────────── */
+    .unsaved-dot {
+      width: 7px; height: 7px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: inline-block;
+      margin-left: 6px;
+      vertical-align: middle;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    /* ── SAVED FILE ITEM ─────────────────────────── */
+    .saved-file-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px 6px 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      transition: all .12s ease;
+      border-left: 2px solid transparent;
+    }
+    .saved-file-item:hover { color: var(--text); background: rgba(255,255,255,.03); }
+    .saved-file-item .sf-name {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .saved-file-item .sf-name:hover { color: var(--accent); }
+    .saved-file-item .sf-actions { display: flex; gap: 4px; opacity: 0; transition: opacity .15s; }
+    .saved-file-item:hover .sf-actions { opacity: 1; }
+    .sf-btn {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 2px 3px;
+      border-radius: 3px;
+      font-size: 10px;
+      transition: color .12s;
+      line-height: 1;
+    }
+    .sf-btn:hover { color: var(--text); }
+    .sf-btn.del:hover { color: var(--error); }
+    .sf-btn svg { width: 11px; height: 11px; display: block; }
+
+    .saved-empty {
+      padding: 8px 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    /* ── MODAL ───────────────────────────────────── */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.7);
+      z-index: 9000;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(3px);
+    }
+    .modal-backdrop.active { display: flex; }
+
+    .modal {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      width: 420px;
+      max-width: 90vw;
+      box-shadow: 0 20px 60px rgba(0,0,0,.6);
+      animation: modalIn .2s ease;
+    }
+    @keyframes modalIn { from{opacity:0;transform:scale(.95) translateY(-8px)} to{opacity:1;transform:none} }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .modal-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+      padding: 0 4px;
+      transition: color .12s;
+    }
+    .modal-close:hover { color: var(--text); }
+
+    .modal-body { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+
+    .modal-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 5px;
+    }
+
+    .modal-input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 9px 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--text);
+      outline: none;
+      transition: border-color .15s;
+    }
+    .modal-input:focus { border-color: var(--accent); }
+
+    .modal-options { display: flex; gap: 8px; flex-wrap: wrap; }
+    .modal-option {
+      padding: 5px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      cursor: pointer;
+      background: transparent;
+      transition: all .12s;
+    }
+    .modal-option:hover { color: var(--text); border-color: var(--muted); }
+    .modal-option.active { color: var(--accent); border-color: var(--accent); background: rgba(240,165,0,.08); }
+
+    .modal-footer {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      padding: 14px 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* Load modal tabs */
+    .load-tabs { display: flex; gap: 0; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .load-tab {
+      flex: 1;
+      padding: 8px;
+      font-family: 'Syne', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .load-tab.active { background: rgba(240,165,0,.1); color: var(--accent); }
+
+    .load-panel { display: none; }
+    .load-panel.active { display: block; }
+
+    .saved-list-modal { display: flex; flex-direction: column; gap: 4px; max-height: 200px; overflow-y: auto; }
+    .saved-list-modal::-webkit-scrollbar { width: 4px; }
+    .saved-list-modal::-webkit-scrollbar-thumb { background: var(--border); }
+
+    .saved-list-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: all .12s;
+    }
+    .saved-list-item:hover { border-color: var(--accent); background: rgba(240,165,0,.05); }
+    .saved-list-item .sli-name {
+      flex: 1;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--text);
+    }
+    .saved-list-item .sli-meta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+    }
+    .saved-list-item .sli-del {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 2px;
+      font-size: 12px;
+      transition: color .12s;
+    }
+    .saved-list-item .sli-del:hover { color: var(--error); }
+
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: var(--accent);
+      background: rgba(240,165,0,.04);
+      color: var(--accent);
+    }
+    .drop-zone svg { width: 28px; height: 28px; margin-bottom: 8px; display: block; margin: 0 auto 8px; }
+
+    /* ── FULLSCREEN BUTTON ───────────────────────── */
+    .fs-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .15s ease;
+      padding: 0;
+    }
+    .fs-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(240,165,0,.08);
+    }
+    .fs-btn svg { width: 12px; height: 12px; }
+
+    /* ── PREVIEW FULLSCREEN OVERLAY ──────────────── */
+    .preview-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: #fff;
+      flex-direction: column;
+    }
+    .preview-overlay.active { display: flex; }
+
+    .preview-overlay-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      height: 42px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .preview-overlay-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .preview-overlay-title strong { color: var(--accent); font-weight: 600; }
+
+    .preview-overlay-actions { display: flex; gap: 8px; align-items: center; }
+
+    .preview-overlay-frame {
+      flex: 1;
+      border: none;
+      background: #fff;
+    }
+
+    /* Escape hint badge */
+    .fs-hint {
+      position: fixed;
+      top: 52px;
+      right: 20px;
+      background: rgba(0,0,0,.7);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      padding: 5px 10px;
+      border-radius: var(--radius);
+      z-index: 10000;
+      opacity: 1;
+      transition: opacity .5s ease;
+      pointer-events: none;
+    }
+    .fs-hint.fade { opacity: 0; }
+
+    /* ── TOAST ───────────────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 46px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--panel);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      padding: 8px 18px;
+      border-radius: var(--radius);
+      opacity: 0;
+      transition: all .25s ease;
+      z-index: 999;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* scrollbar global */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ── TOP BAR ── -->
+  <header class="topbar">
+    <div class="logo">
+      <div class="logo-dot"></div>
+      CODEX
+    </div>
+
+    <div class="lang-tabs" id="langTabs">
+      <button class="lang-tab active" data-lang="javascript" data-mode="javascript">JS</button>
+      <button class="lang-tab" data-lang="html" data-mode="htmlmixed">HTML</button>
+      <button class="lang-tab" data-lang="css" data-mode="css">CSS</button>
+      <button class="lang-tab" data-lang="python" data-mode="python">Python</button>
+      <button class="lang-tab" data-lang="xml" data-mode="xml">XML</button>
+    </div>
+
+    <div class="topbar-actions">
+      <button class="btn" onclick="clearEditor()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+        Leeren
+      </button>
+      <button class="btn" onclick="copyCode()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Kopieren
+      </button>
+      <div class="btn-divider"></div>
+      <button class="btn" onclick="openSaveModal()" title="Speichern (Ctrl+S)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Speichern
+      </button>
+      <button class="btn" onclick="openLoadModal()" title="Laden">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><polyline points="12 11 12 17"/><polyline points="9 14 12 17 15 14"/></svg>
+        Laden
+      </button>
+      <div class="btn-divider"></div>
+      <button class="btn primary" onclick="runCode()">
+        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Ausführen
+      </button>
+    </div>
+    <input type="file" id="fileInput" style="display:none" accept=".js,.html,.css,.py,.xml,.ts,.json,.txt" onchange="loadFromDisk(event)"/>
+  </header>
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+    <div class="sidebar-section">Explorer</div>
+
+    <div class="file-item active" onclick="selectFile(this,'main')">
+      <span class="file-icon">📄</span> main.js
+    </div>
+    <div class="file-item" onclick="selectFile(this,'index')">
+      <span class="file-icon">🌐</span> index.html
+    </div>
+    <div class="file-item" onclick="selectFile(this,'style')">
+      <span class="file-icon">🎨</span> style.css
+    </div>
+    <div class="file-item" onclick="selectFile(this,'notes')">
+      <span class="file-icon">📝</span> notes.py
+    </div>
+
+    <div class="sidebar-section" style="margin-top:16px;display:flex;align-items:center;justify-content:space-between;padding-right:12px"><span>Gespeichert</span><span id="savedCount" style="font-size:9px;background:rgba(240,165,0,.15);color:var(--accent);padding:1px 6px;border-radius:10px">0</span></div>
+    <div id="savedFilesList" style="display:flex;flex-direction:column;gap:0"></div>
+
+    <div class="sidebar-section" style="margin-top:16px">Snippets</div>
+    <div class="sidebar-snippet">
+      <span>// Beispiel</span><br>
+      const arr = [1,2,3];<br>
+      arr.<span>forEach</span>(n =&gt;<br>
+      &nbsp;&nbsp;console.<span>log</span>(n)<br>
+      );
+    </div>
+    <div class="sidebar-snippet" style="margin-top:6px">
+      <span>/* Fetch API */</span><br>
+      fetch(<span>'/api'</span>)<br>
+      &nbsp;.then(r =&gt; r.<span>json</span>())<br>
+      &nbsp;.then(<span>console</span>.log);
+    </div>
+  </aside>
+
+  <!-- ── EDITOR ── -->
+  <main class="editor-wrap">
+    <div class="editor-chrome">
+      <div class="chrome-dots">
+        <div class="chrome-dot r"></div>
+        <div class="chrome-dot y"></div>
+        <div class="chrome-dot g"></div>
+      </div>
+      <div class="file-tab" id="fileTab">main.js<span id="unsavedDot" class="unsaved-dot" style="display:none"></span></div>
+    </div>
+    <div id="editor-container">
+      <textarea id="editor"></textarea>
+    </div>
+    <div class="editor-info">
+      <span id="cursorInfo">Ln 1, Sp 1</span>
+      <span id="selInfo"></span>
+      <span id="charCount">0 Zeichen</span>
+    </div>
+  </main>
+
+  <!-- ── OUTPUT ── -->
+  <aside class="output-panel">
+    <div class="panel-header">
+      <span>Output</span>
+      <div class="panel-tabs">
+        <div class="panel-tab active" id="tab-console" onclick="switchPanel('console')">Konsole</div>
+        <div class="panel-tab" id="tab-preview" onclick="switchPanel('preview')">Vorschau</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <button class="fs-btn" id="fsBtn" onclick="togglePreviewFullscreen()" title="Vollbild (F11)">
+          <svg id="fsIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/>
+            <line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>
+          </svg>
+        </button>
+        <span onclick="clearConsole()" style="cursor:pointer;color:var(--muted)" title="Löschen">✕</span>
+      </div>
+    </div>
+
+    <div class="console-output" id="consoleOutput">
+      <div class="log-line info">
+        <span class="log-icon">ℹ</span>
+        <span class="log-msg">Bereit. Drücke ▶ Ausführen oder Ctrl+Enter.</span>
+      </div>
+    </div>
+
+    <iframe class="preview-frame" id="previewFrame"></iframe>
+
+    <div class="console-input-bar">
+      <span class="console-prompt">&gt;</span>
+      <input class="console-input" id="consoleInput" placeholder="JavaScript eingeben und Enter drücken…" spellcheck="false"/>
+    </div>
+  </aside>
+
+  <!-- ── STATUSBAR ── -->
+  <footer class="statusbar">
+    <div class="status-item">
+      <svg width="9" height="9" viewBox="0 0 10 10" fill="currentColor"><circle cx="5" cy="5" r="5"/></svg>
+      CODEX v1.0
+    </div>
+    <span class="status-sep">|</span>
+    <div class="status-item" id="statusLang">JavaScript</div>
+    <span class="status-sep">|</span>
+    <div class="status-item">UTF-8</div>
+    <span class="status-sep">|</span>
+    <div class="status-item" id="statusLines">1 Zeile</div>
+    <div class="status-item status-right" id="statusTime"></div>
+  </footer>
+</div>
+
+<!-- ── SAVE MODAL ── -->
+<div class="modal-backdrop" id="saveModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">💾 Datei speichern</span>
+      <button class="modal-close" onclick="closeSaveModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div>
+        <div class="modal-label">Dateiname</div>
+        <input class="modal-input" id="saveFileName" type="text" placeholder="meine-datei.js" spellcheck="false"/>
+      </div>
+      <div>
+        <div class="modal-label">Speichern als</div>
+        <div class="modal-options">
+          <button class="modal-option active" id="optLocal" onclick="setSaveTarget('local')">
+            🗂 Browser (lokal)
+          </button>
+          <button class="modal-option" id="optDownload" onclick="setSaveTarget('download')">
+            ⬇ Download
+          </button>
+        </div>
+      </div>
+      <div id="saveInfo" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);line-height:1.6;padding:8px 10px;background:var(--bg);border-radius:var(--radius);border:1px solid var(--border)">
+        Wird im Browser-Speicher gespeichert und bleibt auch nach dem Schließen erhalten.
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeSaveModal()">Abbrechen</button>
+      <button class="btn primary" onclick="confirmSave()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Speichern
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── LOAD MODAL ── -->
+<div class="modal-backdrop" id="loadModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">📂 Datei laden</span>
+      <button class="modal-close" onclick="closeLoadModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="load-tabs">
+        <button class="load-tab active" id="ltSaved" onclick="switchLoadTab('saved')">Gespeicherte</button>
+        <button class="load-tab" id="ltDisk" onclick="switchLoadTab('disk')">Vom Rechner</button>
+      </div>
+
+      <div class="load-panel active" id="lp-saved">
+        <div class="saved-list-modal" id="savedListModal">
+          <div class="saved-empty">Noch keine Dateien gespeichert.</div>
+        </div>
+      </div>
+
+      <div class="load-panel" id="lp-disk">
+        <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()"
+             ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          Klicken oder Datei hier reinziehen
+          <div style="margin-top:6px;font-size:10px;opacity:.6">js · html · css · py · xml · ts · json · txt</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeLoadModal()">Schließen</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── PREVIEW FULLSCREEN OVERLAY ── -->
+<div class="preview-overlay" id="previewOverlay">
+  <div class="preview-overlay-bar">
+    <div class="preview-overlay-title">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+      </svg>
+      <strong>CODEX</strong> — Vorschau
+    </div>
+    <div class="preview-overlay-actions">
+      <button class="btn" onclick="reloadOverlayPreview()" title="Neu laden">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="23 4 23 10 17 10"/>
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+        </svg>
+        Neu laden
+      </button>
+      <button class="btn" onclick="togglePreviewFullscreen()" title="Vollbild beenden (Esc)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/>
+          <line x1="10" y1="14" x2="3" y2="21"/><line x1="21" y1="3" x2="14" y2="10"/>
+        </svg>
+        Schließen
+      </button>
+    </div>
+  </div>
+  <iframe class="preview-overlay-frame" id="previewOverlayFrame"></iframe>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DEFAULT SNIPPETS ──────────────────────────────────────────────────────
+const defaultCode = {
+  javascript: `// 🚀 Willkommen bei CODEX!
+// Drücke ▶ Ausführen oder Ctrl+Enter
+
+const greet = (name) => {
+  return \`Hallo, \${name}! Viel Spaß mit CODEX.\`;
+};
+
+// Arrays & Methoden
+const zahlen = [3, 1, 4, 1, 5, 9, 2, 6];
+const gerade = zahlen.filter(n => n % 2 === 0);
+const summe  = zahlen.reduce((a, b) => a + b, 0);
+
+console.log(greet("Welt"));
+console.log("Gerade Zahlen:", gerade);
+console.log("Summe:", summe);
+
+// Async Demo
+async function fetchDemo() {
+  console.log("Starte Demo...");
+  await new Promise(r => setTimeout(r, 500));
+  console.log("✓ Fertig!");
+}
+
+fetchDemo();
+`,
+  html: `<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Meine Seite</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background: #0d0d0f;
+      color: #f0a500;
+    }
+    h1 { font-size: 3rem; letter-spacing: .1em; }
+  </style>
+</head>
+<body>
+  <h1>Hallo Welt! 🌍</h1>
+</body>
+</html>
+`,
+  css: `/* CSS Demo */
+:root {
+  --accent: #f0a500;
+  --bg: #0d0d0f;
+}
+
+body {
+  background: var(--bg);
+  font-family: 'JetBrains Mono', monospace;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.card {
+  padding: 2rem;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  color: var(--accent);
+  animation: glow 2s ease-in-out infinite;
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 10px var(--accent); }
+  50%       { box-shadow: 0 0 30px var(--accent); }
+}
+`,
+  python: `# Python Demo
+# (Hinweis: Python läuft hier im Read-only Modus)
+
+def fibonacci(n):
+    """Gibt die ersten n Fibonacci-Zahlen zurück."""
+    seq = [0, 1]
+    while len(seq) < n:
+        seq.append(seq[-1] + seq[-2])
+    return seq[:n]
+
+def is_prime(num):
+    if num < 2:
+        return False
+    for i in range(2, int(num**0.5) + 1):
+        if num % i == 0:
+            return False
+    return True
+
+# Ausgabe
+print("Fibonacci:", fibonacci(10))
+primes = [n for n in range(2, 30) if is_prime(n)]
+print("Primzahlen bis 30:", primes)
+`,
+  xml: `<?xml version="1.0" encoding="UTF-8"?>
+<katalog>
+  <buch id="b1">
+    <titel>Der Herr der Ringe</titel>
+    <autor>J.R.R. Tolkien</autor>
+    <jahr>1954</jahr>
+    <genre>Fantasy</genre>
+  </buch>
+  <buch id="b2">
+    <titel>Dune</titel>
+    <autor>Frank Herbert</autor>
+    <jahr>1965</jahr>
+    <genre>Science-Fiction</genre>
+  </buch>
+  <buch id="b3">
+    <titel>Neuromancer</titel>
+    <autor>William Gibson</autor>
+    <jahr>1984</jahr>
+    <genre>Cyberpunk</genre>
+  </buch>
+</katalog>
+`
+};
+
+const fileMap = {
+  main:  { lang:'javascript', mode:'javascript', tab:'main.js'    },
+  index: { lang:'html',       mode:'htmlmixed',  tab:'index.html' },
+  style: { lang:'css',        mode:'css',        tab:'style.css'  },
+  notes: { lang:'python',     mode:'python',     tab:'notes.py'   },
+};
+
+let currentLang = 'javascript';
+let logCount    = 0;
+
+// ── CODEMIRROR INIT ───────────────────────────────────────────────────────
+const cm = CodeMirror.fromTextArea(document.getElementById('editor'), {
+  mode:            'javascript',
+  theme:           'dracula',
+  lineNumbers:     true,
+  matchBrackets:   true,
+  autoCloseBrackets: true,
+  indentUnit:      2,
+  tabSize:         2,
+  indentWithTabs:  false,
+  lineWrapping:    false,
+  extraKeys: {
+    'Ctrl-Enter': runCode,
+    'Cmd-Enter':  runCode,
+    'Ctrl-/':     (cm) => cm.execCommand('toggleComment'),
+  }
+});
+
+cm.setValue(defaultCode.javascript);
+cm.refresh();
+
+// Cursor info
+cm.on('cursorActivity', () => {
+  const cur = cm.getCursor();
+  document.getElementById('cursorInfo').textContent =
+    `Ln ${cur.line + 1}, Sp ${cur.ch + 1}`;
+  const sel = cm.getSelection();
+  document.getElementById('selInfo').textContent =
+    sel ? `${sel.length} ausgewählt` : '';
+  updateCharCount();
+  updateStatusLines();
+});
+
+cm.on('change', () => { updateCharCount(); updateStatusLines(); });
+
+function updateCharCount() {
+  const n = cm.getValue().length;
+  document.getElementById('charCount').textContent = `${n} Zeichen`;
+}
+function updateStatusLines() {
+  const n = cm.lineCount();
+  document.getElementById('statusLines').textContent =
+    `${n} Zeile${n !== 1 ? 'n' : ''}`;
+}
+
+// ── LANGUAGE TABS ─────────────────────────────────────────────────────────
+document.getElementById('langTabs').addEventListener('click', e => {
+  const btn = e.target.closest('.lang-tab');
+  if (!btn) return;
+  document.querySelectorAll('.lang-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const lang = btn.dataset.lang;
+  const mode = btn.dataset.mode;
+  currentLang = lang;
+  cm.setOption('mode', mode);
+  cm.setValue(defaultCode[lang] || '');
+  document.getElementById('statusLang').textContent = btn.textContent.trim();
+});
+
+// ── FILE SELECT ───────────────────────────────────────────────────────────
+function selectFile(el, key) {
+  document.querySelectorAll('.file-item').forEach(f => f.classList.remove('active'));
+  el.classList.add('active');
+  const info = fileMap[key];
+  currentLang = info.lang;
+  cm.setOption('mode', info.mode);
+  cm.setValue(defaultCode[info.lang] || '');
+  document.getElementById('fileTab').textContent = info.tab;
+  // sync lang tab
+  document.querySelectorAll('.lang-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.lang === info.lang);
+  });
+  document.getElementById('statusLang').textContent =
+    info.lang.charAt(0).toUpperCase() + info.lang.slice(1);
+}
+
+// ── RUN CODE ─────────────────────────────────────────────────────────────
+function runCode() {
+  const code = cm.getValue();
+
+  if (currentLang === 'html') {
+    switchPanel('preview');
+    const frame = document.getElementById('previewFrame');
+    frame.srcdoc = code;
+    return;
+  }
+
+  if (currentLang !== 'javascript') {
+    addLog(`▶ ${currentLang.toUpperCase()} Ausführung wird im Browser nicht unterstützt.`, 'warn');
+    return;
+  }
+
+  switchPanel('console');
+  addLog('▶ Ausführen...', 'info');
+
+  // Hook console
+  const origLog   = console.log;
+  const origError = console.error;
+  const origWarn  = console.warn;
+
+  console.log   = (...args) => { origLog(...args);   addLog(args.map(fmt).join(' '), 'log');   };
+  console.error = (...args) => { origError(...args); addLog(args.map(fmt).join(' '), 'error'); };
+  console.warn  = (...args) => { origWarn(...args);  addLog(args.map(fmt).join(' '), 'warn');  };
+
+  try {
+    const fn = new Function(code);
+    const result = fn();
+    if (result !== undefined) addLog(fmt(result), 'success');
+  } catch (err) {
+    addLog(`${err.name}: ${err.message}`, 'error');
+  } finally {
+    console.log   = origLog;
+    console.error = origError;
+    console.warn  = origWarn;
+  }
+}
+
+function fmt(v) {
+  if (v === null) return 'null';
+  if (v === undefined) return 'undefined';
+  if (typeof v === 'object') {
+    try { return JSON.stringify(v, null, 2); } catch { return String(v); }
+  }
+  return String(v);
+}
+
+// ── CONSOLE ───────────────────────────────────────────────────────────────
+function addLog(msg, type = 'log') {
+  logCount++;
+  const icons = { log:'›', error:'✕', warn:'⚠', success:'✓', info:'ℹ' };
+  const out = document.getElementById('consoleOutput');
+  const div = document.createElement('div');
+  div.className = `log-line ${type}`;
+  div.innerHTML = `
+    <span class="log-num">${logCount}</span>
+    <span class="log-icon">${icons[type] || '›'}</span>
+    <span class="log-msg">${escHtml(msg)}</span>`;
+  out.appendChild(div);
+  out.scrollTop = out.scrollHeight;
+}
+
+function escHtml(s) {
+  return String(s)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;');
+}
+
+function clearConsole() {
+  document.getElementById('consoleOutput').innerHTML = '';
+  logCount = 0;
+}
+
+// ── CONSOLE INPUT ─────────────────────────────────────────────────────────
+document.getElementById('consoleInput').addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  const val = e.target.value.trim();
+  if (!val) return;
+  addLog(`> ${val}`, 'log');
+  try {
+    const res = eval(val);
+    if (res !== undefined) addLog(fmt(res), 'success');
+  } catch(err) {
+    addLog(`${err.name}: ${err.message}`, 'error');
+  }
+  e.target.value = '';
+});
+
+// ── PANEL SWITCH ──────────────────────────────────────────────────────────
+function switchPanel(name) {
+  const consoleOut = document.getElementById('consoleOutput');
+  const previewFr  = document.getElementById('previewFrame');
+  document.getElementById('tab-console').classList.toggle('active', name === 'console');
+  document.getElementById('tab-preview').classList.toggle('active', name === 'preview');
+  consoleOut.style.display = name === 'console' ? 'block' : 'none';
+  previewFr.classList.toggle('active', name === 'preview');
+}
+
+// ── PREVIEW FULLSCREEN ────────────────────────────────────────────────────
+let isFullscreen = false;
+
+function togglePreviewFullscreen() {
+  isFullscreen = !isFullscreen;
+  const overlay = document.getElementById('previewOverlay');
+  const inlineFrame = document.getElementById('previewFrame');
+
+  if (isFullscreen) {
+    // Copy current srcdoc to overlay frame
+    const src = inlineFrame.srcdoc || '';
+    const overlayFrame = document.getElementById('previewOverlayFrame');
+    overlayFrame.srcdoc = src;
+    overlay.classList.add('active');
+    updateFsIcon(true);
+    showFsHint('ESC oder ✕ Schließen zum Beenden');
+  } else {
+    overlay.classList.remove('active');
+    updateFsIcon(false);
+  }
+}
+
+function reloadOverlayPreview() {
+  const inlineFrame = document.getElementById('previewFrame');
+  const overlayFrame = document.getElementById('previewOverlayFrame');
+  // Re-run code to get fresh content
+  const code = cm.getValue();
+  if (currentLang === 'html') {
+    inlineFrame.srcdoc = code;
+    overlayFrame.srcdoc = code;
+  }
+  showToast('Vorschau neu geladen');
+}
+
+function updateFsIcon(full) {
+  document.getElementById('fsIcon').innerHTML = full
+    ? `<polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/>
+       <line x1="10" y1="14" x2="3" y2="21"/><line x1="21" y1="3" x2="14" y2="10"/>`
+    : `<polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/>
+       <line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>`;
+}
+
+function showFsHint(msg) {
+  const existing = document.querySelector('.fs-hint');
+  if (existing) existing.remove();
+  const hint = document.createElement('div');
+  hint.className = 'fs-hint';
+  hint.textContent = msg;
+  document.body.appendChild(hint);
+  setTimeout(() => hint.classList.add('fade'), 2000);
+  setTimeout(() => hint.remove(), 2600);
+}
+
+// ESC key exits fullscreen
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && isFullscreen) togglePreviewFullscreen();
+});
+
+// ── COPY / CLEAR ──────────────────────────────────────────────────────────
+function copyCode() {
+  navigator.clipboard.writeText(cm.getValue()).then(() => showToast('Code kopiert!'));
+}
+
+function clearEditor() {
+  cm.setValue('');
+  cm.focus();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ── SAVE / LOAD ───────────────────────────────────────────────────────────
+const STORAGE_KEY = 'codex_saved_files';
+let saveTarget = 'local';
+let isDirty = false;
+
+function markDirty() {
+  if (!isDirty) {
+    isDirty = true;
+    document.getElementById('unsavedDot').style.display = 'inline-block';
+  }
+}
+function markClean() {
+  isDirty = false;
+  document.getElementById('unsavedDot').style.display = 'none';
+}
+
+// Hook CM change to track unsaved state
+cm.on('change', markDirty);
+
+// ── STORAGE HELPERS ───────────────────────────────────────────────────────
+function getSavedFiles() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
+  catch { return {}; }
+}
+function putSavedFile(name, content, lang) {
+  const files = getSavedFiles();
+  files[name] = { content, lang, saved: new Date().toLocaleString('de-DE') };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(files));
+  refreshSavedLists();
+}
+function deleteSavedFile(name) {
+  const files = getSavedFiles();
+  delete files[name];
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(files));
+  refreshSavedLists();
+}
+
+function refreshSavedLists() {
+  const files = getSavedFiles();
+  const keys  = Object.keys(files);
+
+  // Sidebar count badge
+  document.getElementById('savedCount').textContent = keys.length;
+
+  // Sidebar list
+  const sidebar = document.getElementById('savedFilesList');
+  if (keys.length === 0) {
+    sidebar.innerHTML = '<div class="saved-empty">Noch nichts gespeichert.</div>';
+  } else {
+    sidebar.innerHTML = keys.map(name => `
+      <div class="saved-file-item">
+        <span class="sf-name" onclick="loadSavedFile('${escAttr(name)}')" title="${escAttr(name)}">${escHtml(name)}</span>
+        <div class="sf-actions">
+          <button class="sf-btn" onclick="loadSavedFile('${escAttr(name)}')" title="Laden">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
+          </button>
+          <button class="sf-btn" onclick="downloadSavedFile('${escAttr(name)}')" title="Herunterladen">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </button>
+          <button class="sf-btn del" onclick="deleteSavedFile('${escAttr(name)}')" title="Löschen">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+          </button>
+        </div>
+      </div>`).join('');
+  }
+
+  // Modal list
+  const modal = document.getElementById('savedListModal');
+  if (keys.length === 0) {
+    modal.innerHTML = '<div class="saved-empty">Noch keine Dateien gespeichert.</div>';
+  } else {
+    modal.innerHTML = keys.map(name => {
+      const f = files[name];
+      return `<div class="saved-list-item" onclick="loadSavedFileAndClose('${escAttr(name)}')">
+        <span class="sli-name">${escHtml(name)}</span>
+        <span class="sli-meta">${escHtml(f.saved || '')}</span>
+        <button class="sli-del" onclick="event.stopPropagation();deleteSavedFile('${escAttr(name)}')" title="Löschen">✕</button>
+      </div>`;
+    }).join('');
+  }
+}
+
+function escAttr(s) { return String(s).replace(/'/g,"\\'"); }
+
+function loadSavedFile(name) {
+  const files = getSavedFiles();
+  const f = files[name];
+  if (!f) return;
+  const modeMap = { javascript:'javascript', html:'htmlmixed', css:'css', python:'python', xml:'xml', json:'javascript', ts:'javascript' };
+  currentLang = f.lang || 'javascript';
+  const mode  = modeMap[currentLang] || 'javascript';
+  cm.setOption('mode', mode);
+  cm.setValue(f.content);
+  document.getElementById('fileTab').innerHTML = escHtml(name) + '<span id="unsavedDot" class="unsaved-dot" style="display:none"></span>';
+  markClean();
+  showToast(`"${name}" geladen`);
+}
+
+function loadSavedFileAndClose(name) {
+  loadSavedFile(name);
+  closeLoadModal();
+}
+
+function downloadSavedFile(name) {
+  const files = getSavedFiles();
+  const f = files[name];
+  if (!f) return;
+  triggerDownload(name, f.content);
+  showToast(`"${name}" heruntergeladen`);
+}
+
+function triggerDownload(filename, content) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([content], {type:'text/plain'}));
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ── SAVE MODAL ────────────────────────────────────────────────────────────
+function openSaveModal() {
+  const tab = document.getElementById('fileTab').childNodes[0].textContent.trim();
+  document.getElementById('saveFileName').value = tab || 'meine-datei.js';
+  document.getElementById('saveModal').classList.add('active');
+  document.getElementById('saveFileName').select();
+}
+function closeSaveModal() {
+  document.getElementById('saveModal').classList.remove('active');
+}
+function setSaveTarget(t) {
+  saveTarget = t;
+  document.getElementById('optLocal').classList.toggle('active', t === 'local');
+  document.getElementById('optDownload').classList.toggle('active', t === 'download');
+  document.getElementById('saveInfo').textContent = t === 'local'
+    ? 'Wird im Browser-Speicher gespeichert und bleibt auch nach dem Schließen erhalten.'
+    : 'Datei wird direkt auf deinen Rechner heruntergeladen.';
+}
+function confirmSave() {
+  const name = document.getElementById('saveFileName').value.trim();
+  if (!name) { document.getElementById('saveFileName').focus(); return; }
+  const code = cm.getValue();
+  if (saveTarget === 'local') {
+    putSavedFile(name, code, currentLang);
+    showToast(`"${name}" gespeichert`);
+  } else {
+    triggerDownload(name, code);
+    showToast(`"${name}" heruntergeladen`);
+  }
+  markClean();
+  document.getElementById('fileTab').childNodes[0].textContent = name;
+  closeSaveModal();
+}
+
+// ── LOAD MODAL ────────────────────────────────────────────────────────────
+function openLoadModal() {
+  refreshSavedLists();
+  switchLoadTab('saved');
+  document.getElementById('loadModal').classList.add('active');
+}
+function closeLoadModal() {
+  document.getElementById('loadModal').classList.remove('active');
+}
+function switchLoadTab(tab) {
+  document.getElementById('ltSaved').classList.toggle('active', tab === 'saved');
+  document.getElementById('ltDisk').classList.toggle('active', tab === 'disk');
+  document.getElementById('lp-saved').classList.toggle('active', tab === 'saved');
+  document.getElementById('lp-disk').classList.toggle('active', tab === 'disk');
+}
+
+// ── LOAD FROM DISK ────────────────────────────────────────────────────────
+function loadFromDisk(evt) {
+  const file = evt.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    applyLoadedFile(file.name, e.target.result);
+    closeLoadModal();
+    evt.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+function applyLoadedFile(filename, content) {
+  const ext = filename.split('.').pop().toLowerCase();
+  const modeMap = { js:'javascript', html:'htmlmixed', css:'css', py:'python', xml:'xml', ts:'javascript', json:'javascript' };
+  const langMap = { js:'javascript', html:'html', css:'css', py:'python', xml:'xml', ts:'javascript', json:'javascript' };
+  const mode = modeMap[ext] || 'javascript';
+  currentLang = langMap[ext] || 'javascript';
+  cm.setOption('mode', mode);
+  cm.setValue(content);
+  document.getElementById('fileTab').innerHTML = escHtml(filename) + '<span id="unsavedDot" class="unsaved-dot" style="display:none"></span>';
+  markClean();
+  showToast(`"${filename}" geladen`);
+}
+
+// ── DRAG & DROP ───────────────────────────────────────────────────────────
+function handleDragOver(e) {
+  e.preventDefault();
+  document.getElementById('dropZone').classList.add('dragover');
+}
+function handleDragLeave() {
+  document.getElementById('dropZone').classList.remove('dragover');
+}
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('dropZone').classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    applyLoadedFile(file.name, ev.target.result);
+    closeLoadModal();
+  };
+  reader.readAsText(file);
+}
+
+// ── KEYBOARD SHORTCUTS ────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+    e.preventDefault();
+    openSaveModal();
+  }
+  if (e.key === 'Escape') {
+    closeSaveModal();
+    closeLoadModal();
+  }
+});
+
+// Close modals on backdrop click
+document.getElementById('saveModal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeSaveModal();
+});
+document.getElementById('loadModal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeLoadModal();
+});
+
+// Init saved files display
+refreshSavedLists();
+
+// ── CLOCK ─────────────────────────────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  document.getElementById('statusTime').textContent =
+    now.toLocaleTimeString('de-DE');
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+// Init
+updateCharCount();
+updateStatusLines();
+cm.focus();
+</script>
+</body>
+</html>

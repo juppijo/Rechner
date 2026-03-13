@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HTML/CSS/JS – Fortgeschritten</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f5f0e8;
+      --surface: #ede8de;
+      --card: #faf8f4;
+      --border: #c8c0b0;
+      --border2: #a89880;
+      --ink: #1a1410;
+      --ink2: #3d3530;
+      --muted: #8a7d70;
+      --accent: #c0392b;
+      --accent2: #2c7a4b;
+      --accent3: #1a5f9a;
+      --accent4: #8b4513;
+      --code-bg: #1a1410;
+      --code-border: #3d3020;
+      --yellow: #f4c542;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'IBM Plex Mono', monospace;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(0,0,0,0.04) 39px, rgba(0,0,0,0.04) 40px),
+        repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(0,0,0,0.04) 39px, rgba(0,0,0,0.04) 40px);
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--ink);
+      color: #f5f0e8;
+      padding: 0 0 0 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .header-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 340px;
+    }
+    .header-left {
+      padding: 50px 48px;
+      border-right: 2px solid #3d3530;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .header-right {
+      padding: 30px 36px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .level-tag {
+      display: inline-block;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      margin-bottom: 22px;
+    }
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      font-weight: 900;
+      line-height: 1.05;
+      animation: fadeIn 0.5s ease;
+    }
+    header h1 em { color: var(--yellow); font-style: normal; }
+    header p {
+      color: #8a7d70;
+      font-size: 13px;
+      margin-top: 16px;
+      line-height: 1.7;
+    }
+
+    /* Terminal decoration */
+    .terminal-deco {
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 8px;
+      width: 100%;
+      max-width: 320px;
+      font-size: 12px;
+      animation: fadeIn 0.5s 0.2s ease both;
+    }
+    .term-bar {
+      background: #222;
+      padding: 8px 14px;
+      border-bottom: 1px solid #333;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 8px 8px 0 0;
+    }
+    .term-bar span { width:10px;height:10px;border-radius:50%; }
+    .term-bar span:nth-child(1){background:#ff5f57;}
+    .term-bar span:nth-child(2){background:#febc2e;}
+    .term-bar span:nth-child(3){background:#28c840;}
+    .term-body { padding: 16px 18px; line-height: 2; }
+    .term-body .gr  { color: #28c840; }
+    .term-body .yl  { color: #febc2e; }
+    .term-body .rd  { color: #ff6b6b; }
+    .term-body .bl  { color: #6b9dff; }
+    .term-body .dim { color: #555; }
+    .blink { animation: blink 1s infinite; }
+    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0;} }
+
+    /* ── PROGRESS ── */
+    .progress-strip {
+      background: var(--surface);
+      border-bottom: 2px solid var(--border);
+      padding: 16px 48px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .prog-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+    .prog-track {
+      flex: 1;
+      min-width: 120px;
+      height: 4px;
+      background: var(--border);
+    }
+    .prog-fill {
+      height: 100%;
+      background: var(--accent);
+      transition: width 0.5s cubic-bezier(.4,0,.2,1);
+      width: 0%;
+    }
+    .prog-count { font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+    /* ── NAV PILLS ── */
+    .chapter-nav {
+      padding: 20px 48px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      border-bottom: 1px solid var(--border);
+      background: var(--card);
+    }
+    .ch-pill {
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      background: transparent;
+      color: var(--muted);
+      transition: all 0.2s;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+    .ch-pill:hover { border-color: var(--ink); color: var(--ink); }
+    .ch-pill.active { background: var(--ink); color: #f5f0e8; border-color: var(--ink); }
+    .ch-pill.done { border-color: var(--accent2); color: var(--accent2); }
+    .ch-pill.done.active { background: var(--accent2); color: #fff; border-color: var(--accent2); }
+
+    /* ── MAIN LAYOUT ── */
+    .workspace {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: calc(100vh - 420px);
+    }
+
+    /* Sidebar */
+    aside {
+      border-right: 1px solid var(--border);
+      background: var(--surface);
+      padding: 28px 0;
+    }
+    .aside-title {
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0 24px 16px;
+    }
+    .aside-link {
+      display: block;
+      padding: 12px 24px;
+      font-size: 12px;
+      color: var(--ink2);
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all 0.15s;
+      line-height: 1.4;
+    }
+    .aside-link:hover { background: rgba(0,0,0,0.04); border-left-color: var(--border2); }
+    .aside-link.active { background: var(--card); border-left-color: var(--accent); color: var(--accent); font-weight: 600; }
+    .aside-link.done { color: var(--accent2); }
+    .aside-link.done.active { border-left-color: var(--accent2); }
+    .aside-link .num { color: var(--muted); margin-right: 8px; font-size: 11px; }
+    .aside-link.active .num { color: var(--accent); }
+
+    /* Content */
+    article {
+      padding: 48px;
+      max-width: 860px;
+    }
+
+    /* ── LESSON CARD ── */
+    .lesson { display: none; animation: fadeIn 0.35s ease; }
+    .lesson.active { display: block; }
+
+    @keyframes fadeIn { from{opacity:0;transform:translateY(12px);} to{opacity:1;transform:translateY(0);} }
+
+    .lesson-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .difficulty {
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border: 1px solid;
+    }
+    .diff-mid    { border-color: var(--accent3); color: var(--accent3); }
+    .diff-hard   { border-color: var(--accent); color: var(--accent); }
+    .diff-expert { border-color: #7b2d8b; color: #7b2d8b; }
+    .topic-id { font-size: 11px; color: var(--muted); letter-spacing: 2px; }
+
+    .lesson h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem;
+      font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: 20px;
+      color: var(--ink);
+    }
+    .lesson > p, .lesson .desc {
+      font-size: 13px;
+      line-height: 1.9;
+      color: var(--ink2);
+      margin-bottom: 18px;
+    }
+    code {
+      background: rgba(0,0,0,0.08);
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      color: var(--accent);
+    }
+
+    /* ── CODE BLOCK ── */
+    .codeblock {
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
+      margin: 22px 0;
+      overflow: hidden;
+    }
+    .cb-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 18px;
+      border-bottom: 1px solid var(--code-border);
+      background: #111;
+    }
+    .cb-dots { display:flex;gap:6px; }
+    .cb-dots span { width:9px;height:9px;border-radius:50%; }
+    .cb-dots span:nth-child(1){background:#ff5f57;}
+    .cb-dots span:nth-child(2){background:#febc2e;}
+    .cb-dots span:nth-child(3){background:#28c840;}
+    .cb-file { font-size: 11px; color: #666; letter-spacing: 1px; }
+    pre {
+      padding: 22px 24px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12.5px;
+      line-height: 1.9;
+      color: #d4c5b0;
+      overflow-x: auto;
+    }
+    .k  { color: #c792ea; } /* keyword */
+    .fn { color: #82aaff; } /* function */
+    .s  { color: #c3e88d; } /* string */
+    .n  { color: #f78c6c; } /* number */
+    .c  { color: #546e7a; font-style: italic; } /* comment */
+    .t  { color: #80cbc4; } /* tag */
+    .a  { color: #ffcb6b; } /* attr */
+    .v  { color: #f07178; } /* value */
+    .p  { color: #89ddff; } /* punct/selector */
+    .w  { color: #d4c5b0; } /* white/text */
+
+    /* ── CONCEPT GRID ── */
+    .concept-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin: 22px 0;
+    }
+    .concept-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 18px;
+    }
+    .concept-card h4 {
+      font-size: 12px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      color: var(--accent3);
+    }
+    .concept-card p { font-size: 12px; line-height: 1.7; color: var(--ink2); }
+
+    /* ── NOTE BOX ── */
+    .note {
+      border-left: 3px solid;
+      padding: 14px 18px;
+      margin: 18px 0;
+      font-size: 12.5px;
+      line-height: 1.7;
+    }
+    .note.warn { border-color: #e67e22; background: rgba(230,126,34,0.06); color: var(--ink2); }
+    .note.info { border-color: var(--accent3); background: rgba(26,95,154,0.06); color: var(--ink2); }
+    .note.tip  { border-color: var(--accent2); background: rgba(44,122,75,0.06); color: var(--ink2); }
+    .note b { font-weight: 700; }
+
+    /* ── LIVE EDITOR ── */
+    .editor-wrap {
+      margin: 24px 0;
+      border: 1px solid var(--border);
+    }
+    .editor-head {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .editor-head span { font-size: 11px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+    textarea {
+      width: 100%;
+      background: var(--code-bg);
+      border: none;
+      padding: 18px 20px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12.5px;
+      color: #d4c5b0;
+      resize: vertical;
+      min-height: 160px;
+      outline: none;
+      line-height: 1.8;
+    }
+    .editor-actions {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 10px 16px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .run-btn {
+      background: var(--ink);
+      color: #f5f0e8;
+      border: none;
+      padding: 8px 20px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: opacity 0.15s;
+    }
+    .run-btn:hover { opacity: 0.8; }
+    .editor-hint { font-size: 11px; color: var(--muted); }
+    .preview-frame {
+      border-top: 1px solid var(--border);
+      background: #fff;
+      min-height: 80px;
+      padding: 20px;
+      color: #222;
+      font-family: sans-serif;
+    }
+
+    /* ── QUIZ ── */
+    .quiz {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 28px;
+      margin: 28px 0;
+    }
+    .quiz-title {
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+    .quiz h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; margin-bottom: 20px; line-height: 1.5; }
+    .q-opts { display: flex; flex-direction: column; gap: 10px; }
+    .q-opt {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 12px 18px;
+      cursor: pointer;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12.5px;
+      text-align: left;
+      color: var(--ink2);
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .q-opt:hover { border-color: var(--ink); color: var(--ink); }
+    .q-opt.ok  { border-color: var(--accent2); background: rgba(44,122,75,0.08); color: var(--accent2); }
+    .q-opt.err { border-color: var(--accent); background: rgba(192,57,43,0.08); color: var(--accent); }
+    .q-fb { margin-top: 14px; font-size: 12.5px; min-height: 18px; }
+    .q-fb.ok  { color: var(--accent2); }
+    .q-fb.err { color: var(--accent); }
+
+    /* ── CHALLENGE ── */
+    .challenge {
+      border: 2px dashed var(--accent);
+      padding: 24px;
+      margin: 24px 0;
+    }
+    .challenge-tag {
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .challenge h4 { font-family: 'Playfair Display', serif; font-size: 1.1rem; margin-bottom: 10px; }
+    .challenge p { font-size: 12.5px; line-height: 1.7; color: var(--ink2); }
+
+    /* ── NAV BUTTONS ── */
+    .nav-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 40px;
+      padding-top: 28px;
+      border-top: 1px solid var(--border);
+    }
+    .nav-btn {
+      padding: 12px 28px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px;
+      cursor: pointer;
+      border: 2px solid;
+      transition: all 0.15s;
+      letter-spacing: 0.5px;
+    }
+    .nb-back { background: transparent; border-color: var(--border); color: var(--muted); }
+    .nb-back:hover { border-color: var(--ink); color: var(--ink); }
+    .nb-back:disabled { opacity: 0.3; cursor: default; }
+    .nb-next { background: var(--ink); border-color: var(--ink); color: #f5f0e8; }
+    .nb-next:hover { background: var(--accent); border-color: var(--accent); }
+
+    /* ── CONGRATS ── */
+    #congrats {
+      display: none;
+      padding: 60px 48px;
+      animation: fadeIn 0.5s ease;
+    }
+    #congrats.show { display: block; }
+    .cert {
+      border: 2px solid var(--border2);
+      padding: 48px;
+      text-align: center;
+      background: var(--card);
+      max-width: 600px;
+      position: relative;
+    }
+    .cert::before, .cert::after {
+      content: '';
+      position: absolute;
+      inset: 8px;
+      border: 1px solid var(--border);
+      pointer-events: none;
+    }
+    .cert-label { font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; }
+    .cert h2 { font-family: 'Playfair Display', serif; font-size: 2.2rem; margin-bottom: 14px; line-height: 1.2; }
+    .cert h2 em { color: var(--accent); font-style: normal; }
+    .cert p { font-size: 13px; color: var(--muted); line-height: 1.8; }
+    .restart-btn {
+      margin-top: 28px;
+      background: transparent;
+      border: 2px solid var(--ink);
+      color: var(--ink);
+      padding: 12px 32px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: all 0.2s;
+    }
+    .restart-btn:hover { background: var(--ink); color: #f5f0e8; }
+
+    @media (max-width: 760px) {
+      .header-grid { grid-template-columns: 1fr; }
+      .header-right { display: none; }
+      .workspace { grid-template-columns: 1fr; }
+      aside { display: none; }
+      article { padding: 28px 20px; }
+      .progress-strip { padding: 14px 20px; }
+      .chapter-nav { padding: 14px 20px; }
+      .concept-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-grid">
+    <div class="header-left">
+      <div class="level-tag">⚡ Fortgeschrittenes Niveau</div>
+      <h1>Moderne<br><em>Web-</em><br>techniken</h1>
+      <p>CSS Grid · Flexbox · JS APIs<br>Async/Await · DOM Mastery · Performance</p>
+    </div>
+    <div class="header-right">
+      <div class="terminal-deco">
+        <div class="term-bar"><span></span><span></span><span></span></div>
+        <div class="term-body">
+          <div><span class="gr">$</span> <span class="yl">npm</span> start webkurs</div>
+          <div><span class="dim">▶ Lade Module...</span></div>
+          <div><span class="gr">✓</span> CSS Grid geladen</div>
+          <div><span class="gr">✓</span> JS APIs bereit</div>
+          <div><span class="gr">✓</span> Async/Await aktiv</div>
+          <div><span class="bl">→</span> Bereit! <span class="blink">█</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- PROGRESS -->
+<div class="progress-strip">
+  <span class="prog-label">Fortschritt</span>
+  <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
+  <span class="prog-count" id="progCount">0 / 7</span>
+</div>
+
+<!-- CHAPTER NAV -->
+<div class="chapter-nav" id="chapterNav"></div>
+
+<!-- WORKSPACE -->
+<div class="workspace">
+  <aside id="sidebar"></aside>
+
+  <article>
+
+    <!-- ════════ LEKTION 1: CSS FLEXBOX ════════ -->
+    <div class="lesson active" data-i="0">
+      <div class="lesson-eyebrow">
+        <span class="difficulty diff-mid">Mittel</span>
+        <span class="topic-id">01 / 07 · CSS</span>
+      </div>
+      <h2>CSS Flexbox – Das flexible Layout</h2>
+      <p class="desc">Flexbox löst das jahrelange Problem der vertikalen & horizontalen Ausrichtung in CSS. Mit einer Zeile <code>display: flex</code> wird ein Container zum Flex-Container, und seine direkten Kinder werden zu Flex-Items.</p>
+
+      <div class="concept-grid">
+        <div class="concept-card">
+          <h4>Flex-Container</h4>
+          <p>Wird durch <code>display: flex</code> aktiviert. Steuert die Anordnung aller direkten Kinder mit Properties wie <code>justify-content</code>, <code>align-items</code>, <code>flex-direction</code>.</p>
+        </div>
+        <div class="concept-card">
+          <h4>Flex-Items</h4>
+          <p>Die direkten Kinder des Containers. Mit <code>flex: 1</code> wachsen sie gleichmäßig. <code>align-self</code> überschreibt die Container-Ausrichtung für einzelne Items.</p>
+        </div>
+      </div>
+
+      <div class="codeblock">
+        <div class="cb-header">
+          <div class="cb-dots"><span></span><span></span><span></span></div>
+          <div class="cb-file">layout.css</div>
+        </div>
+        <pre><span class="c">/* Flex-Container */</span>
+<span class="p">.container</span> {
+  <span class="a">display</span>: <span class="s">flex</span>;
+  <span class="a">flex-direction</span>: <span class="s">row</span>;          <span class="c">/* row | column */</span>
+  <span class="a">justify-content</span>: <span class="s">space-between</span>; <span class="c">/* Hauptachse */</span>
+  <span class="a">align-items</span>: <span class="s">center</span>;           <span class="c">/* Querachse */</span>
+  <span class="a">gap</span>: <span class="n">16px</span>;                      <span class="c">/* Abstand zwischen Items */</span>
+  <span class="a">flex-wrap</span>: <span class="s">wrap</span>;               <span class="c">/* Zeilenumbruch erlauben */</span>
+}
+
+<span class="c">/* Flex-Items */</span>
+<span class="p">.item</span> {
+  <span class="a">flex</span>: <span class="n">1</span>;           <span class="c">/* flex-grow: 1, flex-shrink: 1 */</span>
+  <span class="a">flex</span>: <span class="n">0 0 200px</span>;  <span class="c">/* feste Breite 200px */</span>
+  <span class="a">align-self</span>: <span class="s">flex-end</span>; <span class="c">/* nur dieses Item */</span>
+}</pre>
+      </div>
+
+      <div class="note info"><b>INFO:</b> <code>justify-content</code> wirkt auf die <em>Hauptachse</em> (horizontal bei row), <code>align-items</code> auf die <em>Querachse</em> (vertikal bei row). Das zu verwechseln ist der häufigste Flexbox-Fehler.</div>
+
+      <div class="editor-wrap">
+        <div class="editor-head">
+          <span>Live-Editor – Flexbox</span>
+        </div>
+        <textarea id="ed0">&lt;style&gt;
+  .flex-demo {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 12px;
+    background: #f0f4ff;
+    padding: 20px;
+    border-radius: 8px;
+    flex-wrap: wrap;
+  }
+  .box {
+    background: #4a4aff;
+    color: white;
+    padding: 20px;
+    border-radius: 6px;
+    font-weight: bold;
+    font-family: monospace;
+    flex: 1;
+    min-width: 80px;
+    text-align: center;
+  }
+  .box:nth-child(2) { background: #c0392b; flex: 2; }
+  .box:nth-child(3) { background: #2c7a4b; }
+&lt;/style&gt;
+&lt;div class="flex-demo"&gt;
+  &lt;div class="box"&gt;flex: 1&lt;/div&gt;
+  &lt;div class="box"&gt;flex: 2&lt;/div&gt;
+  &lt;div class="box"&gt;flex: 1&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        <div class="editor-actions">
+          <button class="run-btn" onclick="run('ed0','pv0')">▶ Ausführen</button>
+          <span class="editor-hint">Ändere justify-content oder flex-Werte!</span>
+        </div>
+        <div class="preview-frame" id="pv0">Vorschau erscheint hier...</div>
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-title">Wissenscheck</div>
+        <h3>Welche CSS-Property richtet Flex-Items auf der Hauptachse aus?</h3>
+        <div class="q-opts">
+          <button class="q-opt" data-ok="false">align-items</button>
+          <button class="q-opt" data-ok="true">justify-content</button>
+          <button class="q-opt" data-ok="false">flex-direction</button>
+          <button class="q-opt" data-ok="false">align-self</button>
+        </div>
+        <div class="q-fb"></div>
+      </div>
+      <div class="nav-row">
+        <button class="nav-btn nb-back" disabled>← Zurück</button>
+        <button class="nav-btn nb-next">Weiter →</button>
+      </div>
+    </div>
+
+    <!-- ════════ LEKTION 2: CSS GRID ════════ -->
+    <div class="lesson" data-i="1">
+      <div class="lesson-eyebrow">
+        <span class="difficulty diff-mid">Mittel</span>
+        <span class="topic-id">02 / 07 · CSS</span>
+      </div>
+      <h2>CSS Grid – Zweidimensionale Layouts</h2>
+      <p class="desc">CSS Grid ist das mächtigste Layout-System in CSS. Im Gegensatz zu Flexbox (1D) arbeitet Grid in <strong>zwei Dimensionen</strong> gleichzeitig – Zeilen <em>und</em> Spalten.</p>
+
+      <div class="codeblock">
+        <div class="cb-header">
+          <div class="cb-dots"><span></span><span></span><span></span></div>
+          <div class="cb-file">grid.css</div>
+        </div>
+        <pre><span class="p">.grid</span> {
+  <span class="a">display</span>: <span class="s">grid</span>;
+
+  <span class="c">/* 3 Spalten: 1fr 2fr 1fr */</span>
+  <span class="a">grid-template-columns</span>: <span class="n">1</span>fr <span class="n">2</span>fr <span class="n">1</span>fr;
+
+  <span class="c">/* Automatische Spalten (responsive!) */</span>
+  <span class="a">grid-template-columns</span>: <span class="fn">repeat</span>(<span class="s">auto-fit</span>, <span class="fn">minmax</span>(<span class="n">200px</span>, <span class="n">1</span>fr));
+
+  <span class="a">grid-template-rows</span>: <span class="n">auto</span> <span class="n">1</span>fr <span class="n">60px</span>;
+  <span class="a">gap</span>: <span class="n">20px</span>;
+}
+
+<span class="c">/* Item überspannt mehrere Zellen */</span>
+<span class="p">.header</span> { <span class="a">grid-column</span>: <span class="n">1</span> / <span class="n">-1</span>; } <span class="c">/* volle Breite */</span>
+<span class="p">.sidebar</span> { <span class="a">grid-row</span>: <span class="n">2</span> / <span class="n">4</span>; }     <span class="c">/* 2 Reihen */</span>
+
+<span class="c">/* Named Grid Areas */</span>
+<span class="p">.layout</span> {
+  <span class="a">grid-template-areas</span>:
+    <span class="s">"header header"</span>
+    <span class="s">"sidebar main"</span>
+    <span class="s">"footer footer"</span>;
+}
+<span class="p">.header</span>  { <span class="a">grid-area</span>: <span class="s">header</span>; }
+<span class="p">.sidebar</span> { <span class="a">grid-area</span>: <span class="s">sidebar</span>; }</pre>
+      </div>
+
+      <div class="note tip"><b>TIPP:</b> Die Funktion <code>repeat(auto-fit, minmax(200px, 1fr))</code> macht ein Grid automatisch responsiv – ohne Media Queries!</div>
+
+      <div class="editor-wrap">
+        <div class="editor-head"><span>Live-Editor – CSS Grid</span></div>
+        <textarea id="ed1">&lt;style&gt;
+  .grid-demo {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    grid-template-rows: 60px 120px 60px;
+    gap: 10px;
+    background: #1a1410;
+    padding: 10px;
+    border-radius: 8px;
+  }
+  .g-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: monospace;
+    font-size: 13px;
+    border-radius: 4px;
+    font-weight: bold;
+  }
+  .g-item:nth-child(1) { background:#c0392b;color:#fff;grid-column:1/-1; }
+  .g-item:nth-child(2) { background:#2c7a4b;color:#fff; }
+  .g-item:nth-child(3) { background:#1a5f9a;color:#fff; }
+  .g-item:nth-child(4) { background:#8b4513;color:#fff; }
+  .g-item:nth-child(5) { background:#4a4aff;color:#fff;grid-column:1/-1; }
+&lt;/style&gt;
+&lt;div class="grid-demo"&gt;
+  &lt;div class="g-item"&gt;Header (volle Breite)&lt;/div&gt;
+  &lt;div class="g-item"&gt;Sidebar&lt;/div&gt;
+  &lt;div class="g-item"&gt;Main Content&lt;/div&gt;
+  &lt;div class="g-item"&gt;Aside&lt;/div&gt;
+  &lt;div class="g-item"&gt;Footer (volle Breite)&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        <div class="editor-actions">
+          <button class="run-btn" onclick="run('ed1','pv1')">▶ Ausführen</button>
+          <span class="editor-hint">Probiere grid-template-columns zu ändern!</span>
+        </div>
+        <div class="preview-frame" id="pv1"></div>
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-title">Wissenscheck</div>
+        <h3>Was bewirkt <code>grid-column: 1 / -1</code> bei einem Grid-Item?</h3>
+        <div class="q-opts">
+          <button class="q-opt" data-ok="false">Das Item wird ausgeblendet</button>
+          <button class="q-opt" data-ok="true">Das Item erstreckt sich über alle Spalten</button>
+          <button class="q-opt" data-ok="false">Das Item bekommt eine negative Breite</button>
+          <button class="q-opt" data-ok="false">Das Item wird in der ersten Spalte zentriert</button>
+        </div>
+        <div class="q-fb"></div>
+      </div>
+      <div class="nav-row">
+        <button class="nav-btn nb-back">← Zurück</button>
+        <button class="nav-btn nb-next">Weiter →</button>
+      </div>
+    </div>
+
+    <!-- ════════ LEKTION 3: CSS ANIMATIONEN ════════ -->
+    <div class="lesson" data-i="2">
+      <div class="lesson-eyebrow">
+        <span class="difficulty diff-mid">Mittel</span>
+        <span class="topic-id">03 / 07 · CSS</span>
+      </div>
+      <h2>CSS Animationen & Transitions</h2>
+      <p class="desc"><code>transition</code> erzeugt weiche Übergänge bei Zustandsänderungen (z.B. Hover). <code>@keyframes</code> definiert komplexe mehrstufige Animationen, die automatisch ablaufen.</p>
+
+      <div class="codeblock">
+        <div class="cb-header">
+          <div class="cb-dots"><span></span><span></span><span></span></div>
+          <div class="cb-file">animation.css</div>
+        </div>
+        <pre><span class="c">/* ── Transitions ── */</span>
+<span class="p">.button</span> {
+  <span class="a">background</span>: <span class="s">blue</span>;
+  <span class="a">transition</span>: <span class="s">background</span> <span class="n">0.3s</span> <span class="s">ease</span>,
+              <span class="s">transform</span>  <span class="n">0.2s</span> <span class="s">cubic-bezier(.4,0,.2,1)</span>;
+}
+<span class="p">.button:hover</span> {
+  <span class="a">background</span>: <span class="s">red</span>;
+  <span class="a">transform</span>: <span class="fn">scale</span>(<span class="n">1.05</span>) <span class="fn">translateY</span>(<span class="n">-2px</span>);
+}
+
+<span class="c">/* ── Keyframe-Animation ── */</span>
+<span class="k">@keyframes</span> <span class="fn">pulsieren</span> {
+  <span class="n">0%</span>   { <span class="a">transform</span>: <span class="fn">scale</span>(<span class="n">1</span>);    <span class="a">opacity</span>: <span class="n">1</span>; }
+  <span class="n">50%</span>  { <span class="a">transform</span>: <span class="fn">scale</span>(<span class="n">1.1</span>);  <span class="a">opacity</span>: <span class="n">0.8</span>; }
+  <span class="n">100%</span> { <span class="a">transform</span>: <span class="fn">scale</span>(<span class="n">1</span>);    <span class="a">opacity</span>: <span class="n">1</span>; }
+}
+<span class="p">.puls</span> {
+  <span class="a">animation</span>: <span class="s">pulsieren</span> <span class="n">2s</span> <span class="s">ease-in-out</span> <span class="s">infinite</span>;
+  <span class="a">animation-delay</span>: <span class="n">0.5s</span>; <span class="c">/* Verzögerung */</span>
+}</pre>
+      </div>
+
+      <div class="editor-wrap">
+        <div class="editor-head"><span>Live-Editor – Animationen</span></div>
+        <textarea id="ed2">&lt;style&gt;
+  @keyframes einflug {
+    from { opacity:0; transform: translateX(-40px); }
+    to   { opacity:1; transform: translateX(0); }
+  }
+  @keyframes drehen {
+    to { transform: rotate(360deg); }
+  }
+  .anim-box {
+    display: flex; gap: 20px; align-items: center;
+    padding: 24px; background: #f5f0e8;
+    border-radius: 10px; flex-wrap: wrap;
+  }
+  .ball {
+    width: 60px; height: 60px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: bold; font-size: 12px;
+    font-family: monospace;
+  }
+  .b1 { background:#c0392b; animation: einflug 0.8s ease both; }
+  .b2 { background:#1a5f9a; animation: einflug 0.8s 0.2s ease both; }
+  .b3 { background:#2c7a4b; animation: drehen 2s linear infinite; }
+  .btn-hover {
+    padding: 12px 24px; background:#1a1410; color:#f5f0e8;
+    border:none; border-radius:6px; cursor:pointer; font-size:14px;
+    transition: background 0.3s ease, transform 0.2s cubic-bezier(.4,0,.2,1);
+  }
+  .btn-hover:hover { background:#c0392b; transform: scale(1.06) translateY(-2px); }
+&lt;/style&gt;
+&lt;div class="anim-box"&gt;
+  &lt;div class="ball b1"&gt;einflug&lt;/div&gt;
+  &lt;div class="ball b2"&gt;delay&lt;/div&gt;
+  &lt;div class="ball b3"&gt;∞&lt;/div&gt;
+  &lt;button class="btn-hover"&gt;Hover über mich!&lt;/button&gt;
+&lt;/div&gt;</textarea>
+        <div class="editor-actions">
+          <button class="run-btn" onclick="run('ed2','pv2')">▶ Ausführen</button>
+          <span class="editor-hint">Ändere Dauer, Easing oder Keyframe-Werte!</span>
+        </div>
+        <div class="preview-frame" id="pv2"></div>
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-title">Wissenscheck</div>
+        <h3>Welche Eigenschaft erzeugt einen weichen Übergang bei einem Hover-Effekt?</h3>
+        <div class="q-opts">
+          <button class="q-opt" data-ok="false">@keyframes</button>
+          <button class="q-opt" data-ok="false">animation</button>
+          <button class="q-opt" data-ok="true">transition</button>
+          <button class="q-opt" data-ok="false">transform</button>
+        </div>
+        <div class="q-fb"></div>
+      </div>
+      <div class="nav-row">
+        <button class="nav-btn nb-back">← Zurück</button>
+        <button class="nav-btn nb-next">Weiter →</button>
+      </div>
+    </div>
+
+    <!-- ════════ LEKTION 4: DOM MANIPULATION ════════ -->
+    <div class="lesson" data-i="3">
+      <div class="lesson-eyebrow">
+        <span class="difficulty diff-hard">Fortgeschritten</span>
+        <span class="topic-id">04 / 07 · JavaScript</span>
+      </div>
+      <h2>DOM – Fortgeschrittene Manipulation</h2>
+      <p class="desc">Das <strong>Document Object Model (DOM)</strong> ist die programmatische Repräsentation deiner HTML-Seite. Fortgeschrittene Entwickler nutzen mehr als nur <code>getElementById</code> – sie arbeiten mit Query-Selektoren, Event-Delegation und dynamischem Element-Erstellen.</p>
+
+      <div class="codeblock">
+        <div class="cb-header">
+          <div class="cb-dots"><span></span><span></span><span></span></div>
+          <div class="cb-file">dom.js</div>
+        </div>
+        <pre><span class="c">// ── Moderne Selektion ──</span>
+<span class="k">const</span> <span class="w">btn</span>  = <span class="w">document</span>.<span class="fn">querySelector</span>(<span class="s">'.mein-btn'</span>);
+<span class="k">const</span> <span class="w">alle</span> = <span class="w">document</span>.<span class="fn">querySelectorAll</span>(<span class="s">'li.aktiv'</span>);
+
+<span class="c">// ── Element erstellen & einfügen ──</span>
+<span class="k">const</span> <span class="w">li</span> = <span class="w">document</span>.<span class="fn">createElement</span>(<span class="s">'li'</span>);
+<span class="w">li</span>.<span class="a">textContent</span> = <span class="s">'Neuer Eintrag'</span>;
+<span class="w">li</span>.<span class="fn">classList</span>.<span class="fn">add</span>(<span class="s">'aktiv'</span>, <span class="s">'neu'</span>);
+<span class="w">document</span>.<span class="fn">querySelector</span>(<span class="s">'ul'</span>).<span class="fn">appendChild</span>(<span class="w">li</span>);
+
+<span class="c">// ── Event-Delegation (effizient!) ──</span>
+<span class="w">document</span>.<span class="fn">querySelector</span>(<span class="s">'.liste'</span>)
+  .<span class="fn">addEventListener</span>(<span class="s">'click'</span>, (<span class="w">e</span>) => {
+    <span class="k">if</span> (<span class="w">e</span>.<span class="a">target</span>.<span class="fn">matches</span>(<span class="s">'li'</span>)) {
+      <span class="w">e</span>.<span class="a">target</span>.<span class="fn">classList</span>.<span class="fn">toggle</span>(<span class="s">'erledigt'</span>);
+    }
+  });
+
+<span class="c">// ── data-Attribute ──</span>
+<span class="w">btn</span>.<span class="a">dataset</span>.<span class="a">userId</span> = <span class="n">42</span>;   <span class="c">// → data-user-id="42"</span>
+<span class="k">const</span> <span class="w">id</span> = <span class="w">btn</span>.<span class="a">dataset</span>.<span class="a">userId</span>;</pre>
+      </div>
+
+      <div class="note warn"><b>PERFORMANCE:</b> Verwende Event-Delegation statt Event-Listener auf jedem Element. Ein Listener auf dem Parent-Element ist effizienter als 100 Listener auf 100 Kinder-Elementen.</div>
+
+      <div class="editor-wrap">
+        <div class="editor-head"><span>Live-Editor – DOM To-Do-Liste</span></div>
+        <textarea id="ed3">&lt;style&gt;
+  .todo-app { font-family: monospace; max-width: 350px; }
+  .todo-input { display:flex; gap:8px; margin-bottom:12px; }
+  input { flex:1; padding:8px; border:2px solid #ccc; border-radius:4px; font-family:monospace; }
+  .add-btn { padding:8px 16px; background:#1a1410; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+  .todo-list { list-style:none; display:flex; flex-direction:column; gap:6px; }
+  .todo-list li {
+    padding:10px 14px; background:#f0f0f0; border-radius:4px;
+    cursor:pointer; display:flex; justify-content:space-between;
+    transition: background 0.2s;
+  }
+  .todo-list li.done { background:#d4edda; text-decoration:line-through; color:#666; }
+  .del { color:#c0392b; font-weight:bold; cursor:pointer; margin-left:10px; }
+&lt;/style&gt;
+&lt;div class="todo-app"&gt;
+  &lt;div class="todo-input"&gt;
+    &lt;input id="inp" placeholder="Aufgabe eingeben..."&gt;
+    &lt;button class="add-btn" onclick="addTodo()"&gt;+ Add&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;ul class="todo-list" id="list"&gt;&lt;/ul&gt;
+&lt;/div&gt;
+&lt;script&gt;
+  function addTodo() {
+    const val = document.getElementById('inp').value.trim();
+    if (!val) return;
+    const li = document.createElement('li');
+    li.innerHTML = `&lt;span&gt;${val}&lt;/span&gt;&lt;span class="del" onclick="this.parentElement.remove()"&gt;✕&lt;/span&gt;`;
+    li.querySelector('span').addEventListener('click', () =&gt; li.classList.toggle('done'));
+    document.getElementById('list').appendChild(li);
+    document.getElementById('inp').value = '';
+  }
+  document.getElementById('inp').addEventListener('keydown', e =&gt; {
+    if (e.key === 'Enter') addTodo();
+  });
+&lt;/script&gt;</textarea>
+        <div class="editor-actions">
+          <button class="run-btn" onclick="run('ed3','pv3')">▶ Ausführen</button>
+          <span class="editor-hint">Funktioniert voll interaktiv!</span>
+        </div>
+        <div class="preview-frame" id="pv3"></div>
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-title">Wissenscheck</div>
+        <h3>Was gibt <code>document.querySelectorAll('p')</code> zurück?</h3>
+        <div class="q-opts">
+          <button class="q-opt" data-ok="false">Das erste &lt;p&gt;-Element</button>
+          <button class="q-opt" data-ok="false">Einen String mit allen Paragraphen</button>
+          <button class="q-opt" data-ok="true">Eine NodeList aller &lt;p&gt;-Elemente</button>
+          <button class="q-opt" data-ok="false">Einen Boolean: true wenn p-Elemente existieren</button>
+        </div>
+        <div class="q-fb"></div>
+      </div>
+      <div class="nav-row">
+        <button class="nav-btn nb-back">← Zurück</button>
+        <button class="nav-btn nb-next">Weiter →</button>
+      </div>
+    </div>
+
+    <!-- ════════ LEKTION 5: ASYNC/AWAIT & FETCH ════════ -->
+    <div class="lesson" data-i="4">
+      <div class="lesson-eyebrow">
+        <span class="difficulty diff-hard">Fortgeschritten</span>
+        <span class="topic-id">05 / 07 · JavaScript</span>
+      </div>
+      <h2>Async / Await & die Fetch API</h2>
+      <p class="desc">JavaScript ist <strong>asynchron</strong> – es wartet nicht auf langsame Operationen (Netzwerk, Dateien). Mit <code>async/await</code> schreibst du asynchronen Code, der wie synchroner Code aussieht und lesbar bleibt.</p>
+
+      <div class="codeblock">
+        <div class="cb-header">
+          <div class="cb-dots"><span></span><span></span><span></span></div>
+          <div class="cb-file">fetch.js</div>
+        </div>
+        <pre><span class="c">// ── Fetch-API mit async/await ──</span>
+<span class="k">async function</span> <span class="fn">ladeDaten</span>() {
+  <span class="k">try</span> {
+    <span class="c">// await pausiert bis die Response kommt</span>
+    <span class="k">const</span> <span class="w">response</span> = <span class="k">await</span> <span class="fn">fetch</span>(<span class="s">'https://api.example.com/users'</span>);
+
+    <span class="c">// HTTP-Fehler prüfen</span>
+    <span class="k">if</span> (!<span class="w">response</span>.<span class="a">ok</span>) <span class="k">throw new</span> <span class="fn">Error</span>(<span class="s">`HTTP Fehler: </span>${<span class="w">response</span>.<span class="a">status</span>}<span class="s">`</span>);
+
+    <span class="c">// JSON parsen</span>
+    <span class="k">const</span> <span class="w">daten</span> = <span class="k">await</span> <span class="w">response</span>.<span class="fn">json</span>();
+    <span class="w">console</span>.<span class="fn">log</span>(<span class="w">daten</span>);
+    <span class="k">return</span> <span class="w">daten</span>;
+
+  } <span class="k">catch</span> (<span class="w">fehler</span>) {
+    <span class="w">console</span>.<span class="fn">error</span>(<span class="s">'Fehler:'</span>, <span class="w">fehler</span>);
+  }
+}
+
+<span class="c">// ── Mehrere Requests parallel ──</span>
+<span class="k">const</span> [<span class="w">user</span>, <span class="w">posts</span>] = <span class="k">await</span> <span class="fn">Promise</span>.<span class="fn">all</span>([
+  <span class="fn">fetch</span>(<span class="s">'/api/user'</span>).<span class="fn">then</span>(<span class="w">r</span> => <span class="w">r</span>.<span class="fn">json</span>()),
+  <span class="fn">fetch</span>(<span class="s">'/api/posts'</span>).<span class="fn">then</span>(<span class="w">r</span> => <span class="w">r</span>.<span class="fn">json</span>()),
+]);</pre>
+      </div>
+
+      <div class="note info"><b>INFO:</b> <code>async</code> vor einer Funktion macht sie asynchron und sie gibt immer ein Promise zurück. <code>await</code> kann nur innerhalb einer <code>async</code>-Funktion benutzt werden.</div>
+
+      <div class="editor-wrap">
+        <div class="editor-head"><span>Live-Editor – Fetch mit echter API</span></div>
+        <textarea id="ed4">&lt;style&gt;
+  .api-demo { font-family: monospace; }
+  .fetch-btn {
+    padding: 10px 22px; background: #1a5f9a; color: white;
+    border: none; border-radius: 6px; cursor: pointer; font-size: 14px;
+    transition: opacity 0.2s;
+  }
+  .fetch-btn:hover { opacity: 0.8; }
+  .result { margin-top: 16px; background: #f0f4ff; padding: 14px; border-radius: 6px; font-size: 13px; line-height: 1.7; }
+  .loading { color: #888; font-style: italic; }
+&lt;/style&gt;
+&lt;div class="api-demo"&gt;
+  &lt;button class="fetch-btn" onclick="ladeWitz()"&gt;🎲 Lade einen Witz (API)&lt;/button&gt;
+  &lt;div class="result" id="result"&gt;Klicke den Button...&lt;/div&gt;
+&lt;/div&gt;
+&lt;script&gt;
+async function ladeWitz() {
+  const el = document.getElementById('result');
+  el.innerHTML = '&lt;span class="loading"&gt;Lade...&lt;/span&gt;';
+  try {
+    const res = await fetch('https://official-joke-api.appspot.com/random_joke');
+    const data = await res.json();
+    el.innerHTML = `&lt;b&gt;Setup:&lt;/b&gt; ${data.setup}&lt;br&gt;&lt;b&gt;Punchline:&lt;/b&gt; ${data.punchline}`;
+  } catch (e) {
+    el.textContent = 'Fehler: ' + e.message;
+  }
+}
+&lt;/script&gt;</textarea>
+        <div class="editor-actions">
+          <button class="run-btn" onclick="run('ed4','pv4')">▶ Ausführen</button>
+          <span class="editor-hint">Ruft eine echte externe API ab!</span>
+        </div>
+        <div class="preview-frame" id="pv4"></div>
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-title">Wissenscheck</div>
+        <h3>Wofür wird <code>Promise.all([])</code> verwendet?</h3>
+        <div class="q-opts">
+          <button class="q-opt" data-ok="false">Um Fehler in async-Funktionen abzufangen</button>
+          <button class="q-opt" data-ok="true">Um mehrere asynchrone Operationen parallel auszuführen</button>
+          <button class="q-opt" data-ok="false">Um eine Funktion in ein Promise umzuwandeln</button>
+          <button class="q-opt" data-ok="false">Um den ersten erfolgreichen Request zurückzugeben</button>
+        </div>
+        <div class="q-fb"></div>
+      </div>
+      <div class="nav-row">
+        <button class="nav-btn nb-back">← Zurück</button>
+        <button class="nav-btn nb-next">Weiter →</button>
+      </div>
+    </div>
+
+    <!-- ════════ LEKTION 6: LOCAL STORAGE ════════ -->
+    <div class="lesson" data-i="5">
+      <div class="lesson-eyebrow">
+        <span class="difficulty diff-hard">Fortgeschritten</span>
+        <span class="topic-id">06 / 07 · Browser APIs</span>
+      </div>
+      <h2>localStorage & sessionStorage</h2>
+      <p class="desc">Browser-APIs ermöglichen das Speichern von Daten direkt im Browser – kein Server nötig! <code>localStorage</code> ist dauerhaft (bleibt nach Browser-Neustart), <code>sessionStorage</code> gilt nur für die aktuelle Tab-Session.</p>
+
+      <div class="codeblock">
+        <div class="cb-header">
+          <div class="cb-dots"><span></span><span></span><span></span></div>
+          <div class="cb-file">storage.js</div>
+        </div>
+        <pre><span class="c">// ── localStorage ──</span>
+<span class="w">localStorage</span>.<span class="fn">setItem</span>(<span class="s">'name'</span>, <span class="s">'Max'</span>);
+<span class="k">const</span> <span class="w">name</span> = <span class="w">localStorage</span>.<span class="fn">getItem</span>(<span class="s">'name'</span>); <span class="c">// 'Max'</span>
+<span class="w">localStorage</span>.<span class="fn">removeItem</span>(<span class="s">'name'</span>);
+<span class="w">localStorage</span>.<span class="fn">clear</span>();                       <span class="c">// Alles löschen</span>
+
+<span class="c">// ── Objekte speichern (JSON) ──</span>
+<span class="k">const</span> <span class="w">user</span> = { <span class="a">id</span>: <span class="n">1</span>, <span class="a">name</span>: <span class="s">'Anna'</span>, <span class="a">punkte</span>: <span class="n">42</span> };
+<span class="w">localStorage</span>.<span class="fn">setItem</span>(<span class="s">'user'</span>, <span class="fn">JSON</span>.<span class="fn">stringify</span>(<span class="w">user</span>));
+
+<span class="c">// Laden & parsen</span>
+<span class="k">const</span> <span class="w">geladen</span> = <span class="fn">JSON</span>.<span class="fn">parse</span>(
+  <span class="w">localStorage</span>.<span class="fn">getItem</span>(<span class="s">'user'</span>) ?? <span class="s">'null'</span>
+);
+
+<span class="c">// ── Verfügbar prüfen ──</span>
+<span class="k">function</span> <span class="fn">getItem</span>(<span class="w">key</span>, <span class="w">fallback</span> = <span class="k">null</span>) {
+  <span class="k">try</span> {
+    <span class="k">return</span> <span class="fn">JSON</span>.<span class="fn">parse</span>(<span class="w">localStorage</span>.<span class="fn">getItem</span>(<span class="w">key</span>)) ?? <span class="w">fallback</span>;
+  } <span class="k">catch</span> { <span class="k">return</span> <span class="w">fallback</span>; }
+}</pre>
+      </div>
+
+      <div class="editor-wrap">
+        <div class="editor-head"><span>Live-Editor – Notiz-App mit localStorage</span></div>
+        <textarea id="ed5">&lt;style&gt;
+  .note-app { font-family: monospace; max-width: 400px; }
+  textarea { width:100%; height:100px; padding:10px; border:2px solid #ccc; border-radius:6px; font-family:monospace; resize:vertical; }
+  .btns { display:flex; gap:8px; margin-top:8px; }
+  .s-btn { padding:8px 16px; border:none; border-radius:4px; cursor:pointer; font-family:monospace; }
+  .save { background:#2c7a4b; color:#fff; }
+  .load { background:#1a5f9a; color:#fff; }
+  .del  { background:#c0392b; color:#fff; }
+  .status { margin-top:10px; font-size:12px; color:#666; }
+&lt;/style&gt;
+&lt;div class="note-app"&gt;
+  &lt;h3 style="margin-bottom:8px;"&gt;📝 Notiz-App&lt;/h3&gt;
+  &lt;textarea id="notiz" placeholder="Schreibe hier deine Notiz..."&gt;&lt;/textarea&gt;
+  &lt;div class="btns"&gt;
+    &lt;button class="s-btn save" onclick="speichern()"&gt;💾 Speichern&lt;/button&gt;
+    &lt;button class="s-btn load" onclick="laden()"&gt;📂 Laden&lt;/button&gt;
+    &lt;button class="s-btn del"  onclick="loeschen()"&gt;🗑 Löschen&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;div class="status" id="status"&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;script&gt;
+function speichern() {
+  localStorage.setItem('meine-notiz', document.getElementById('notiz').value);
+  document.getElementById('status').textContent = '✅ Gespeichert! Seite neu laden und "Laden" klicken.';
+}
+function laden() {
+  const text = localStorage.getItem('meine-notiz');
+  if (text) { document.getElementById('notiz').value = text; document.getElementById('status').textContent = '📂 Geladen!'; }
+  else document.getElementById('status').textContent = 'Nichts gespeichert.';
+}
+function loeschen() {
+  localStorage.removeItem('meine-notiz');
+  document.getElementById('notiz').value = '';
+  document.getElementById('status').textContent = '🗑 Gelöscht!';
+}
+&lt;/script&gt;</textarea>
+        <div class="editor-actions">
+          <button class="run-btn" onclick="run('ed5','pv5')">▶ Ausführen</button>
+          <span class="editor-hint">localStorage überlebt Seitenreloads!</span>
+        </div>
+        <div class="preview-frame" id="pv5"></div>
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-title">Wissenscheck</div>
+        <h3>Warum braucht man <code>JSON.stringify()</code> beim Speichern in localStorage?</h3>
+        <div class="q-opts">
+          <button class="q-opt" data-ok="false">Für bessere Performance</button>
+          <button class="q-opt" data-ok="false">localStorage funktioniert nur mit verschlüsselten Daten</button>
+          <button class="q-opt" data-ok="true">localStorage speichert nur Strings, JSON.stringify konvertiert Objekte zu Strings</button>
+          <button class="q-opt" data-ok="false">Es ist optional, empfehlenswert aber nicht nötig</button>
+        </div>
+        <div class="q-fb"></div>
+      </div>
+      <div class="nav-row">
+        <button class="nav-btn nb-back">← Zurück</button>
+        <button class="nav-btn nb-next">Weiter →</button>
+      </div>
+    </div>
+
+    <!-- ════════ LEKTION 7: ABSCHLUSSPROJEKT ════════ -->
+    <div class="lesson" data-i="6">
+      <div class="lesson-eyebrow">
+        <span class="difficulty diff-expert">Expert</span>
+        <span class="topic-id">07 / 07 · Abschlussprojekt</span>
+      </div>
+      <h2>Abschlussprojekt – Alles vereint</h2>
+      <p class="desc">Du kombinierst <strong>CSS Grid, Transitions, DOM-Manipulation, Fetch und localStorage</strong> in einem einzigen Projekt: ein responsives Wetter-Dashboard mit Theme-Switcher und lokalem Speicher.</p>
+
+      <div class="challenge">
+        <div class="challenge-tag">🏆 Abschlussprojekt</div>
+        <h4>Produktivitäts-Dashboard</h4>
+        <p>Das Beispiel unten zeigt ein Dashboard mit Grid-Layout, Animationen, localStorage und einem API-Aufruf. Analysiere den Code, erweitere ihn und baue dein eigenes Feature ein!</p>
+      </div>
+
+      <div class="editor-wrap">
+        <div class="editor-head"><span>Live-Editor – Komplettes Dashboard</span></div>
+        <textarea id="ed6">&lt;style&gt;
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family: monospace; }
+  .dash {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 12px;
+    padding: 16px;
+    background: #1a1410;
+    min-height: 400px;
+  }
+  .widget {
+    background: #2a2018;
+    border: 1px solid #3d3020;
+    border-radius: 8px;
+    padding: 18px;
+    color: #e8dcc8;
+    animation: einblenden 0.4s ease both;
+  }
+  @keyframes einblenden {
+    from { opacity:0; transform: scale(0.97); }
+    to   { opacity:1; transform: scale(1); }
+  }
+  .widget:nth-child(2) { animation-delay: 0.1s; }
+  .widget:nth-child(3) { animation-delay: 0.2s; }
+  .widget:nth-child(4) { animation-delay: 0.3s; grid-column: 1/-1; }
+  .w-title { font-size:10px; letter-spacing:3px; text-transform:uppercase; color:#8a7060; margin-bottom:10px; }
+  .big-num { font-size:42px; font-weight:700; color:#f4c542; line-height:1; }
+  .w-btn { margin-top:10px; padding:6px 14px; background:#c0392b; color:#fff; border:none; border-radius:4px; cursor:pointer; font-family:monospace; font-size:12px; transition:opacity 0.2s; }
+  .w-btn:hover { opacity:0.8; }
+  .task-input { width:100%; background:#1a1410; border:1px solid #3d3020; color:#e8dcc8; padding:6px 10px; border-radius:4px; font-family:monospace; margin-bottom:8px; }
+  .task-list { list-style:none; display:flex; flex-direction:column; gap:4px; }
+  .task-list li { font-size:12px; padding:6px 8px; background:#1a1410; border-radius:4px; cursor:pointer; transition:background 0.2s; display:flex; justify-content:space-between; }
+  .task-list li:hover { background:#3d3020; }
+  .task-list li.done { text-decoration:line-through; opacity:0.5; }
+  .quote-text { font-size:13px; line-height:1.6; color:#c8b89a; font-style:italic; }
+  .del-x { color:#c0392b; }
+&lt;/style&gt;
+&lt;div class="dash"&gt;
+  &lt;!-- Zähler Widget --&gt;
+  &lt;div class="widget"&gt;
+    &lt;div class="w-title"&gt;⚡ Fokus-Zähler&lt;/div&gt;
+    &lt;div class="big-num" id="cnt"&gt;0&lt;/div&gt;
+    &lt;div style="font-size:11px;color:#8a7060;margin-top:4px;"&gt;Sessions heute&lt;/div&gt;
+    &lt;button class="w-btn" onclick="addCount()"&gt;+ Session&lt;/button&gt;
+    &lt;button class="w-btn" style="background:#3d3020;margin-left:6px;" onclick="resetCount()"&gt;Reset&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;!-- Uhrzeit Widget --&gt;
+  &lt;div class="widget"&gt;
+    &lt;div class="w-title"&gt;🕐 Aktuelle Zeit&lt;/div&gt;
+    &lt;div class="big-num" id="clock" style="font-size:28px;"&gt;&lt;/div&gt;
+    &lt;div style="font-size:11px;color:#8a7060;margin-top:6px;" id="datum"&gt;&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;!-- Tasks Widget --&gt;
+  &lt;div class="widget"&gt;
+    &lt;div class="w-title"&gt;✅ Aufgaben&lt;/div&gt;
+    &lt;input class="task-input" id="taskInp" placeholder="+ Aufgabe..." onkeydown="if(event.key==='Enter')addTask()"&gt;
+    &lt;ul class="task-list" id="tasks"&gt;&lt;/ul&gt;
+  &lt;/div&gt;
+  &lt;!-- Quote Widget --&gt;
+  &lt;div class="widget"&gt;
+    &lt;div class="w-title"&gt;💬 Zitat&lt;/div&gt;
+    &lt;div class="quote-text" id="quote"&gt;Lade Zitat...&lt;/div&gt;
+    &lt;button class="w-btn" style="margin-top:12px;background:#1a5f9a;" onclick="ladeZitat()"&gt;Neues Zitat&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;script&gt;
+// Zähler
+let cnt = +( localStorage.getItem('cnt') || 0);
+function addCount() { cnt++; save(); updateCnt(); }
+function resetCount() { cnt=0; save(); updateCnt(); }
+function updateCnt() { document.getElementById('cnt').textContent = cnt; }
+function save() { localStorage.setItem('cnt', cnt); }
+updateCnt();
+
+// Uhr
+function uhr() {
+  const now = new Date();
+  document.getElementById('clock').textContent = now.toLocaleTimeString('de-DE');
+  document.getElementById('datum').textContent = now.toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long'});
+}
+setInterval(uhr, 1000); uhr();
+
+// Tasks
+let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+function renderTasks() {
+  const ul = document.getElementById('tasks');
+  ul.innerHTML = '';
+  tasks.forEach((t, i) => {
+    const li = document.createElement('li');
+    if (t.done) li.classList.add('done');
+    li.innerHTML = `<span onclick="toggleTask(${i})">${t.text}</span><span class="del-x" onclick="delTask(${i})">✕</span>`;
+    ul.appendChild(li);
+  });
+  localStorage.setItem('tasks', JSON.stringify(tasks));
+}
+function addTask() {
+  const v = document.getElementById('taskInp').value.trim();
+  if (!v) return;
+  tasks.push({text:v, done:false});
+  document.getElementById('taskInp').value='';
+  renderTasks();
+}
+function toggleTask(i) { tasks[i].done = !tasks[i].done; renderTasks(); }
+function delTask(i)    { tasks.splice(i,1); renderTasks(); }
+renderTasks();
+
+// Zitat
+async function ladeZitat() {
+  try {
+    const r = await fetch('https://api.quotable.io/random?maxLength=120');
+    const d = await r.json();
+    document.getElementById('quote').textContent = `"${d.content}" — ${d.author}`;
+  } catch(e) {
+    document.getElementById('quote').textContent = '"Code ist Poesie." — Unbekannt';
+  }
+}
+ladeZitat();
+&lt;/script&gt;</textarea>
+        <div class="editor-actions">
+          <button class="run-btn" onclick="run('ed6','pv6')">▶ Ausführen</button>
+          <span class="editor-hint">Grid + localStorage + Fetch + DOM – alles in einem!</span>
+        </div>
+        <div class="preview-frame" id="pv6" style="min-height:420px; padding:0; background:#1a1410;"></div>
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-title">Abschlussfrage</div>
+        <h3>Welche Kombination macht eine moderne Web-App aus?</h3>
+        <div class="q-opts">
+          <button class="q-opt" data-ok="false">Nur HTML und viel CSS</button>
+          <button class="q-opt" data-ok="false">JavaScript allein ohne HTML-Grundstruktur</button>
+          <button class="q-opt" data-ok="true">HTML-Struktur + CSS-Layout/Animation + JS für Logik/APIs/Speicher</button>
+          <button class="q-opt" data-ok="false">localStorage für alles, fetch ist unnötig</button>
+        </div>
+        <div class="q-fb"></div>
+      </div>
+      <div class="nav-row">
+        <button class="nav-btn nb-back">← Zurück</button>
+        <button class="nav-btn nb-next" id="finishBtn">Kurs abschließen 🏆</button>
+      </div>
+    </div>
+
+    <!-- CONGRATS -->
+    <div id="congrats">
+      <div class="cert">
+        <div class="cert-label">Zertifikat des Abschlusses</div>
+        <h2>Fortgeschrittener<br><em>Web-Entwickler</em></h2>
+        <p>Du hast alle 7 Lektionen abgeschlossen.<br>CSS Grid · Flexbox · Animationen · DOM · Async/Await · Fetch · localStorage<br><br>Du bist bereit für echte Projekte.</p>
+        <button class="restart-btn" onclick="restart()">↩ Nochmal von vorne</button>
+      </div>
+    </div>
+
+  </article>
+</div>
+
+<script>
+  const TOTAL = 7;
+  let current = 0;
+  const done = new Set();
+
+  const lessons = document.querySelectorAll('.lesson');
+  const chNav   = document.getElementById('chapterNav');
+  const sidebar  = document.getElementById('sidebar');
+  const fill     = document.getElementById('progFill');
+  const pCount   = document.getElementById('progCount');
+
+  const titles = [
+    'CSS Flexbox','CSS Grid','Animationen',
+    'DOM Manipulation','Async & Fetch','localStorage','Abschlussprojekt'
+  ];
+
+  // Build chapter nav
+  titles.forEach((t, i) => {
+    const p = document.createElement('button');
+    p.className = 'ch-pill';
+    p.textContent = `${String(i+1).padStart(2,'0')} ${t}`;
+    p.addEventListener('click', () => goTo(i));
+    chNav.appendChild(p);
+  });
+
+  // Build sidebar
+  const asideTitle = document.createElement('div');
+  asideTitle.className = 'aside-title';
+  asideTitle.textContent = 'Lektionen';
+  sidebar.appendChild(asideTitle);
+  titles.forEach((t, i) => {
+    const a = document.createElement('div');
+    a.className = 'aside-link';
+    a.innerHTML = `<span class="num">${String(i+1).padStart(2,'0')}</span>${t}`;
+    a.addEventListener('click', () => goTo(i));
+    sidebar.appendChild(a);
+  });
+
+  function updateUI() {
+    lessons.forEach((l, i) => l.classList.toggle('active', i === current));
+
+    const pills  = chNav.querySelectorAll('.ch-pill');
+    const aLinks = sidebar.querySelectorAll('.aside-link');
+    [pills, aLinks].forEach(els => {
+      els.forEach((el, i) => {
+        el.className = el.tagName === 'BUTTON' ? 'ch-pill' : 'aside-link';
+        if (done.has(i)) el.classList.add('done');
+        if (i === current) el.classList.add('active');
+      });
+    });
+
+    const pct = Math.round((done.size / TOTAL) * 100);
+    fill.style.width = pct + '%';
+    pCount.textContent = `${done.size} / ${TOTAL}`;
+
+    lessons.forEach(l => {
+      const back = l.querySelector('.nb-back');
+      if (back) back.disabled = +l.dataset.i === 0;
+    });
+  }
+
+  function goTo(idx) {
+    if (idx >= 0 && idx < TOTAL) {
+      current = idx;
+      updateUI();
+      document.querySelector('.workspace').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  document.querySelectorAll('.nb-back').forEach(btn =>
+    btn.addEventListener('click', () => goTo(current - 1))
+  );
+  document.querySelectorAll('.nb-next').forEach(btn =>
+    btn.addEventListener('click', () => {
+      done.add(current);
+      if (current < TOTAL - 1) {
+        goTo(current + 1);
+      } else {
+        lessons.forEach(l => l.classList.remove('active'));
+        const cg = document.getElementById('congrats');
+        cg.style.display = 'block';
+        setTimeout(() => cg.classList.add('show'), 10);
+        fill.style.width = '100%';
+        pCount.textContent = `${TOTAL} / ${TOTAL} ✓`;
+      }
+    })
+  );
+
+  // Quiz
+  document.querySelectorAll('.quiz, .quiz-section').forEach(q => {
+    q.querySelectorAll('.q-opt, .quiz-opt').forEach(opt => {
+      opt.addEventListener('click', () => {
+        if (q.dataset.answered) return;
+        q.dataset.answered = '1';
+        q.querySelectorAll('.q-opt, .quiz-opt').forEach(o => o.disabled = true);
+        const ok = opt.dataset.ok === 'true' || opt.dataset.correct === 'true';
+        opt.classList.add(ok ? 'ok' : 'err');
+        if (!ok) {
+          q.querySelectorAll('[data-ok="true"],[data-correct="true"]').forEach(o => o.classList.add('ok'));
+        }
+        const fb = q.querySelector('.q-fb, .quiz-feedback');
+        if (fb) {
+          fb.textContent = ok ? '✓ Richtig!' : '✗ Leider falsch – die grüne Antwort ist korrekt.';
+          fb.className = (fb.className.includes('fb') ? 'q-fb' : 'quiz-feedback') + (ok ? ' ok' : ' err');
+        }
+      });
+    });
+  });
+
+  // Live editor
+  function run(edId, pvId) {
+    const code = document.getElementById(edId).value;
+    const pv   = document.getElementById(pvId);
+    pv.innerHTML = code;
+    pv.querySelectorAll('script').forEach(s => {
+      const ns = document.createElement('script');
+      ns.textContent = s.textContent;
+      pv.appendChild(ns);
+    });
+  }
+
+  function restart() {
+    current = 0;
+    done.clear();
+    document.getElementById('congrats').style.display = 'none';
+    updateUI();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  updateUI();
+</script>
+</body>
+</html>

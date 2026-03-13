@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="de">
- <head>
-  <meta charset="utf-8"/>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>
-   Meine Notizen
-  </title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&amp;family=Lora:ital,wght@0,400;0,500;1,400&amp;family=Inter:wght@400;500&amp;family=Courier+Prime&amp;family=Dancing+Script:wght@500&amp;display=swap" rel="stylesheet"/>
-  <style>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Meine Notizen
+</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lora:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500&family=Courier+Prime&family=Dancing+Script:wght@500&display=swap" rel="stylesheet">
+<style>
 :root {
   --sidebar: #252525;
   --ink: #1a1a1a;
@@ -81,13 +81,16 @@ body {
 
 /* TOP TOOLBAR */
 #toolbar {
-  display:flex; align-items:center; gap:8px;
-  padding:10px 18px;
-  background:rgba(245,240,232,0.95);
-  border-bottom:1px solid var(--border);
-  backdrop-filter:blur(10px);
-  flex-wrap:wrap;
-  transition:background .4s;
+  display: flex;
+  align-items: center; 
+  gap: 8px;
+  padding: 10px 18px;
+  background: rgba(245,240,232,0.95);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(10px);
+  /* flex-wrap: wrap; <-- Entferne dies, falls die Leiste starr bleiben soll */
+  transition: background .4s;
+  z-index: 500; /* Toolbar über dem Papier-Scrollbereich */
 }
 #note-title-input {
   flex:1; min-width:130px;
@@ -125,9 +128,18 @@ body {
 /* DROPDOWN */
 .dwrap { position:relative; }
 .dmenu {
-  display:none;position:absolute;top:calc(100% + 5px);right:0;
-  background:#fff;border:1px solid var(--border);border-radius:8px;
-  box-shadow:0 8px 24px rgba(0,0,0,.12);min-width:195px;z-index:300;overflow:hidden;
+  display: none;
+  position: absolute;
+  top: 100%; /* Direkt unter dem Button */
+  right: 0;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  min-width: 195px;
+  z-index: 1000; /* Sicherstellen, dass es über dem Editor schwebt */
+  overflow: hidden;
+  margin-top: 5px;
 }
 .dmenu.open { display:block; }
 .ditem { padding:9px 14px;cursor:pointer;font-size:.79rem;color:var(--ink);display:flex;align-items:center;gap:8px;transition:background .1s; }
@@ -217,8 +229,23 @@ body {
 #welcome p  { font-size:.86rem;color:#888;font-style:italic; }
 
 /* ── FULLSCREEN ── */
-:fullscreen #sidebar,:-webkit-full-screen #sidebar { display:none; }
-:fullscreen #paper-wrap,:-webkit-full-screen #paper-wrap { padding:56px; }
+/* Neu: Sidebar bleibt im Vollbild verfügbar */
+:fullscreen #sidebar { 
+  display: flex; 
+  z-index: 2001; 
+}
+:fullscreen #sidebar-toggle {
+  opacity: 0.5;
+}
+:fullscreen #sidebar-toggle:hover {
+  opacity: 1;
+}
+
+/* Optional: Damit das Papier im Vollbild mehr Platz hat, 
+   wenn die Sidebar eingeklappt ist */
+:fullscreen #paper-wrap { 
+  padding: 40px; 
+}
 
 /* ── TOAST ── */
 #toast {
@@ -236,12 +263,13 @@ body {
   #paper-wrap{padding:18px 10px;}
   #paper{padding:28px 22px;}
 }
+
 /* Der Button zum Ein/Ausklappen */
 #sidebar-toggle {
   position: fixed;
-  left: 252px; /* Gleiche Breite wie die Sidebar */
-  top: 20px;
-  z-index: 100;
+  left: 252px;
+  top: 15px; /* Etwas weiter oben, um mittig zur Toolbar zu wirken */
+  z-index: 2000; /* Höher als Toolbar (500) und Dropdown (1000) */
   background: var(--sidebar);
   color: white;
   border: 1px solid rgba(255,255,255,0.1);
@@ -281,261 +309,185 @@ body.sidebar-closed #sidebar-toggle {
   pointer-events: none;
 }
 </style>
- </head>
- <body>
+</head>
+<body>
     <button id="sidebar-toggle" onclick="toggleSidebar()" title="Sidebar umschalten">
         «
     </button>
-  <!-- SIDEBAR -->
-  <div id="sidebar">
-   <div id="sidebar-header">
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <div id="sidebar-header">
     <h1>
-     📒 Notizen
+      📒 Notizen
     </h1>
     <p>
-     Deine persönlichen Gedanken
+    Deine persönlichen Gedanken
     </p>
-   </div>
-   <button id="new-note-btn" onclick="newNote()">
-    ＋ Neue Notiz
-   </button>
+  </div>
+  <button id="new-note-btn" onclick="newNote()">
+  ＋ Neue Notiz
+</button>
 
-   <div id="search-container" style="padding: 0 14px 10px;">
+<div id="search-container" style="padding: 0 14px 10px;">
       <input type="text" id="search-input" placeholder="Notizen durchsuchen..." oninput="filterNotes()" 
              style="width: 100%; padding: 8px 10px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.1); 
                     background: rgba(0,0,0,0.2); color: #fff; font-size: 0.8rem; outline: none;">
     </div>
 
-   <div id="notes-list">
+  <div id="notes-list">
     <div class="empty-state">
-     Noch keine Notizen.
-     <br/>
-     Erstelle deine erste!
+      Noch keine Notizen.
+      <br>
+      Erstelle deine erste!
     </div>
-   </div>
-   <div id="bg-section">
+  </div>
+  <div id="bg-section">
     <label>
-     🎨 Hintergrund
-    </label>
+      🎨 Hintergrund
+    </label>  
     <div id="bg-grid">
     </div>
-    <input id="custom-bg" oninput="applyCustomBg(this.value)" type="color" value="#f5f0e8"/>
-   </div>
-  </div>
-  <!-- MAIN -->
-  <div id="main">
-   <div id="welcome">
-    <div class="icon">
-     ✍️
+      <input type="color" id="custom-bg" value="#f5f0e8" oninput="applyCustomBg(this.value)">
     </div>
-    <h2>
-     Bereit zum Schreiben
-    </h2>
-    <p>
-     Wähle eine Notiz oder erstelle eine neue.
-    </p>
-   </div>
-   <div id="editor-area" style="display:none;flex:1;flex-direction:column;overflow:hidden;">
+</div>
+
+<!-- MAIN -->
+<div id="main">
+  <div id="welcome">
+    <div class="icon">✍️</div>
+    <h2>Bereit zum Schreiben</h2>
+    <p>Wähle eine Notiz oder erstelle eine neue.</p>
+  </div>
+
+  <div id="editor-area" style="display:none;flex:1;flex-direction:column;overflow:hidden;">
+
     <!-- TOP TOOLBAR -->
     <div id="toolbar">
-     <input id="note-title-input" oninput="markDirty()" placeholder="Titel der Notiz…" type="text"/>
-     <div class="tsep">
-     </div>
-     <div id="color-palette">
-     </div>
-     <div class="tsep">
-     </div>
-     <button class="tbtn red" onclick="saveNote()">
-      💾 Speichern
-     </button>
-     <div class="dwrap">
-      <button class="tbtn grn" onclick="toggleDrop('exp-menu',event)">
-       ⬇ Export ▾
-      </button>
-      <div class="dmenu" id="exp-menu">
-       <div class="ditem" onclick="exportAs('txt')">
-        📄 Textdatei
-        <span class="ext">
-         .txt
-        </span>
-       </div>
-       <div class="ditem" onclick="exportAs('md')">
-        📝 Markdown
-        <span class="ext">
-         .md
-        </span>
-       </div>
-       <div class="ditem" onclick="exportAs('html')">
-        🌐 HTML-Seite
-        <span class="ext">
-         .html
-        </span>
-       </div>
-       <div class="ditem div" onclick="exportAll()">
-        📦 Alle Notizen
-        <span class="ext">
-         .json
-        </span>
-       </div>
+      <input id="note-title-input" type="text" placeholder="Titel der Notiz…" oninput="markDirty()">
+      <div class="tsep"></div>
+      <div id="color-palette"></div>
+      <div class="tsep"></div>
+      <button class="tbtn red" onclick="saveNote()">💾 Speichern</button>
+      <div class="dwrap">
+        <button class="tbtn grn" onclick="toggleDrop('exp-menu',event)">⬇ Export ▾</button>
+        <div class="dmenu" id="exp-menu">
+          <div class="ditem" onclick="exportAs('txt')">📄 Textdatei <span class="ext">.txt</span></div>
+          <div class="ditem" onclick="exportAs('md')">📝 Markdown <span class="ext">.md</span></div>
+          <div class="ditem" onclick="exportAs('html')">🌐 HTML-Seite <span class="ext">.html</span></div>
+          <div class="ditem div" onclick="exportAll()">📦 Alle Notizen <span class="ext">.json</span></div>
+        </div>
       </div>
-     </div>
-     <span id="save-status">
-     </span>
-     <button class="tbtn mla" onclick="toggleFullscreen()" title="Vollbild">
-      ⛶ Vollbild
-     </button>
+      <span id="save-status"></span>
+      <button class="tbtn mla" onclick="toggleFullscreen()" title="Vollbild">⛶ Vollbild</button>
     </div>
+
     <!-- FORMAT BAR -->
     <div id="fmt-bar">
-     <!-- Font family -->
-     <select class="fsel" id="sel-font" onchange="applyFont(this.value)" style="width:120px;" title="Schriftart">
-      <option value="Lora, Georgia, serif">
-       Lora (Standard)
-      </option>
-      <option value="'Playfair Display', serif">
-       Playfair Display
-      </option>
-      <option value="'Dancing Script', cursive">
-       Dancing Script
-      </option>
-      <option value="'Inter', sans-serif">
-       Inter
-      </option>
-      <option value="'Courier Prime', monospace">
-       Courier (Mono)
-      </option>
-      <option value="Georgia, serif">
-       Georgia
-      </option>
-      <option value="Arial, sans-serif">
-       Arial
-      </option>
-      <option value="'Times New Roman', serif">
-       Times New Roman
-      </option>
-     </select>
-     <!-- Font size -->
-     <select class="fsel" id="sel-size" onchange="applySize(this.value)" style="width:62px;" title="Schriftgröße">
-      <option value="0.75rem">
-       10
-      </option>
-      <option value="0.85rem">
-       12
-      </option>
-      <option value="0.95rem">
-       13
-      </option>
-      <option selected="" value="1rem">
-       14
-      </option>
-      <option value="1.1rem">
-       15
-      </option>
-      <option value="1.2rem">
-       17
-      </option>
-      <option value="1.4rem">
-       20
-      </option>
-      <option value="1.6rem">
-       23
-      </option>
-      <option value="1.9rem">
-       27
-      </option>
-      <option value="2.2rem">
-       32
-      </option>
-     </select>
-     <div class="fsep">
-     </div>
-     <!-- B I U S -->
-     <button class="fbtn bold-btn" id="btn-bold" onclick="fmt('bold')" title="Fett (Strg+B)">
-      B
-     </button>
-     <button class="fbtn ital-btn" id="btn-italic" onclick="fmt('italic')" title="Kursiv (Strg+I)">
-      I
-     </button>
-     <button class="fbtn under-btn" id="btn-under" onclick="fmt('underline')" title="Unterstrichen (Strg+U)">
-      U
-     </button>
-     <button class="fbtn strike-btn" id="btn-strike" onclick="fmt('strikeThrough')" title="Durchgestrichen">
-      S
-     </button>
-     <div class="fsep">
-     </div>
-     <!-- Heading -->
-     <button class="fbtn" onclick="fmt('formatBlock','h1')" style="width:auto;padding:0 8px;font-family:'Playfair Display',serif;font-size:.75rem;" title="Überschrift 1">
-      H1
-     </button>
-     <button class="fbtn" onclick="fmt('formatBlock','h2')" style="width:auto;padding:0 8px;font-family:'Playfair Display',serif;font-size:.75rem;" title="Überschrift 2">
-      H2
-     </button>
-     <button class="fbtn" onclick="fmt('formatBlock','p')" style="width:auto;padding:0 8px;font-size:.75rem;" title="Normaler Text">
-      ¶
-     </button>
-     <div class="fsep">
-     </div>
-     <!-- Align -->
-     <button class="fbtn" onclick="fmt('justifyLeft')" title="Linksbündig">
-      ⬅
-     </button>
-     <button class="fbtn" onclick="fmt('justifyCenter')" title="Zentriert">
-      ↔
-     </button>
-     <button class="fbtn" onclick="fmt('justifyRight')" title="Rechtsbündig">
-      ➡
-     </button>
-     <div class="fsep">
-     </div>
-     <!-- Lists -->
-     <button class="fbtn" onclick="fmt('insertUnorderedList')" style="font-size:.9rem;" title="Aufzählung">
-      •≡
-     </button>
-     <button class="fbtn" onclick="fmt('insertOrderedList')" style="font-size:.75rem;" title="Nummerierte Liste">
-      1≡
-     </button>
-     <div class="fsep">
-     </div>
-     <!-- Text color -->
 
-<div class="fcolor-wrap" title="Textfarbe">
-  <div class="fcolor-preview" onclick="document.getElementById('text-color-input').click()">
-    <span id="tc-letter" style="color:#1a1a1a;">A</span>
-    <div class="bar" id="tc-bar" style="background:#1a1a1a;"></div>
-  </div>
-  <input id="text-color-input" oninput="applyTextColor(this.value)" type="color" value="#1a1a1a"/>
-</div>
+      <!-- Font family -->
+      <select class="fsel" id="sel-font" onchange="applyFont(this.value)" title="Schriftart" style="width:120px;">
+        <option value="Lora, Georgia, serif">Lora (Standard)</option>
+        <option value="'Playfair Display', serif">Playfair Display</option>
+        <option value="'Dancing Script', cursive">Dancing Script</option>
+        <option value="'Inter', sans-serif">Inter</option>
+        <option value="'Courier Prime', monospace">Courier (Mono)</option>
+        <option value="Georgia, serif">Georgia</option>
+        <option value="Arial, sans-serif">Arial</option>
+        <option value="'Times New Roman', serif">Times New Roman</option>
+      </select>
 
-<div class="fcolor-wrap" title="Markieren">
-  <div class="fcolor-preview" onclick="document.getElementById('hl-color-input').click()">
-    <span style="font-size:.7rem;color:#333;">✏️</span>
-    <div class="bar" id="hl-bar" style="background:#fff176;"></div>
-  </div>
-  <input id="hl-color-input" oninput="applyHighlight(this.value)" type="color" value="#fff176"/>
-</div>
+      <!-- Font size -->
+      <select class="fsel" id="sel-size" onchange="applySize(this.value)" title="Schriftgröße" style="width:62px;">
+        <option value="0.75rem">10</option>
+        <option value="0.85rem">12</option>
+        <option value="0.95rem">13</option>
+        <option value="1rem" selected>14</option>
+        <option value="1.1rem">15</option>
+        <option value="1.2rem">17</option>
+        <option value="1.4rem">20</option>
+        <option value="1.6rem">23</option>
+        <option value="1.9rem">27</option>
+        <option value="2.2rem">32</option>
+      </select>
+
+      <div class="fsep"></div>
+
+      <!-- B I U S -->
+      <button class="fbtn bold-btn"   id="btn-bold"   onclick="fmt('bold')"          title="Fett (Strg+B)">B</button>
+      <button class="fbtn ital-btn"   id="btn-italic" onclick="fmt('italic')"        title="Kursiv (Strg+I)">I</button>
+      <button class="fbtn under-btn"  id="btn-under"  onclick="fmt('underline')"     title="Unterstrichen (Strg+U)">U</button>
+      <button class="fbtn strike-btn" id="btn-strike" onclick="fmt('strikeThrough')" title="Durchgestrichen">S</button>
+
+      <div class="fsep"></div>
+
+      <!-- Heading -->
+      <button class="fbtn" style="width:auto;padding:0 8px;font-family:'Playfair Display',serif;font-size:.75rem;" onclick="fmt('formatBlock','h1')" title="Überschrift 1">H1</button>
+      <button class="fbtn" style="width:auto;padding:0 8px;font-family:'Playfair Display',serif;font-size:.75rem;" onclick="fmt('formatBlock','h2')" title="Überschrift 2">H2</button>
+      <button class="fbtn" style="width:auto;padding:0 8px;font-size:.75rem;" onclick="fmt('formatBlock','p')" title="Normaler Text">¶</button>
+
+      <div class="fsep"></div>
+
+      <!-- Align -->
+      <button class="fbtn" onclick="fmt('justifyLeft')"   title="Linksbündig">⬅</button>
+      <button class="fbtn" onclick="fmt('justifyCenter')" title="Zentriert">↔</button>
+      <button class="fbtn" onclick="fmt('justifyRight')"  title="Rechtsbündig">➡</button>
+
+      <div class="fsep"></div>
+
+      <!-- Lists -->
+      <button class="fbtn" onclick="fmt('insertUnorderedList')" title="Aufzählung" style="font-size:.9rem;">•≡</button>
+      <button class="fbtn" onclick="fmt('insertOrderedList')"   title="Nummerierte Liste" style="font-size:.75rem;">1≡</button>
+
+      <div class="fsep"></div>
+
+      <!-- Text color -->
+      <div class="fsep"> </div>
+
+      <div class="fcolor-wrap" title="Textfarbe">
+        <div class="fcolor-preview" onclick="document.getElementById('text-color-input').click()">
+          <span id="tc-letter" style="color:#1a1a1a;">A</span>
+          <div class="bar" id="tc-bar" style="background:#1a1a1a;"></div>
+        </div>
+        <input id="text-color-input" oninput="applyTextColor(this.value)" type="color" value="#1a1a1a"/>
+      </div>
+
+      <div class="fcolor-wrap" title="Markieren">
+        <div class="fcolor-preview" onclick="document.getElementById('hl-color-input').click()">
+          <span style="font-size:.7rem;color:#333;">✏️</span>
+          <div class="bar" id="hl-bar" style="background:#fff176;"></div>
+        </div>
+        <input id="hl-color-input" oninput="applyHighlight(this.value)" type="color" value="#fff176"/>
+      </div>
 
      <div class="fsep"> </div>
 
-     <!-- Clear formatting -->
-     <button class="fbtn" onclick="fmt('removeFormat')" style="font-size:.7rem;width:auto;padding:0 7px;color:#999;" title="Formatierung entfernen">
-      ✕ fmt
-     </button>
+      <div class="fsep"></div>
+
+      <!-- Clear formatting -->
+      <button class="fbtn" onclick="fmt('removeFormat')" title="Formatierung entfernen" style="font-size:.7rem;width:auto;padding:0 7px;color:#999;">✕ fmt</button>
+
     </div>
+
     <!-- PAPER -->
     <div id="paper-wrap">
-     <div id="paper">
-      <div contenteditable="true" data-placeholder="Fange an zu schreiben…" id="note-editor" oninput="markDirty(); updateFormatState();" onkeydown="handleEditorKey(event)" onkeyup="updateFormatState()" onmouseup="updateFormatState()">
+      <div id="paper">
+        <div id="note-editor"
+             contenteditable="true"
+             data-placeholder="Fange an zu schreiben…"
+             oninput="markDirty(); updateFormatState();"
+             onkeyup="updateFormatState()"
+             onmouseup="updateFormatState()"
+             onkeydown="handleEditorKey(event)">
+        </div>
       </div>
-     </div>
     </div>
-   </div>
   </div>
-  <div id="toast">
-  </div>
-  <script src="script.js">
-  </script>
- <script>
+</div>
+
+<div id="toast"></div>
+
+<script>
+
 // ── SELECTION MANAGER (Verhindert das Verschwinden der Markierung) ──
 let savedSelection = null;
 
@@ -569,8 +521,8 @@ const COLORS = [
   {name:'Pfirsich',   bg:'#fdf0ed', label:'#e67e22'},
   {name:'Dunkel',     bg:'#1e1e2e', label:'#a29bfe'},
 ];
-
 const pal = document.getElementById('color-palette');
+
 if(pal) {
   COLORS.forEach((c,i)=>{
     const s=document.createElement('div');
@@ -609,18 +561,15 @@ const BGS=[
   {l:'Schiefer', css:'linear-gradient(135deg,#2c3e50,#4a5568)',  dark:true},
   {l:'Eigene',   css:'custom'},
 ];
-
 const bgGrid=document.getElementById('bg-grid');
-if(bgGrid) {
-  BGS.forEach((b,i)=>{
-    const s=document.createElement('div');
-    s.className='bg-sw'+(i===0?' sel':'');
-    s.title=b.l;
-    if(b.css==='custom'){s.classList.add('pick');s.innerHTML='✏️';s.onclick=()=>document.getElementById('custom-bg').click();}
-    else{s.style.background=b.css;s.onclick=()=>applyBg(i);}
-    bgGrid.appendChild(s);
-  });
-}
+BGS.forEach((b,i)=>{
+  const s=document.createElement('div');
+  s.className='bg-sw'+(i===0?' sel':'');
+  s.title=b.l;
+  if(b.css==='custom'){s.classList.add('pick');s.innerHTML='✏️';s.onclick=()=>document.getElementById('custom-bg').click();}
+  else{s.style.background=b.css;s.onclick=()=>applyBg(i);}
+  bgGrid.appendChild(s);
+});
 
 function applyBg(idx){
   document.querySelectorAll('.bg-sw').forEach((s,i)=>s.classList.toggle('sel',i===idx));
@@ -629,7 +578,6 @@ function applyBg(idx){
   setToolbarTheme(!!b.dark);
   localStorage.setItem('notizen_bg',JSON.stringify({t:'p',i:idx}));
 }
-
 function applyCustomBg(hex){
   document.querySelectorAll('.bg-sw').forEach((s,i)=>s.classList.toggle('sel',i===BGS.length-1));
   document.body.style.background=hex;
@@ -637,17 +585,15 @@ function applyCustomBg(hex){
   setToolbarTheme(dark);
   localStorage.setItem('notizen_bg',JSON.stringify({t:'c',v:hex}));
 }
-
 function darkHex(h){
   const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);
   return(r*.299+g*.587+b*.114)<100;
 }
-
 function setToolbarTheme(dark){
   const tb=document.getElementById('toolbar');
   const fb=document.getElementById('fmt-bar');
-  if(tb) tb.style.background=dark?'rgba(15,20,40,0.93)':'rgba(245,240,232,0.95)';
-  if(fb) fb.style.background=dark?'rgba(20,25,50,0.75)':'rgba(255,255,255,0.75)';
+  tb.style.background=dark?'rgba(15,20,40,0.93)':'rgba(245,240,232,0.95)';
+  fb.style.background=dark?'rgba(20,25,50,0.75)':'rgba(255,255,255,0.75)';
   const inp=document.getElementById('note-title-input');
   if(inp)inp.style.color=dark?'#e0e0f0':'#1a1a1a';
 }
@@ -704,63 +650,105 @@ function removeHighlight() {
 }
 
 function updateFormatState(){
-  const b=document.getElementById('btn-bold');
-  if(b) b.classList.toggle('active',document.queryCommandState('bold'));
-  // ... andere Buttons analog
+  document.getElementById('btn-bold').classList.toggle('active',document.queryCommandState('bold'));
+  document.getElementById('btn-italic').classList.toggle('active',document.queryCommandState('italic'));
+  document.getElementById('btn-under').classList.toggle('active',document.queryCommandState('underline'));
+  document.getElementById('btn-strike').classList.toggle('active',document.queryCommandState('strikeThrough'));
 }
+function handleEditorKey(e){
+  if((e.ctrlKey||e.metaKey)){
+    if(e.key==='b'){e.preventDefault();fmt('bold');}
+    else if(e.key==='i'){e.preventDefault();fmt('italic');}
+    else if(e.key==='u'){e.preventDefault();fmt('underline');}
+    else if(e.key==='s'){e.preventDefault();saveNote();}
+  }
+}
+
+// ── STATE ──
+let notes=JSON.parse(localStorage.getItem('notizen_v2')||'[]');
+let currentNote=null,dirty=false,saveTimer=null;
 
 function markDirty(){
   dirty=true;
-  const status = document.getElementById('save-status');
-  if(status) status.textContent='Nicht gespeichert…';
+  document.getElementById('save-status').textContent='Nicht gespeichert…';
   clearTimeout(saveTimer);
   saveTimer=setTimeout(saveNote,4000);
 }
 
-// ── STATE & PERSISTENCE ──
-let notes=JSON.parse(localStorage.getItem('notizen_v2')||'[]');
-let currentNote=null,dirty=false,saveTimer=null;
-
-function renderList() {
-  const list = document.getElementById('notes-list');
-  if(!list) return;
-  const searchQuery = document.getElementById('search-input')?.value.toLowerCase() || "";
-  
-  if (!notes.length) {
-    list.innerHTML = '<div class="empty-state">Noch keine Notizen.</div>';
-    return;
-  }
-
-  list.innerHTML = notes.map(n => {
-    const col = COLORS[n.color ?? 0];
-    const title = n.title || 'Ohne Titel';
-    const date = new Date(n.updated).toLocaleDateString('de-DE');
-    const active = currentNote && currentNote.id === n.id ? ' active' : '';
-    const isVisible = title.toLowerCase().includes(searchQuery);
-    return `<div class="note-item${active}" onclick="openNote('${n.id}')" style="display: ${isVisible?'block':'none'}">
+function renderList(){
+  const list=document.getElementById('notes-list');
+  if(!notes.length){list.innerHTML='<div class="empty-state">Noch keine Notizen.<br>Erstelle deine erste!</div>';return;}
+  list.innerHTML=notes.map(n=>{
+    const col=COLORS[n.color??0];
+    const title=n.title||'Ohne Titel';
+    const date=new Date(n.updated).toLocaleDateString('de-DE',{day:'2-digit',month:'short',year:'2-digit'});
+    const active=currentNote&&currentNote.id===n.id?' active':'';
+    return`<div class="note-item${active}" onclick="openNote('${n.id}')">
       <span class="note-item-dot" style="background:${col.bg};border:2px solid ${col.label}"></span>
       <span class="note-item-title">${escHtml(title)}</span>
       <button class="note-item-del" onclick="deleteNote(event,'${n.id}')">✕</button>
+      <div class="note-item-date">${date}</div>
     </div>`;
   }).join('');
+}
+
+function filterNotes() {
+  const query = document.getElementById('search-input').value.toLowerCase();
+  const list = document.getElementById('notes-list');
+  
+  if (!notes.length) return;
+
+  // Filtere die Notizen basierend auf Titel oder Inhalt
+  const filtered = notes.filter(n => 
+    (n.title && n.title.toLowerCase().includes(query)) || 
+    (n.body && n.body.toLowerCase().includes(query))
+  );
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="empty-state">Keine passenden Notizen gefunden.</div>';
+    return;
+  }
+
+  // Render die gefilterte Liste
+  list.innerHTML = filtered.map(n => {
+    const col = COLORS[n.color ?? 0];
+    const title = n.title || 'Ohne Titel';
+    const date = new Date(n.updated).toLocaleDateString('de-DE', {day:'2-digit', month:'short', year:'2-digit'});
+    const active = currentNote && currentNote.id === n.id ? ' active' : '';
+    
+    return `<div class="note-item${active}" onclick="openNote('${n.id}')">
+      <span class="note-item-dot" style="background:${col.bg}; border:2px solid ${col.label}"></span>
+      <span class="note-item-title">${escHtml(title)}</span>
+      <button class="note-item-del" onclick="deleteNote(event,'${n.id}')">✕</button>
+      <div class="note-item-date">${date}</div>
+    </div>`;
+  }).join('');
+}
+
+function newNote(){
+  const n={id:Date.now().toString(),title:'',body:'',color:0,fontFamily:'Lora, Georgia, serif',fontSize:'1rem',created:Date.now(),updated:Date.now()};
+  notes.unshift(n);saveAll();openNote(n.id);
 }
 
 function openNote(id){
   if(dirty&&currentNote)saveNote(false);
   currentNote=notes.find(n=>n.id===id);
   if(!currentNote)return;
-  
   document.getElementById('welcome').style.display='none';
   document.getElementById('editor-area').style.display='flex';
   document.getElementById('note-title-input').value=currentNote.title;
-  
   const ed=document.getElementById('note-editor');
   ed.innerHTML=currentNote.body||'';
   ed.style.fontFamily=currentNote.fontFamily||'Lora, Georgia, serif';
   ed.style.fontSize=currentNote.fontSize||'1rem';
-  
+  // sync selects
+  document.getElementById('sel-font').value=currentNote.fontFamily||'Lora, Georgia, serif';
+  document.getElementById('sel-size').value=currentNote.fontSize||'1rem';
   setNoteColor(currentNote.color??0);
+  dirty=false;
+  document.getElementById('save-status').textContent='';
   renderList();
+  ed.focus();
 }
 
 function saveNote(toast=true){
@@ -768,25 +756,95 @@ function saveNote(toast=true){
   currentNote.title=document.getElementById('note-title-input').value;
   currentNote.body=document.getElementById('note-editor').innerHTML;
   currentNote.updated=Date.now();
-  localStorage.setItem('notizen_v2',JSON.stringify(notes));
-  dirty=false;
-  if(toast) showToast('Gespeichert ✓');
+  saveAll();dirty=false;
+  document.getElementById('save-status').textContent='✓ Gespeichert';
+  setTimeout(()=>{if(document.getElementById('save-status').textContent==='✓ Gespeichert')document.getElementById('save-status').textContent='';},2200);
+  if(toast)showToast('Notiz gespeichert ✓');
   renderList();
 }
 
 function deleteNote(e,id){
   e.stopPropagation();
-  if(!confirm('Löschen?'))return;
+  if(!confirm('Diese Notiz wirklich löschen?'))return;
   notes=notes.filter(n=>n.id!==id);
-  localStorage.setItem('notizen_v2',JSON.stringify(notes));
-  location.reload(); 
+  if(currentNote&&currentNote.id===id){
+    currentNote=null;dirty=false;
+    document.getElementById('editor-area').style.display='none';
+    document.getElementById('welcome').style.display='flex';
+    if(notes.length>0)setTimeout(()=>openNote(notes[0].id),10);
+  }
+  saveAll();renderList();showToast('Notiz gelöscht');
+}
+function saveAll(){localStorage.setItem('notizen_v2',JSON.stringify(notes));}
+
+// ── EXPORT ──
+function toggleDrop(id,e){
+  e.stopPropagation();
+  document.querySelectorAll('.dmenu').forEach(m=>m.classList.remove('open'));
+  document.getElementById(id).classList.toggle('open');
+}
+document.addEventListener('click',()=>document.querySelectorAll('.dmenu').forEach(m=>m.classList.remove('open')));
+
+function exportAs(fmt){
+  document.getElementById('exp-menu').classList.remove('open');
+  if(!currentNote){showToast('Keine Notiz geöffnet');return;}
+  saveNote(false);
+  const title=currentNote.title||'Notiz';
+  const htmlBody=currentNote.body||'';
+  const date=new Date(currentNote.updated).toLocaleString('de-DE');
+  let content,mime,ext;
+
+  if(fmt==='txt'){
+    const tmp=document.createElement('div');tmp.innerHTML=htmlBody;
+    const plain=tmp.innerText;
+    const bar='─'.repeat(Math.max(title.length,6));
+    content=`${title}\n${bar}\nDatum: ${date}\n\n${plain}`;
+    mime='text/plain';ext='txt';
+  } else if(fmt==='md'){
+    const tmp=document.createElement('div');tmp.innerHTML=htmlBody;
+    content=`# ${title}\n_${date}_\n\n${tmp.innerText}`;
+    mime='text/markdown';ext='md';
+  } else {
+    const noteCol=COLORS[currentNote.color??0].bg;
+    const ff=currentNote.fontFamily||'Georgia,serif';
+    const fs=currentNote.fontSize||'1rem';
+    content=`<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8"><title>${escHtml(title)}</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lora:ital,wght@0,400;1,400&family=Dancing+Script:wght@500&family=Inter&family=Courier+Prime&display=swap" rel="stylesheet">
+<style>body{font-family:${ff};font-size:${fs};max-width:760px;margin:60px auto;padding:46px 54px;background:${noteCol};line-height:2rem;color:#1a1a1a;border-radius:3px;box-shadow:0 4px 24px rgba(0,0,0,.12);}h1{font-family:'Playfair Display',serif;font-size:1.8rem;margin-bottom:.2em;}small{color:#999;}hr{border:none;border-top:1px solid rgba(0,0,0,0.08);margin:18px 0;}</style>
+</head><body><h1>${escHtml(title)}</h1><small>${date}</small><hr>${htmlBody}</body></html>`;
+    mime='text/html';ext='html';
+  }
+  dlBlob(content,safe(title)+'.'+ext,mime);
+  showToast('Als .'+ext+' exportiert ✓');
 }
 
+function exportAll(){
+  document.getElementById('exp-menu').classList.remove('open');
+  if(!notes.length){showToast('Keine Notizen vorhanden');return;}
+  dlBlob(JSON.stringify(notes,null,2),'meine-notizen.json','application/json');
+  showToast(notes.length+' Notizen exportiert ✓');
+}
+function dlBlob(content,filename,mime){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([content],{type:mime+';charset=utf-8'}));
+  a.download=filename;a.click();URL.revokeObjectURL(a.href);
+}
+function safe(s){return(s||'Notiz').replace(/[\\/:*?"<>|]/g,'_').substring(0,64);}
 function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
+function toggleFullscreen(){
+  const el=document.documentElement;
+  if(!document.fullscreenElement&&!document.webkitFullscreenElement)
+    (el.requestFullscreen||el.webkitRequestFullscreen).call(el);
+  else(document.exitFullscreen||document.webkitExitFullscreen).call(document);
+}
+
+let toastTimer;
 function showToast(msg){
   const t=document.getElementById('toast');
-  if(t){ t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2000); }
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2500);
 }
 
 function toggleSidebar() {
@@ -796,8 +854,13 @@ function toggleSidebar() {
 
 // ── INIT ──
 (function(){
+  const saved=JSON.parse(localStorage.getItem('notizen_bg')||'null');
+  if(saved){
+    if(saved.t==='p'&&saved.i!=null)applyBg(saved.i);
+    else if(saved.t==='c'){document.getElementById('custom-bg').value=saved.v;applyCustomBg(saved.v);}
+  }
   renderList();
-  if(notes.length>0) openNote(notes[0].id);
+  if(notes.length>0)openNote(notes[0].id);
 })();
 </script>
 </body>

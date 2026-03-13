@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HTML Lernen – Für Anfänger</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0e0e14;
+      --card: #16161f;
+      --border: #2a2a3d;
+      --accent1: #f7c94b;
+      --accent2: #ff6b6b;
+      --accent3: #6bffb8;
+      --accent4: #6b9dff;
+      --text: #e8e8f0;
+      --muted: #7a7a9a;
+      --code-bg: #0a0a12;
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Syne', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* HEADER */
+    header {
+      position: relative;
+      text-align: center;
+      padding: 80px 20px 60px;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute;
+      top: -60px; left: 50%; transform: translateX(-50%);
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(247,201,75,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(247,201,75,0.15);
+      color: var(--accent1);
+      border: 1px solid rgba(247,201,75,0.3);
+      border-radius: 999px;
+      padding: 6px 18px;
+      font-size: 13px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      animation: fadeDown 0.6s ease both;
+    }
+    h1 {
+      font-size: clamp(2.5rem, 7vw, 5rem);
+      font-weight: 800;
+      line-height: 1.1;
+      animation: fadeDown 0.6s 0.1s ease both;
+    }
+    h1 span { color: var(--accent1); }
+    header p {
+      color: var(--muted);
+      font-size: 1.1rem;
+      margin-top: 16px;
+      animation: fadeDown 0.6s 0.2s ease both;
+    }
+
+    /* PROGRESS BAR */
+    .progress-wrap {
+      max-width: 700px;
+      margin: 40px auto 0;
+      animation: fadeDown 0.6s 0.3s ease both;
+    }
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .progress-bar-bg {
+      background: var(--border);
+      border-radius: 999px;
+      height: 8px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent1), var(--accent2));
+      border-radius: 999px;
+      width: 0%;
+      transition: width 0.6s cubic-bezier(.4,0,.2,1);
+    }
+
+    /* NAV DOTS */
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      padding: 20px;
+      flex-wrap: wrap;
+    }
+    .nav-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: var(--border);
+      cursor: pointer;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .nav-dot.done { background: var(--accent3); }
+    .nav-dot.active { background: var(--accent1); transform: scale(1.4); }
+
+    /* MAIN CONTENT */
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 20px 20px 80px;
+    }
+
+    /* LESSON CARD */
+    .lesson-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 36px;
+      margin-bottom: 24px;
+      display: none;
+      animation: slideIn 0.4s ease;
+    }
+    .lesson-card.active { display: block; }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .lesson-num {
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      color: var(--accent1);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .lesson-card h2 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+    .lesson-card p {
+      color: var(--muted);
+      line-height: 1.8;
+      margin-bottom: 20px;
+    }
+    .lesson-card p strong { color: var(--text); }
+
+    /* CODE BLOCK */
+    .code-block {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 20px 0;
+    }
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .code-dots { display: flex; gap: 6px; }
+    .code-dots span {
+      width: 10px; height: 10px; border-radius: 50%;
+    }
+    .code-dots span:nth-child(1) { background: #ff5f57; }
+    .code-dots span:nth-child(2) { background: #febc2e; }
+    .code-dots span:nth-child(3) { background: #28c840; }
+    .code-lang {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    pre {
+      padding: 20px;
+      font-family: 'Space Mono', monospace;
+      font-size: 13px;
+      line-height: 1.8;
+      overflow-x: auto;
+      color: #c9d1d9;
+    }
+    .kw  { color: #ff79c6; }
+    .tag { color: #6bffb8; }
+    .atr { color: #f7c94b; }
+    .val { color: #ff6b6b; }
+    .txt { color: #e8e8f0; }
+    .cmt { color: #6a737d; font-style: italic; }
+
+    /* LIVE EDITOR */
+    .editor-section {
+      margin: 24px 0;
+    }
+    .editor-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      color: var(--accent4);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    textarea {
+      width: 100%;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      font-family: 'Space Mono', monospace;
+      font-size: 13px;
+      color: var(--text);
+      resize: vertical;
+      min-height: 120px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    textarea:focus { border-color: var(--accent1); }
+    .run-btn {
+      margin-top: 10px;
+      background: var(--accent1);
+      color: #0e0e14;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 24px;
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s, opacity 0.15s;
+    }
+    .run-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+    .preview-box {
+      margin-top: 14px;
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      background: #fff;
+      color: #222;
+      min-height: 60px;
+      font-family: serif;
+    }
+
+    /* QUIZ */
+    .quiz-section {
+      margin-top: 28px;
+      background: rgba(107,157,255,0.06);
+      border: 1px solid rgba(107,157,255,0.2);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+    .quiz-section h3 {
+      font-size: 1rem;
+      margin-bottom: 16px;
+      color: var(--accent4);
+    }
+    .quiz-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .quiz-opt {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      text-align: left;
+      color: var(--text);
+      transition: border-color 0.2s, background 0.2s;
+      font-family: 'Syne', sans-serif;
+    }
+    .quiz-opt:hover { border-color: var(--accent4); background: rgba(107,157,255,0.08); }
+    .quiz-opt.correct { border-color: var(--accent3); background: rgba(107,255,184,0.1); color: var(--accent3); }
+    .quiz-opt.wrong   { border-color: var(--accent2); background: rgba(255,107,107,0.1); color: var(--accent2); }
+    .quiz-feedback {
+      margin-top: 14px;
+      font-size: 14px;
+      min-height: 20px;
+      font-weight: 700;
+    }
+    .quiz-feedback.ok  { color: var(--accent3); }
+    .quiz-feedback.err { color: var(--accent2); }
+
+    /* TIP BOX */
+    .tip-box {
+      background: rgba(247,201,75,0.07);
+      border-left: 3px solid var(--accent1);
+      border-radius: 0 8px 8px 0;
+      padding: 14px 18px;
+      margin: 16px 0;
+      font-size: 14px;
+      color: var(--text);
+    }
+    .tip-box b { color: var(--accent1); }
+
+    /* NAV BUTTONS */
+    .nav-btns {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 32px;
+      gap: 12px;
+    }
+    .btn {
+      flex: 1;
+      padding: 14px 24px;
+      border-radius: 8px;
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.15s, opacity 0.15s;
+    }
+    .btn:hover { transform: translateY(-2px); opacity: 0.9; }
+    .btn:disabled { opacity: 0.3; cursor: default; transform: none; }
+    .btn-back { background: var(--border); color: var(--text); }
+    .btn-next { background: var(--accent1); color: #0e0e14; }
+
+    /* CONGRATS */
+    #congrats {
+      display: none;
+      text-align: center;
+      padding: 60px 20px;
+    }
+    #congrats.show { display: block; animation: slideIn 0.5s ease; }
+    .trophy { font-size: 80px; margin-bottom: 20px; }
+    #congrats h2 { font-size: 2.5rem; font-weight: 800; margin-bottom: 12px; }
+    #congrats h2 span { color: var(--accent1); }
+    #congrats p { color: var(--muted); font-size: 1.1rem; }
+    .restart-btn {
+      margin-top: 30px;
+      background: var(--accent3);
+      color: #0e0e14;
+      border: none;
+      border-radius: 8px;
+      padding: 14px 36px;
+      font-family: 'Syne', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      .quiz-options { grid-template-columns: 1fr; }
+      .lesson-card { padding: 24px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="badge">🚀 Kurs für Anfänger</div>
+  <h1>Lerne <span>HTML</span>, CSS<br>&amp; JavaScript</h1>
+  <p>Interaktiv · Schritt für Schritt · Deutsch</p>
+
+  <div class="progress-wrap">
+    <div class="progress-label">
+      <span>Fortschritt</span>
+      <span id="progressText">0 / 6 Lektionen</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressFill"></div>
+    </div>
+  </div>
+</header>
+
+<nav id="navDots"></nav>
+
+<main>
+
+  <!-- LEKTION 1 -->
+  <div class="lesson-card active" data-lesson="0">
+    <div class="lesson-num">Lektion 01 / 06</div>
+    <h2>Was ist HTML? 🏗️</h2>
+    <p><strong>HTML</strong> steht für <em>HyperText Markup Language</em>. Es ist die Grundstruktur jeder Webseite – wie das Skelett eines Gebäudes.</p>
+    <p>HTML verwendet sogenannte <strong>Tags</strong> (Etiketten), die dem Browser sagen, wie Inhalte dargestellt werden sollen.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <div class="code-lang">HTML</div>
+      </div>
+      <pre><span class="cmt">&lt;!-- Kommentar: Das ist ein einfaches HTML-Dokument --&gt;</span>
+<span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html&gt;</span>
+  <span class="tag">&lt;head&gt;</span>
+    <span class="tag">&lt;title&gt;</span><span class="txt">Meine erste Seite</span><span class="tag">&lt;/title&gt;</span>
+  <span class="tag">&lt;/head&gt;</span>
+  <span class="tag">&lt;body&gt;</span>
+    <span class="tag">&lt;h1&gt;</span><span class="txt">Hallo Welt!</span><span class="tag">&lt;/h1&gt;</span>
+    <span class="tag">&lt;p&gt;</span><span class="txt">Meine erste Webseite 🎉</span><span class="tag">&lt;/p&gt;</span>
+  <span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></pre>
+    </div>
+
+    <div class="tip-box"><b>💡 Tipp:</b> Jedes Tag hat einen <em>öffnenden</em> Teil <code>&lt;tag&gt;</code> und einen <em>schließenden</em> Teil <code>&lt;/tag&gt;</code>.</div>
+
+    <div class="quiz-section">
+      <h3>🧠 Frage: Wofür steht das „H" in HTML?</h3>
+      <div class="quiz-options">
+        <button class="quiz-opt" data-correct="false">Hauptseite</button>
+        <button class="quiz-opt" data-correct="true">HyperText</button>
+        <button class="quiz-opt" data-correct="false">Homepage</button>
+        <button class="quiz-opt" data-correct="false">Hyperlink</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn btn-back" disabled>← Zurück</button>
+      <button class="btn btn-next">Weiter →</button>
+    </div>
+  </div>
+
+  <!-- LEKTION 2 -->
+  <div class="lesson-card" data-lesson="1">
+    <div class="lesson-num">Lektion 02 / 06</div>
+    <h2>Überschriften &amp; Text ✍️</h2>
+    <p>HTML hat <strong>6 Überschriftsebenen</strong> (<code>h1</code> bis <code>h6</code>). <code>h1</code> ist die größte, <code>h6</code> die kleinste. Für normalen Text nutzt man <code>&lt;p&gt;</code> (Paragraph).</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <div class="code-lang">HTML</div>
+      </div>
+      <pre><span class="tag">&lt;h1&gt;</span><span class="txt">Größte Überschrift</span><span class="tag">&lt;/h1&gt;</span>
+<span class="tag">&lt;h2&gt;</span><span class="txt">Zweitgrößte Überschrift</span><span class="tag">&lt;/h2&gt;</span>
+<span class="tag">&lt;h3&gt;</span><span class="txt">Drittgrößte Überschrift</span><span class="tag">&lt;/h3&gt;</span>
+
+<span class="tag">&lt;p&gt;</span><span class="txt">Dies ist ein normaler Absatz.</span><span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;p&gt;</span><span class="txt">Text kann <span class="tag">&lt;strong&gt;</span>fett<span class="tag">&lt;/strong&gt;</span> oder <span class="tag">&lt;em&gt;</span>kursiv<span class="tag">&lt;/em&gt;</span> sein.</span><span class="tag">&lt;/p&gt;</span></pre>
+    </div>
+
+    <div class="editor-section">
+      <div class="editor-label">✏️ Probier es aus – schreibe deinen eigenen HTML-Code:</div>
+      <textarea id="editor1">&lt;h2&gt;Mein Name ist ...&lt;/h2&gt;
+&lt;p&gt;Ich lerne gerade HTML!&lt;/p&gt;</textarea>
+      <button class="run-btn" onclick="runCode('editor1','preview1')">▶ Vorschau anzeigen</button>
+      <div class="preview-box" id="preview1">Vorschau erscheint hier...</div>
+    </div>
+
+    <div class="quiz-section">
+      <h3>🧠 Frage: Welches Tag erzeugt die größte Überschrift?</h3>
+      <div class="quiz-options">
+        <button class="quiz-opt" data-correct="false">&lt;heading&gt;</button>
+        <button class="quiz-opt" data-correct="false">&lt;h6&gt;</button>
+        <button class="quiz-opt" data-correct="true">&lt;h1&gt;</button>
+        <button class="quiz-opt" data-correct="false">&lt;big&gt;</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn btn-back">← Zurück</button>
+      <button class="btn btn-next">Weiter →</button>
+    </div>
+  </div>
+
+  <!-- LEKTION 3 -->
+  <div class="lesson-card" data-lesson="2">
+    <div class="lesson-num">Lektion 03 / 06</div>
+    <h2>Links &amp; Bilder 🔗🖼️</h2>
+    <p>Mit dem <code>&lt;a&gt;</code>-Tag erstellst du klickbare Links. Das <code>href</code>-Attribut gibt die Zieladresse an. Bilder werden mit <code>&lt;img&gt;</code> eingebunden.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <div class="code-lang">HTML</div>
+      </div>
+      <pre><span class="cmt">&lt;!-- Ein einfacher Link --&gt;</span>
+<span class="tag">&lt;a</span> <span class="atr">href</span>=<span class="val">"https://google.de"</span><span class="tag">&gt;</span><span class="txt">Google öffnen</span><span class="tag">&lt;/a&gt;</span>
+
+<span class="cmt">&lt;!-- Link in neuem Tab öffnen --&gt;</span>
+<span class="tag">&lt;a</span> <span class="atr">href</span>=<span class="val">"https://google.de"</span> <span class="atr">target</span>=<span class="val">"_blank"</span><span class="tag">&gt;</span>
+  <span class="txt">Google (neuer Tab)</span>
+<span class="tag">&lt;/a&gt;</span>
+
+<span class="cmt">&lt;!-- Ein Bild einfügen --&gt;</span>
+<span class="tag">&lt;img</span> <span class="atr">src</span>=<span class="val">"bild.jpg"</span> <span class="atr">alt</span>=<span class="val">"Beschreibung"</span> <span class="atr">width</span>=<span class="val">"200"</span><span class="tag">&gt;</span></pre>
+    </div>
+
+    <div class="tip-box"><b>💡 Tipp:</b> Das <code>alt</code>-Attribut bei Bildern ist wichtig für die Barrierefreiheit – es beschreibt das Bild für Screenreader.</div>
+
+    <div class="editor-section">
+      <div class="editor-label">✏️ Erstelle einen Link:</div>
+      <textarea id="editor2">&lt;a href="https://wikipedia.de" target="_blank"&gt;Wikipedia besuchen&lt;/a&gt;</textarea>
+      <button class="run-btn" onclick="runCode('editor2','preview2')">▶ Vorschau anzeigen</button>
+      <div class="preview-box" id="preview2">Vorschau erscheint hier...</div>
+    </div>
+
+    <div class="quiz-section">
+      <h3>🧠 Frage: Welches Attribut gibt die Zieladresse eines Links an?</h3>
+      <div class="quiz-options">
+        <button class="quiz-opt" data-correct="false">src</button>
+        <button class="quiz-opt" data-correct="true">href</button>
+        <button class="quiz-opt" data-correct="false">link</button>
+        <button class="quiz-opt" data-correct="false">url</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn btn-back">← Zurück</button>
+      <button class="btn btn-next">Weiter →</button>
+    </div>
+  </div>
+
+  <!-- LEKTION 4 -->
+  <div class="lesson-card" data-lesson="3">
+    <div class="lesson-num">Lektion 04 / 06</div>
+    <h2>CSS – Styling ✨</h2>
+    <p><strong>CSS</strong> (Cascading Style Sheets) macht HTML schön! Mit CSS kannst du Farben, Schriftarten, Abstände und viel mehr anpassen.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <div class="code-lang">HTML + CSS</div>
+      </div>
+      <pre><span class="cmt">&lt;!-- CSS direkt im HTML (style-Attribut) --&gt;</span>
+<span class="tag">&lt;p</span> <span class="atr">style</span>=<span class="val">"color: blue; font-size: 20px;"</span><span class="tag">&gt;</span>
+  <span class="txt">Blauer Text</span>
+<span class="tag">&lt;/p&gt;</span>
+
+<span class="cmt">&lt;!-- CSS im &lt;style&gt;-Block --&gt;</span>
+<span class="tag">&lt;style&gt;</span>
+  <span class="atr">h2</span> {
+    <span class="kw">color</span>: <span class="val">hotpink</span>;
+    <span class="kw">background</span>: <span class="val">yellow</span>;
+    <span class="kw">padding</span>: <span class="val">10px</span>;
+    <span class="kw">border-radius</span>: <span class="val">8px</span>;
+  }
+<span class="tag">&lt;/style&gt;</span>
+
+<span class="tag">&lt;h2&gt;</span><span class="txt">Gestylte Überschrift</span><span class="tag">&lt;/h2&gt;</span></pre>
+    </div>
+
+    <div class="editor-section">
+      <div class="editor-label">✏️ Style deinen Text:</div>
+      <textarea id="editor3">&lt;p style="color: red; font-size: 24px; font-weight: bold;"&gt;
+  Hallo, ich bin rot und groß! 🔴
+&lt;/p&gt;
+&lt;p style="background: lightblue; padding: 10px;"&gt;
+  Ich habe einen blauen Hintergrund!
+&lt;/p&gt;</textarea>
+      <button class="run-btn" onclick="runCode('editor3','preview3')">▶ Vorschau anzeigen</button>
+      <div class="preview-box" id="preview3">Vorschau erscheint hier...</div>
+    </div>
+
+    <div class="quiz-section">
+      <h3>🧠 Frage: Welche CSS-Eigenschaft ändert die Textfarbe?</h3>
+      <div class="quiz-options">
+        <button class="quiz-opt" data-correct="false">text-color</button>
+        <button class="quiz-opt" data-correct="false">font-color</button>
+        <button class="quiz-opt" data-correct="true">color</button>
+        <button class="quiz-opt" data-correct="false">foreground</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn btn-back">← Zurück</button>
+      <button class="btn btn-next">Weiter →</button>
+    </div>
+  </div>
+
+  <!-- LEKTION 5 -->
+  <div class="lesson-card" data-lesson="4">
+    <div class="lesson-num">Lektion 05 / 06</div>
+    <h2>JavaScript – Interaktion ⚡</h2>
+    <p><strong>JavaScript</strong> macht Webseiten lebendig! Mit JS kannst du auf Klicks reagieren, Texte ändern, Animationen starten und vieles mehr.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <div class="code-lang">HTML + JavaScript</div>
+      </div>
+      <pre><span class="tag">&lt;button</span> <span class="atr">onclick</span>=<span class="val">"sageHallo()"</span><span class="tag">&gt;</span><span class="txt">Klick mich!</span><span class="tag">&lt;/button&gt;</span>
+<span class="tag">&lt;p</span> <span class="atr">id</span>=<span class="val">"ausgabe"</span><span class="tag">&gt;</span><span class="txt">Hier erscheint der Text</span><span class="tag">&lt;/p&gt;</span>
+
+<span class="tag">&lt;script&gt;</span>
+  <span class="kw">function</span> <span class="txt">sageHallo() {</span>
+    <span class="cmt">// getElementById findet das Element</span>
+    <span class="kw">let</span> <span class="txt">element = document.getElementById(</span><span class="val">"ausgabe"</span><span class="txt">);</span>
+    <span class="txt">element.textContent = </span><span class="val">"Hallo! Du hast geklickt! 🎉"</span><span class="txt">;</span>
+    <span class="txt">element.style.color = </span><span class="val">"green"</span><span class="txt">;</span>
+  <span class="txt">}</span>
+<span class="tag">&lt;/script&gt;</span></pre>
+    </div>
+
+    <div class="editor-section">
+      <div class="editor-label">✏️ Erstelle einen interaktiven Button:</div>
+      <textarea id="editor4">&lt;button onclick="aendereText()"
+  style="padding:10px 20px; background:purple; color:white; border:none; border-radius:8px; cursor:pointer; font-size:16px;"&gt;
+  Farbe ändern!
+&lt;/button&gt;
+&lt;p id="meinText" style="font-size:20px; margin-top:10px;"&gt;Ich werde mich verändern...&lt;/p&gt;
+
+&lt;script&gt;
+  function aendereText() {
+    let text = document.getElementById("meinText");
+    text.textContent = "🎨 JavaScript hat mich verändert!";
+    text.style.color = "purple";
+    text.style.fontWeight = "bold";
+  }
+&lt;/script&gt;</textarea>
+      <button class="run-btn" onclick="runCode('editor4','preview4')">▶ Vorschau anzeigen</button>
+      <div class="preview-box" id="preview4">Vorschau erscheint hier...</div>
+    </div>
+
+    <div class="quiz-section">
+      <h3>🧠 Frage: Womit findet JavaScript ein HTML-Element anhand seiner ID?</h3>
+      <div class="quiz-options">
+        <button class="quiz-opt" data-correct="false">findElement("id")</button>
+        <button class="quiz-opt" data-correct="true">getElementById("id")</button>
+        <button class="quiz-opt" data-correct="false">getElement("id")</button>
+        <button class="quiz-opt" data-correct="false">selectById("id")</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn btn-back">← Zurück</button>
+      <button class="btn btn-next">Weiter →</button>
+    </div>
+  </div>
+
+  <!-- LEKTION 6 -->
+  <div class="lesson-card" data-lesson="5">
+    <div class="lesson-num">Lektion 06 / 06</div>
+    <h2>Alles zusammen – Mini-Projekt 🚀</h2>
+    <p>Jetzt kombinierst du alles: HTML-Struktur, CSS-Styling und JavaScript-Interaktion. Baue deine erste kleine App!</p>
+
+    <div class="tip-box"><b>🎯 Aufgabe:</b> Erstelle einen einfachen Klick-Zähler mit einem Button und einem Anzeige-Element.</div>
+
+    <div class="editor-section">
+      <div class="editor-label">✏️ Dein Mini-Projekt – passe es an und experimentiere:</div>
+      <textarea id="editor5">&lt;style&gt;
+  .zaehler-app {
+    text-align: center;
+    padding: 30px;
+    font-family: Arial, sans-serif;
+    background: #f0f4ff;
+    border-radius: 16px;
+  }
+  .zahl { font-size: 72px; font-weight: bold; color: #4a4aff; }
+  .klick-btn {
+    background: #4a4aff; color: white;
+    border: none; border-radius: 12px;
+    padding: 14px 32px; font-size: 18px; cursor: pointer;
+    transition: transform 0.1s;
+  }
+  .klick-btn:active { transform: scale(0.95); }
+  .reset-btn {
+    background: #ff4a4a; color: white;
+    border: none; border-radius: 12px;
+    padding: 10px 20px; font-size: 14px; cursor: pointer;
+    margin-left: 10px;
+  }
+&lt;/style&gt;
+
+&lt;div class="zaehler-app"&gt;
+  &lt;h2&gt;🖱️ Klick-Zähler&lt;/h2&gt;
+  &lt;div class="zahl" id="anzahl"&gt;0&lt;/div&gt;
+  &lt;p style="color:#888;"&gt;Mal geklickt&lt;/p&gt;
+  &lt;button class="klick-btn" onclick="zaehle()"&gt;+ Klick!&lt;/button&gt;
+  &lt;button class="reset-btn" onclick="reset()"&gt;Reset&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+  let zaehler = 0;
+  function zaehle() {
+    zaehler++;
+    document.getElementById("anzahl").textContent = zaehler;
+  }
+  function reset() {
+    zaehler = 0;
+    document.getElementById("anzahl").textContent = 0;
+  }
+&lt;/script&gt;</textarea>
+      <button class="run-btn" onclick="runCode('editor5','preview5')">▶ Vorschau anzeigen</button>
+      <div class="preview-box" id="preview5">Vorschau erscheint hier...</div>
+    </div>
+
+    <div class="quiz-section">
+      <h3>🧠 Frage: Wie startet man eine JavaScript-Funktion beim Klick auf einen Button?</h3>
+      <div class="quiz-options">
+        <button class="quiz-opt" data-correct="false">onpress="funktion()"</button>
+        <button class="quiz-opt" data-correct="true">onclick="funktion()"</button>
+        <button class="quiz-opt" data-correct="false">click="funktion()"</button>
+        <button class="quiz-opt" data-correct="false">action="funktion()"</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn btn-back">← Zurück</button>
+      <button class="btn btn-next" id="finishBtn">Kurs abschließen 🎉</button>
+    </div>
+  </div>
+
+  <!-- CONGRATS -->
+  <div id="congrats">
+    <div class="trophy">🏆</div>
+    <h2>Glückwunsch, <span>Webentwickler!</span></h2>
+    <p>Du hast alle 6 Lektionen abgeschlossen.<br>Du kennst jetzt HTML, CSS und JavaScript!</p>
+    <button class="restart-btn" onclick="restart()">↩ Nochmal von vorne</button>
+  </div>
+
+</main>
+
+<script>
+  const TOTAL = 6;
+  let current = 0;
+  const completed = new Set();
+
+  const cards = document.querySelectorAll('.lesson-card');
+  const dots = document.getElementById('navDots');
+  const fill = document.getElementById('progressFill');
+  const progText = document.getElementById('progressText');
+
+  // Build nav dots
+  for (let i = 0; i < TOTAL; i++) {
+    const d = document.createElement('div');
+    d.className = 'nav-dot' + (i === 0 ? ' active' : '');
+    d.addEventListener('click', () => goTo(i));
+    dots.appendChild(d);
+  }
+
+  function updateUI() {
+    cards.forEach((c, i) => c.classList.toggle('active', i === current));
+    const dotEls = dots.querySelectorAll('.nav-dot');
+    dotEls.forEach((d, i) => {
+      d.className = 'nav-dot';
+      if (completed.has(i)) d.classList.add('done');
+      if (i === current) d.classList.add('active');
+    });
+    const pct = Math.round((completed.size / TOTAL) * 100);
+    fill.style.width = pct + '%';
+    progText.textContent = completed.size + ' / ' + TOTAL + ' Lektionen';
+
+    // Back button
+    cards.forEach(c => {
+      const back = c.querySelector('.btn-back');
+      const fwd  = c.querySelector('.btn-next');
+      const idx  = +c.dataset.lesson;
+      if (back) back.disabled = idx === 0;
+    });
+  }
+
+  function goTo(idx) {
+    if (idx >= 0 && idx < TOTAL) {
+      current = idx;
+      updateUI();
+      window.scrollTo({ top: 300, behavior: 'smooth' });
+    }
+  }
+
+  // Wire nav buttons
+  document.querySelectorAll('.btn-back').forEach(btn => {
+    btn.addEventListener('click', () => goTo(current - 1));
+  });
+  document.querySelectorAll('.btn-next').forEach(btn => {
+    btn.addEventListener('click', () => {
+      completed.add(current);
+      if (current < TOTAL - 1) {
+        goTo(current + 1);
+      } else {
+        // Show congrats
+        document.querySelector('main > *:last-child').style.display = 'none';
+        cards.forEach(c => c.classList.remove('active'));
+        const cg = document.getElementById('congrats');
+        cg.style.display = 'block';
+        setTimeout(() => cg.classList.add('show'), 10);
+        fill.style.width = '100%';
+        progText.textContent = '6 / 6 Lektionen ✅';
+      }
+    });
+  });
+
+  // Quiz logic
+  document.querySelectorAll('.quiz-section').forEach(section => {
+    const opts = section.querySelectorAll('.quiz-opt');
+    const fb   = section.querySelector('.quiz-feedback');
+    opts.forEach(opt => {
+      opt.addEventListener('click', () => {
+        if (section.dataset.answered) return;
+        section.dataset.answered = '1';
+        opts.forEach(o => o.disabled = true);
+        const correct = opt.dataset.correct === 'true';
+        opt.classList.add(correct ? 'correct' : 'wrong');
+        if (!correct) {
+          opts.forEach(o => { if (o.dataset.correct === 'true') o.classList.add('correct'); });
+        }
+        fb.textContent = correct ? '✅ Richtig! Super gemacht!' : '❌ Leider falsch. Die grüne Option ist richtig.';
+        fb.className = 'quiz-feedback ' + (correct ? 'ok' : 'err');
+      });
+    });
+  });
+
+  // Live editor
+  function runCode(editorId, previewId) {
+    const code = document.getElementById(editorId).value;
+    const preview = document.getElementById(previewId);
+    preview.innerHTML = code;
+    // Re-run scripts manually
+    preview.querySelectorAll('script').forEach(s => {
+      const ns = document.createElement('script');
+      ns.textContent = s.textContent;
+      preview.appendChild(ns);
+    });
+  }
+
+  function restart() {
+    current = 0;
+    completed.clear();
+    document.getElementById('congrats').style.display = 'none';
+    document.getElementById('congrats').classList.remove('show');
+    updateUI();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  updateUI();
+</script>
+</body>
+</html>

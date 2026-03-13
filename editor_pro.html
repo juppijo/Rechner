@@ -14,6 +14,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/comment/comment.min.js"></script>
@@ -751,6 +752,7 @@
       <button class="lang-tab" data-lang="html" data-mode="htmlmixed">HTML</button>
       <button class="lang-tab" data-lang="css" data-mode="css">CSS</button>
       <button class="lang-tab" data-lang="python" data-mode="python">Python</button>
+      <button class="lang-tab" data-lang="json" data-mode="application/json">JSON</button>
       <button class="lang-tab" data-lang="xml" data-mode="xml">XML</button>
     </div>
 
@@ -777,6 +779,13 @@
         <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
         Ausführen
       </button>
+      <div class="btn-divider"></div>
+      <button class="btn" id="appFsBtn" onclick="toggleAppFullscreen()" title="App Vollbild (F11)">
+        <svg id="appFsIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/>
+          <line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>
+        </svg>
+      </button>
     </div>
     <input type="file" id="fileInput" style="display:none" accept=".js,.html,.css,.py,.xml,.ts,.json,.txt" onchange="loadFromDisk(event)"/>
   </header>
@@ -796,6 +805,9 @@
     </div>
     <div class="file-item" onclick="selectFile(this,'notes')">
       <span class="file-icon">📝</span> notes.py
+    </div>
+    <div class="file-item" onclick="selectFile(this,'data')">
+      <span class="file-icon">🔢</span> data.json
     </div>
 
     <div class="sidebar-section" style="margin-top:16px;display:flex;align-items:center;justify-content:space-between;padding-right:12px"><span>Gespeichert</span><span id="savedCount" style="font-size:9px;background:rgba(240,165,0,.15);color:var(--accent);padding:1px 6px;border-radius:10px">0</span></div>
@@ -1118,14 +1130,37 @@ print("Primzahlen bis 30:", primes)
     <genre>Cyberpunk</genre>
   </buch>
 </katalog>
+`,
+  json: `{
+  "projekt": "CODEX Editor",
+  "version": "1.0.0",
+  "autor": {
+    "name": "Max Mustermann",
+    "email": "max@example.com"
+  },
+  "sprachen": ["JavaScript", "HTML", "CSS", "Python", "JSON", "XML"],
+  "features": {
+    "syntaxHighlighting": true,
+    "autoClose": true,
+    "vollbild": true,
+    "speichern": true
+  },
+  "statistik": {
+    "zeilen": 42,
+    "commits": 7,
+    "bewertung": 9.5
+  },
+  "tags": ["editor", "browser", "codex", "open-source"]
+}
 `
 };
 
 const fileMap = {
-  main:  { lang:'javascript', mode:'javascript', tab:'main.js'    },
-  index: { lang:'html',       mode:'htmlmixed',  tab:'index.html' },
-  style: { lang:'css',        mode:'css',        tab:'style.css'  },
-  notes: { lang:'python',     mode:'python',     tab:'notes.py'   },
+  main:  { lang:'javascript', mode:'javascript',      tab:'main.js'    },
+  index: { lang:'html',       mode:'htmlmixed',        tab:'index.html' },
+  style: { lang:'css',        mode:'css',              tab:'style.css'  },
+  notes: { lang:'python',     mode:'python',           tab:'notes.py'   },
+  data:  { lang:'json',       mode:'application/json', tab:'data.json'  },
 };
 
 let currentLang = 'javascript';
@@ -1215,6 +1250,41 @@ function runCode() {
     switchPanel('preview');
     const frame = document.getElementById('previewFrame');
     frame.srcdoc = code;
+    return;
+  }
+
+  if (currentLang === 'json') {
+    switchPanel('console');
+    const raw = cm.getValue().trim();
+    try {
+      const parsed = JSON.parse(raw);
+      const pretty = JSON.stringify(parsed, null, 2);
+      // Count keys/items
+      const isArr = Array.isArray(parsed);
+      const count = isArr ? parsed.length : Object.keys(parsed).length;
+      addLog(`✓ Gültiges JSON — ${isArr ? 'Array' : 'Objekt'} mit ${count} ${isArr ? 'Einträgen' : 'Schlüsseln'}`, 'success');
+      // Pretty-print top level
+      if (isArr) {
+        parsed.forEach((item, i) => addLog(`[${i}] ${fmt(item)}`, 'log'));
+      } else {
+        Object.entries(parsed).forEach(([k, v]) => addLog(`${k}: ${fmt(v)}`, 'log'));
+      }
+      // Auto-format in editor
+      cm.setValue(pretty);
+      markClean();
+    } catch(err) {
+      addLog(`JSON Fehler: ${err.message}`, 'error');
+      // Try to highlight position
+      const match = err.message.match(/position (\d+)/);
+      if (match) {
+        const pos = parseInt(match[1]);
+        const doc = cm.getDoc();
+        const coords = doc.posFromIndex(pos);
+        cm.setSelection(coords, {line: coords.line, ch: coords.ch + 1});
+        cm.scrollIntoView(coords);
+        addLog(`▲ Fehler bei Zeile ${coords.line + 1}, Spalte ${coords.ch + 1}`, 'warn');
+      }
+    }
     return;
   }
 
@@ -1308,6 +1378,28 @@ function switchPanel(name) {
   consoleOut.style.display = name === 'console' ? 'block' : 'none';
   previewFr.classList.toggle('active', name === 'preview');
 }
+
+// ── APP FULLSCREEN ────────────────────────────────────────────────────────
+function toggleAppFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(() => {
+      showToast('Vollbild nicht verfügbar');
+    });
+  } else {
+    document.exitFullscreen();
+  }
+}
+
+document.addEventListener('fullscreenchange', () => {
+  const full = !!document.fullscreenElement;
+  document.getElementById('appFsIcon').innerHTML = full
+    ? `<polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/>
+       <line x1="10" y1="14" x2="3" y2="21"/><line x1="21" y1="3" x2="14" y2="10"/>`
+    : `<polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/>
+       <line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>`;
+  document.getElementById('appFsBtn').title = full ? 'Vollbild beenden (Esc)' : 'App Vollbild (F11)';
+  cm.refresh();
+});
 
 // ── PREVIEW FULLSCREEN ────────────────────────────────────────────────────
 let isFullscreen = false;
@@ -1472,7 +1564,7 @@ function loadSavedFile(name) {
   const files = getSavedFiles();
   const f = files[name];
   if (!f) return;
-  const modeMap = { javascript:'javascript', html:'htmlmixed', css:'css', python:'python', xml:'xml', json:'javascript', ts:'javascript' };
+  const modeMap = { javascript:'javascript', html:'htmlmixed', css:'css', python:'python', xml:'xml', json:'application/json', ts:'javascript' };
   currentLang = f.lang || 'javascript';
   const mode  = modeMap[currentLang] || 'javascript';
   cm.setOption('mode', mode);
@@ -1568,8 +1660,8 @@ function loadFromDisk(evt) {
 
 function applyLoadedFile(filename, content) {
   const ext = filename.split('.').pop().toLowerCase();
-  const modeMap = { js:'javascript', html:'htmlmixed', css:'css', py:'python', xml:'xml', ts:'javascript', json:'javascript' };
-  const langMap = { js:'javascript', html:'html', css:'css', py:'python', xml:'xml', ts:'javascript', json:'javascript' };
+  const modeMap = { js:'javascript', html:'htmlmixed', css:'css', py:'python', xml:'xml', ts:'javascript', json:'application/json' };
+  const langMap = { js:'javascript', html:'html', css:'css', py:'python', xml:'xml', ts:'javascript', json:'json' };
   const mode = modeMap[ext] || 'javascript';
   currentLang = langMap[ext] || 'javascript';
   cm.setOption('mode', mode);

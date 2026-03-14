@@ -470,7 +470,7 @@ footer{
   <div class="logo">
     <img src="Zami_Calc.jpg" alt="Zaminia" class="header-img">
     <div class="logo-icon">f</div>
-    ✨  Einheiten-Rechner  💫  Pro  🚀
+    ✨  Einheiten-Rechner  💫  Pro  🚀 🌟
   </div>
   <div class="header-right">
     <div class="swatches" id="swatches">
@@ -797,6 +797,14 @@ function tokenize(str) {
     const c = str[i];
     if (c === ' ') { i++; continue; }
     if ('*/()'.includes(c)) { tokens.push({t:'op',v:c}); i++; }
+    else if (c === '+') { tokens.push({t:'op',v:'+'}); i++; }
+    else if (c === '-') {
+      // Binary minus only if preceded by a unit, number, ) or frac — otherwise skip (e.g. in exponent context already consumed)
+      const last = tokens[tokens.length-1];
+      const isBinary = last && (last.t==='unit'||last.t==='num'||last.t==='frac'||(last.t==='op'&&last.v===')'));
+      if (isBinary) { tokens.push({t:'op',v:'-'}); i++; }
+      else { i++; } // unary minus — skip (exponent sign already handled by ^ block)
+    }
     else if (c === '√') { tokens.push({t:'root',v:2}); i++; }
     else if (c === '∛') { tokens.push({t:'root',v:3}); i++; }
     else if (c === '^') {
@@ -810,12 +818,17 @@ function tokenize(str) {
         let num = '';
         while (i < str.length && /\d/.test(str[i])) num += str[i++];
         let den = 1;
-        // Check for /D (fractional exponent like ^1/2)
+        // Only consume /D if digits actually follow — otherwise leave / for the parser
         if (i < str.length && str[i] === '/') {
-          i++; // skip /
+          const savedI = i;
+          i++; // tentatively skip /
           let d = '';
           while (i < str.length && /\d/.test(str[i])) d += str[i++];
-          if (d) den = parseInt(d);
+          if (d) {
+            den = parseInt(d); // legit fraction exponent e.g. ^1/2
+          } else {
+            i = savedI; // no digits after /, put / back — it's a division op
+          }
         }
         tokens.push({t:'frac', n: sign * parseInt(num), d: den});
       } else if (sign === -1) {
@@ -866,26 +879,42 @@ function parseExpr(str) {
   function parseGroup() {
     const result = {};
     let sign = RAT1; // +1 multiply, −1 divide
+    // For +/- (addition/subtraction): unit of result = unit of terms (they must match)
+    // We simply collect all unit contributions — same as * for dimensional analysis
 
     while (pos < tokens.length) {
       const tok = tokens[pos];
 
       if (tok.t === 'op' && tok.v === ')') { pos++; break; }
 
+      // Addition / subtraction: for unit analysis, treat like * (same units required)
+      if (tok.t === 'op' && (tok.v === '+' || tok.v === '-')) { pos++; continue; }
+
       if (tok.t === 'op' && tok.v === '(') {
         pos++;
-        const inner = parseGroup();          // recurse
-        // Exponent after closing bracket?
+        const inner = parseGroup();
         let expFrac = RAT1;
         const next = tokens[pos];
         if (next && next.t === 'op' && next.v === '^') { expFrac = readExp(); }
-        else if (next && (next.t === 'frac' || next.t === 'num')) { expFrac = readExp(); }
+        else if (next && (next.t === 'frac' || next.t === 'num')) {
+          // Only treat as exponent if inner has units (not a bare number like "1")
+          const innerHasUnits = Object.keys(inner).length > 0;
+          if (innerHasUnits) expFrac = readExp();
+        }
         mergeInto(result, inner, ratMul(sign, expFrac));
         continue;
       }
 
       if (tok.t === 'op' && tok.v === '/') { sign = rat(-1); pos++; continue; }
       if (tok.t === 'op' && tok.v === '*') { pos++; continue; }
+
+      // Bare number (e.g. "1", "2") → dimensionless, skip but don't consume as exponent
+      if (tok.t === 'num') {
+        const next = tokens[pos+1];
+        const isExponent = next && next.t === 'op' && next.v === '^';
+        if (!isExponent) { pos++; continue; } // dimensionless constant, ignore
+        pos++; continue;
+      }
 
       if (tok.t === 'unit') {
         pos++;
@@ -901,7 +930,7 @@ function parseExpr(str) {
         continue;
       }
 
-      if (tok.t === 'root') { pos++; continue; } // handled by normalize now
+      if (tok.t === 'root') { pos++; continue; }
       pos++;
     }
 
@@ -1199,7 +1228,7 @@ function insertUnit(u) {
   const after = v.slice(end);
   const noSepChars = ['*','/','^','(',')',
     '²','³','⁴','⁻','½','⅓','⅔','¼','¾','⅛','⅜','⅝','⅞','⅕','⅖','⅗','⅘','⅙','⅚'];
-  const endsWithNoSep = c => ['·','*','/','('].includes(c);
+  const endsWithNoSep = c => ['·','*','/','+','-','('].includes(c);
   const sep = (before.trim() && !endsWithNoSep(before.trimEnd().slice(-1)) && !noSepChars.includes(u) && !u.startsWith('^') && !u.startsWith('⁻') && !u.startsWith('²') && !u.startsWith('³') && !u.startsWith('⁴') && !u.startsWith('½') && !u.startsWith('⅓')) ? '·' : '';
   const insert = sep + u;
   inp.value = before + insert + after;

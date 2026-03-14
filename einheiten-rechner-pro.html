@@ -1,0 +1,1636 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Einheiten-Rechner</title>
+<link rel="icon" href="favicon.jpg" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ac: #00d4ff;
+  --ac-dim: rgba(0,212,255,0.12);
+  --ac-glow: rgba(0,212,255,0.25);
+  --bg: #0b0b14;
+  --surf: #111120;
+  --card: #181828;
+  --card2: #1f1f32;
+  --b: rgba(255,255,255,0.07);
+  --b2: rgba(255,255,255,0.13);
+  --txt: #ddddf0;
+  --txt2: #7070a0;
+  --txt3: #4a4a70;
+  --tip-bg: #1a1a30;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Outfit', sans-serif;
+  --r: 12px;
+  --r2: 8px;
+  --r3: 6px;
+}
+html.light {
+  --bg: #f0f2f7;
+  --surf: #ffffff;
+  --card: #f7f8fc;
+  --card2: #eef0f6;
+  --b: rgba(0,0,0,0.07);
+  --b2: rgba(0,0,0,0.13);
+  --txt: #1a1a2e;
+  --txt2: #5a5a80;
+  --txt3: #9090b0;
+  --tip-bg: #ffffff;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--bg);color:var(--txt);font-family:var(--sans);font-size:15px;line-height:1.5;transition:background .2s,color .2s;}
+::selection{background:var(--ac-dim);color:var(--ac);}
+
+/* ── Layout ── */
+#app{
+  min-height:100vh;
+  display:grid;
+  grid-template-rows:auto auto 1fr auto;
+  gap:0;
+}
+:fullscreen #app, :-webkit-full-screen #app{min-height:100vh;}
+
+/* ── Header ── */
+header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 28px 14px;
+  border-bottom:1px solid var(--b);
+  background:var(--surf);
+  position:sticky;top:0;z-index:10;
+  backdrop-filter:blur(12px);
+}
+.logo{
+  display:flex;align-items:center;gap:10px;
+  font-size:13px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--txt2);
+}
+.logo-icon{
+  width:28px;height:28px;border-radius:6px;
+  background:var(--ac-dim);border:1px solid var(--ac-glow);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:14px;color:var(--ac);font-weight:700;
+}
+.header-right{display:flex;align-items:center;gap:12px;}
+.header-img {
+  width: 140px;        /* Breite des Bildes */
+  height: 80px;        /* Höhe des Bildes */
+  object-fit: cover;   /* Verhindert Verzerrung */
+  border-radius: 15%;  /* Macht das Bild rund */
+  border: 2px solid var(--clr-primary); /* Ein feiner Rahmen in der aktuellen Themenfarbe */
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  transition: border-color 1s linear; /* Damit der Rahmen mit dem Auto-Hue mitfließt */
+  float: left;
+  margin-right: 100px;
+}
+
+/* Color swatches */
+.swatches{display:flex;gap:7px;align-items:center;}
+.swatch{
+  width:20px;height:20px;border-radius:50%;cursor:pointer;
+  border:2px solid transparent;transition:all .15s;
+  position:relative;
+}
+.swatch::after{
+  content:'';position:absolute;inset:-4px;border-radius:50%;
+  border:2px solid currentColor;opacity:0;transition:opacity .15s;
+}
+.swatch.active::after{opacity:1;}
+.swatch:hover{transform:scale(1.2);}
+
+/* Icon buttons */
+.ibtn{
+  width:34px;height:34px;border:1px solid var(--b2);background:transparent;
+  color:var(--txt2);border-radius:var(--r3);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;font-size:16px;
+}
+.ibtn:hover{color:var(--ac);border-color:var(--ac);background:var(--ac-dim);}
+
+/* ── Main content ── */
+main{
+  display:grid;
+  grid-template-columns:1fr 340px;
+  gap:0;
+  flex:1;
+}
+
+/* Left panel */
+.left-panel{
+  padding:24px 28px;
+  border-right:1px solid var(--b);
+  display:flex;flex-direction:column;gap:20px;
+}
+
+/* Fraction display */
+.fraction-card{
+  background:var(--card);
+  border:1px solid var(--b);
+  border-radius:var(--r);
+  padding:20px;
+  display:flex;flex-direction:column;gap:16px;
+}
+.fraction-card-title{
+  font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--txt2);font-weight:500;
+}
+
+.fraction-row{
+  display:flex;align-items:stretch;gap:12px;
+}
+.frac-side{
+  flex:1;display:flex;flex-direction:column;gap:8px;
+}
+.frac-label{
+  font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--txt3);font-weight:500;padding-left:4px;
+}
+.frac-input{
+  flex:1;
+  background:var(--surf);
+  border:1px solid var(--b2);
+  border-radius:var(--r3);
+  padding:10px 14px;
+  font-family:var(--mono);
+  font-size:1.05rem;
+  color:var(--txt);
+  outline:none;
+  transition:border-color .15s,box-shadow .15s;
+  min-height:52px;
+  resize:none;
+  width:100%;
+}
+.frac-input:focus{border-color:var(--ac);box-shadow:0 0 0 3px var(--ac-dim);}
+.frac-input::placeholder{color:var(--txt3);}
+
+.frac-divider{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  padding:0 6px;
+}
+.frac-bar{
+  width:2px;height:70px;
+  background:linear-gradient(to bottom,transparent,var(--b2),var(--b2),transparent);
+  border-radius:1px;
+}
+.frac-slash{
+  font-family:var(--mono);font-size:1.6rem;color:var(--txt3);line-height:1;
+}
+
+/* Formula preview */
+.formula-preview{
+  background:var(--surf);
+  border:1px solid var(--b);
+  border-radius:var(--r2);
+  padding:16px;
+  text-align:center;
+  min-height:72px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+}
+.preview-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--txt3);}
+.preview-formula{font-family:var(--mono);font-size:1.3rem;color:var(--txt);}
+.preview-frac{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.preview-num{font-family:var(--mono);font-size:1.1rem;color:var(--txt);}
+.preview-line{width:100%;min-width:40px;height:1px;background:var(--txt2);}
+.preview-den{font-family:var(--mono);font-size:1.1rem;color:var(--txt);}
+
+/* Unit pad */
+.unitpad-card{
+  background:var(--card);border:1px solid var(--b);border-radius:var(--r);
+  padding:18px;display:flex;flex-direction:column;gap:12px;
+}
+.pad-section{display:flex;flex-direction:column;gap:8px;}
+.pad-section-title{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--txt3);font-weight:500;}
+.pad-grid{display:flex;flex-wrap:wrap;gap:6px;}
+
+.ubt{
+  font-family:var(--mono);font-size:.8rem;font-weight:500;
+  background:var(--surf);border:1px solid var(--b2);
+  color:var(--txt2);border-radius:var(--r3);
+  padding:6px 10px;cursor:pointer;
+  transition:all .12s;
+  white-space:nowrap;
+  user-select:none;
+}
+.ubt:hover{border-color:var(--ac);color:var(--ac);background:var(--ac-dim);}
+.ubt:active{transform:scale(.95);}
+.ubt.base-unit{color:var(--ac);border-color:var(--ac-glow);background:var(--ac-dim);}
+.ubt.op-btn{
+  background:var(--card2);color:var(--txt);
+  font-size:1rem;padding:6px 12px;
+}
+.ubt.op-btn:hover{border-color:var(--ac);color:var(--ac);}
+.ubt.clear-btn{color:#ff6b6b;border-color:rgba(255,107,107,.25);background:rgba(255,107,107,.07);}
+.ubt.clear-btn:hover{border-color:#ff6b6b;background:rgba(255,107,107,.15);}
+
+/* Target field indicator */
+.target-indicator{
+  display:flex;gap:8px;align-items:center;margin-bottom:4px;
+}
+.target-pill{
+  font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+  padding:4px 10px;border-radius:20px;cursor:pointer;
+  border:1px solid var(--b2);background:transparent;color:var(--txt2);
+  transition:all .15s;font-family:var(--sans);font-weight:500;
+}
+.target-pill.active{
+  background:var(--ac-dim);border-color:var(--ac);color:var(--ac);
+}
+
+/* ── Right panel – Results ── */
+.right-panel{
+  padding:24px 24px;
+  background:var(--surf);
+  display:flex;flex-direction:column;gap:16px;
+  overflow-y:auto;
+}
+.right-title{
+  font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--txt2);font-weight:500;
+}
+
+.result-card{
+  background:var(--card);border:1px solid var(--b);border-radius:var(--r);
+  overflow:hidden;
+}
+.result-header{
+  padding:12px 16px;
+  border-bottom:1px solid var(--b);
+  font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--txt3);font-weight:500;
+}
+.result-body{padding:14px 16px;}
+
+.big-result{
+  font-family:var(--mono);font-size:1.3rem;font-weight:500;
+  color:var(--ac);
+  word-break:break-all;
+  min-height:32px;
+}
+.big-result.empty{color:var(--txt3);font-size:1rem;font-weight:400;}
+
+.base-result{
+  font-family:var(--mono);font-size:.9rem;color:var(--txt);word-break:break-all;
+  line-height:1.7;
+}
+
+/* Named unit badge */
+.named-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--ac-dim);border:1px solid var(--ac-glow);
+  border-radius:var(--r2);padding:10px 14px;margin-top:4px;
+}
+.named-badge-sym{font-family:var(--mono);font-size:1.1rem;font-weight:700;color:var(--ac);}
+.named-badge-name{font-size:.85rem;color:var(--txt2);}
+
+/* Steps */
+.steps-list{display:flex;flex-direction:column;gap:8px;}
+.step-item{
+  display:flex;flex-direction:column;gap:2px;
+  padding:8px 10px;
+  background:var(--surf);border-radius:var(--r3);
+  border-left:2px solid var(--b2);
+}
+.step-item.highlight{border-left-color:var(--ac);}
+.step-unit{font-family:var(--mono);font-size:.85rem;color:var(--ac);}
+.step-eq{font-family:var(--mono);font-size:.85rem;color:var(--txt2);}
+
+/* Dimension table */
+.dim-table{width:100%;border-collapse:collapse;}
+.dim-table td{
+  padding:6px 8px;font-family:var(--mono);font-size:.82rem;
+  border-bottom:1px solid var(--b);
+}
+.dim-table td:last-child{text-align:right;color:var(--ac);}
+.dim-table td:first-child{color:var(--txt2);}
+.dim-table tr:last-child td{border-bottom:none;}
+.dim-table tr.zero-row td{opacity:.35;}
+
+/* Empty state */
+.empty-state{
+  text-align:center;padding:32px 16px;
+  color:var(--txt3);font-size:.9rem;line-height:1.6;
+}
+
+/* ── Suggestions ── */
+.suggest-card{
+  background:var(--card);border:1px solid var(--b);border-radius:var(--r);
+  padding:16px 18px;display:flex;flex-direction:column;gap:10px;
+}
+.suggest-title{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--txt3);font-weight:500;}
+.suggest-scroll{display:flex;flex-wrap:wrap;gap:7px;}
+.sug-btn{
+  display:flex;flex-direction:column;gap:2px;
+  background:var(--surf);border:1px solid var(--b2);
+  border-radius:var(--r3);padding:7px 11px;
+  cursor:pointer;transition:all .13s;text-align:left;
+  min-width:80px;
+}
+.sug-btn:hover{border-color:var(--ac);background:var(--ac-dim);}
+.sug-btn:active{transform:scale(.96);}
+.sug-formula{font-family:var(--mono);font-size:.78rem;color:var(--ac);white-space:nowrap;}
+.sug-name{font-size:.72rem;color:var(--txt3);white-space:nowrap;}
+
+/* ── Tooltip ── */
+.tip-wrap{position:relative;display:inline-block;}
+.tip-box{
+  pointer-events:none;
+  position:absolute;bottom:calc(100% + 8px);left:50%;
+  transform:translateX(-50%) translateY(4px);
+  background:var(--tip-bg);border:1px solid var(--b2);
+  border-radius:var(--r2);padding:9px 13px;
+  min-width:170px;max-width:240px;
+  opacity:0;transition:opacity .15s, transform .15s;
+  z-index:100;white-space:normal;
+  box-shadow:0 8px 24px rgba(0,0,0,.25);
+}
+.tip-wrap:hover .tip-box{opacity:1;transform:translateX(var(--tip-tx,-50%)) translateY(0);}
+.tip-name{font-family:var(--sans);font-size:.82rem;font-weight:600;color:var(--txt);margin-bottom:4px;}
+.tip-si{font-family:var(--mono);font-size:.75rem;color:var(--ac);margin-bottom:3px;}
+.tip-desc{font-family:var(--sans);font-size:.75rem;color:var(--txt2);line-height:1.45;}
+.tip-arrow{
+  position:absolute;top:100%;left:var(--arr-left,50%);transform:translateX(-50%);
+  width:0;height:0;
+  border-left:6px solid transparent;border-right:6px solid transparent;
+  border-top:6px solid var(--b2);
+}
+.tip-arrow::after{
+  content:'';position:absolute;top:-7px;left:-5px;
+  width:0;height:0;
+  border-left:5px solid transparent;border-right:5px solid transparent;
+  border-top:5px solid var(--tip-bg);
+}
+
+/* ── History ── */
+.hist-card{
+  background:var(--card);border:1px solid var(--b);border-radius:var(--r);
+  overflow:hidden;
+}
+.hist-header{
+  padding:11px 16px;border-bottom:1px solid var(--b);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.hist-header-title{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--txt3);font-weight:500;}
+.hist-actions{display:flex;gap:6px;}
+.hist-clear-btn{
+  font-size:11px;padding:3px 9px;border-radius:4px;
+  background:transparent;border:1px solid var(--b2);color:var(--txt3);
+  cursor:pointer;transition:all .12s;font-family:var(--sans);
+}
+.hist-clear-btn:hover{border-color:#ff6b6b;color:#ff6b6b;background:rgba(255,107,107,.07);}
+.hist-list{max-height:340px;overflow-y:auto;}
+.hist-empty{padding:20px 16px;text-align:center;color:var(--txt3);font-size:.85rem;}
+.hist-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 14px;border-bottom:1px solid var(--b);
+  cursor:pointer;transition:background .1s;
+}
+.hist-item:last-child{border-bottom:none;}
+.hist-item:hover{background:var(--card2);}
+.hist-item-main{flex:1;min-width:0;}
+.hist-formula{
+  font-family:var(--mono);font-size:.8rem;color:var(--txt);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.hist-result{font-family:var(--mono);font-size:.75rem;color:var(--ac);margin-top:2px;}
+.hist-time{font-size:.7rem;color:var(--txt3);white-space:nowrap;flex-shrink:0;}
+.hist-item-btns{display:flex;gap:4px;opacity:0;transition:opacity .12s;}
+.hist-item:hover .hist-item-btns{opacity:1;}
+.hist-ibtn{
+  width:22px;height:22px;border-radius:4px;
+  background:transparent;border:1px solid var(--b2);
+  color:var(--txt2);cursor:pointer;font-size:12px;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .12s;
+}
+.hist-ibtn:hover{border-color:var(--ac);color:var(--ac);background:var(--ac-dim);}
+.hist-ibtn.del:hover{border-color:#ff6b6b;color:#ff6b6b;background:rgba(255,107,107,.1);}
+.hist-ibtn.pin{font-size:10px;}
+.hist-item.pinned{background:var(--ac-dim);}
+.hist-item.pinned .hist-formula{color:var(--ac);}
+.pin-dot{width:6px;height:6px;border-radius:50%;background:var(--ac);flex-shrink:0;opacity:0;}
+.hist-item.pinned .pin-dot{opacity:1;}
+.hist-export-btn{
+  font-size:11px;padding:3px 9px;border-radius:4px;
+  background:transparent;border:1px solid var(--b2);color:var(--txt2);
+  cursor:pointer;transition:all .12s;font-family:var(--sans);
+  display:flex;align-items:center;gap:4px;
+}
+.hist-export-btn:hover{border-color:var(--ac);color:var(--ac);background:var(--ac-dim);}
+.hist-export-btn.json:hover{border-color:#f97316;color:#f97316;background:rgba(249,115,22,.08);}
+.hist-export-btn.md:hover{border-color:#a855f7;color:#a855f7;background:rgba(168,85,247,.08);}
+.hist-export-btn.imp:hover{border-color:#22c55e;color:#22c55e;background:rgba(34,197,94,.08);}
+
+/* import hidden input */
+#importFile{display:none;}
+
+/* toast */
+.toast{
+  position:fixed;bottom:28px;right:28px;z-index:999;
+  background:var(--card);border:1px solid var(--b2);
+  border-radius:var(--r2);padding:10px 18px;
+  font-size:.85rem;color:var(--txt);
+  box-shadow:0 6px 24px rgba(0,0,0,.3);
+  opacity:0;transform:translateY(8px);
+  transition:opacity .2s,transform .2s;pointer-events:none;
+}
+.toast.show{opacity:1;transform:translateY(0);}
+
+/* ── Footer ── */
+footer{
+  padding:10px 28px;
+  background:var(--surf);border-top:1px solid var(--b);
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:11px;color:var(--txt3);letter-spacing:.04em;
+}
+
+/* ── Fullscreen adjustments ── */
+:fullscreen, :-webkit-full-screen{background:var(--bg);}
+:fullscreen #app, :-webkit-full-screen #app{
+  grid-template-rows:auto 1fr auto;
+}
+:fullscreen main, :-webkit-full-screen main{
+  height:calc(100vh - 65px - 34px);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px;}
+
+/* Responsive */
+@media(max-width:800px){
+  main{grid-template-columns:1fr;}
+  .right-panel{border-top:1px solid var(--b);}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ── Header ── -->
+<header>
+  <div class="logo">
+    <img src="Zami_Calc.jpg" alt="Zaminia" class="header-img">
+    <div class="logo-icon">f</div>
+    Einheiten-Rechner
+  </div>
+  <div class="header-right">
+    <div class="swatches" id="swatches">
+      <div class="swatch active" data-color="#00d4ff" style="background:#00d4ff;color:#00d4ff" title="Cyan"></div>
+      <div class="swatch" data-color="#a855f7" style="background:#a855f7;color:#a855f7" title="Violett"></div>
+      <div class="swatch" data-color="#22c55e" style="background:#22c55e;color:#22c55e" title="Grün"></div>
+      <div class="swatch" data-color="#f97316" style="background:#f97316;color:#f97316" title="Orange"></div>
+      <div class="swatch" data-color="#ec4899" style="background:#ec4899;color:#ec4899" title="Pink"></div>
+      <div class="swatch" data-color="#eab308" style="background:#eab308;color:#eab308" title="Gold"></div>
+    </div>
+    <div style="width:1px;height:20px;background:var(--b2);"></div>
+    <button class="ibtn" id="themeBtn" title="Hell/Dunkel umschalten" onclick="toggleTheme()">☀</button>
+    <button class="ibtn" id="fsBtn" title="Vollbild" onclick="toggleFullscreen()">⛶</button>
+  </div>
+</header>
+
+<!-- ── Main ── -->
+<main>
+  <!-- LEFT: Input + Pad -->
+  <div class="left-panel">
+
+    <!-- Fraction input card -->
+    <div class="fraction-card">
+      <div class="fraction-card-title">Formel eingeben</div>
+
+      <!-- Target selector -->
+      <div class="target-indicator">
+        <span style="font-size:12px;color:var(--txt3);">Eingabe für:</span>
+        <button class="target-pill active" id="btnNum" onclick="setTarget('num')">Zähler</button>
+        <button class="target-pill" id="btnDen" onclick="setTarget('den')">Nenner</button>
+      </div>
+
+      <!-- Fraction display -->
+      <div class="fraction-row">
+        <div class="frac-side">
+          <div class="frac-label">Zähler (Numerator)</div>
+          <textarea class="frac-input" id="numInput" rows="2" placeholder="z.B. N · m" spellcheck="false"
+            oninput="calculate()" onfocus="setTarget('num')"></textarea>
+        </div>
+        <div class="frac-divider">
+          <div class="frac-bar"></div>
+        </div>
+        <div class="frac-side">
+          <div class="frac-label">Nenner (Denominator)</div>
+          <textarea class="frac-input" id="denInput" rows="2" placeholder="z.B. s²" spellcheck="false"
+            oninput="calculate()" onfocus="setTarget('den')"></textarea>
+        </div>
+      </div>
+
+      <!-- Rendered preview -->
+      <div class="formula-preview">
+        <div class="preview-label">Formelvorschau</div>
+        <div id="previewArea">
+          <div class="big-result empty">Einheit eingeben …</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Suggestions -->
+    <div class="suggest-card">
+      <div class="suggest-title">Vorschläge</div>
+      <div class="suggest-scroll" id="suggestGrid"></div>
+    </div>
+
+    <!-- Unit keyboard -->
+    <div class="unitpad-card">
+
+      <div class="pad-section">
+        <div class="pad-section-title">SI-Basiseinheiten</div>
+        <div class="pad-grid" id="baseGrid"></div>
+      </div>
+
+      <div class="pad-section">
+        <div class="pad-section-title">Mechanik</div>
+        <div class="pad-grid" id="mechGrid"></div>
+      </div>
+
+      <div class="pad-section">
+        <div class="pad-section-title">Elektromagnetismus</div>
+        <div class="pad-grid" id="emGrid"></div>
+      </div>
+
+      <div class="pad-section">
+        <div class="pad-section-title">Sonstige</div>
+        <div class="pad-grid" id="otherGrid"></div>
+      </div>
+
+      <div class="pad-section">
+        <div class="pad-section-title">Operatoren &amp; Potenzen</div>
+        <div class="pad-grid" id="opGrid"></div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- RIGHT: Results -->
+  <div class="right-panel">
+    <div class="right-title">Ergebnis</div>
+
+    <!-- Simplified result -->
+    <div class="result-card">
+      <div class="result-header">Vereinfachte Einheit</div>
+      <div class="result-body">
+        <div class="big-result empty" id="simplResult">—</div>
+        <div id="namedBadge" style="margin-top:10px;display:none;"></div>
+      </div>
+    </div>
+
+    <!-- SI Base units -->
+    <div class="result-card">
+      <div class="result-header">SI-Grundeinheiten</div>
+      <div class="result-body">
+        <div class="base-result" id="baseResult" style="color:var(--txt3)">—</div>
+      </div>
+    </div>
+
+    <!-- Dimension table -->
+    <div class="result-card">
+      <div class="result-header">Dimensionstabelle</div>
+      <div class="result-body" style="padding:0">
+        <table class="dim-table" id="dimTable">
+          <tr><td colspan="2" style="color:var(--txt3);padding:16px;text-align:center;">Keine Einheit eingegeben</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Expansion steps -->
+    <div class="result-card">
+      <div class="result-header">Umrechnungsschritte</div>
+      <div class="result-body">
+        <div class="steps-list" id="stepsList">
+          <div class="empty-state">Gib eine Formel ein, um die Schritte zu sehen.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- History -->
+    <div class="hist-card">
+      <div class="hist-header">
+        <span class="hist-header-title">Verlauf</span>
+        <div class="hist-actions">
+          <button class="hist-export-btn json" onclick="exportJSON()" title="Als JSON speichern">⬇ JSON</button>
+          <button class="hist-export-btn md"   onclick="exportMD()"   title="Als Markdown speichern">⬇ MD</button>
+          <label  class="hist-export-btn imp"  title="JSON importieren">⬆ Import<input type="file" id="importFile" accept=".json" onchange="importJSON(this)"></label>
+          <button class="hist-clear-btn" onclick="clearHistory()">✕ Leeren</button>
+        </div>
+      </div>
+      <div class="hist-list" id="histList">
+        <div class="hist-empty">Noch kein Verlauf.</div>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+  </div>
+</main>
+
+<footer>
+  <span>SI-Einheitensystem · 7 Basiseinheiten</span>
+  <span id="statusBar">Bereit</span>
+</footer>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// UNIT DEFINITIONS
+// Each unit maps to its base-unit exponent decomposition
+// ═══════════════════════════════════════════════════════
+const BASE = ['m','kg','s','A','K','mol','cd'];
+const BASE_NAMES = {m:'Meter',kg:'Kilogramm',s:'Sekunde',A:'Ampere',K:'Kelvin',mol:'Mol',cd:'Candela'};
+
+// Each entry: [symbol, { m, kg, s, A, K, mol, cd }, name, symbol]
+const UNITS_DEF = {
+  // Base units
+  m:   [{m:1},           'Meter'],
+  kg:  [{kg:1},          'Kilogramm'],
+  s:   [{s:1},           'Sekunde'],
+  A:   [{A:1},           'Ampere'],
+  K:   [{K:1},           'Kelvin'],
+  mol: [{mol:1},         'Mol'],
+  cd:  [{cd:1},          'Candela'],
+  // Mechanics
+  N:   [{kg:1,m:1,s:-2}, 'Newton'],
+  J:   [{kg:1,m:2,s:-2}, 'Joule'],
+  W:   [{kg:1,m:2,s:-3}, 'Watt'],
+  Pa:  [{kg:1,m:-1,s:-2},'Pascal'],
+  Hz:  [{s:-1},          'Hertz'],
+  rad: [{},              'Radiant'],
+  sr:  [{},              'Steradiant'],
+  // E&M
+  V:   [{kg:1,m:2,s:-3,A:-1},'Volt'],
+  Ohm: [{kg:1,m:2,s:-3,A:-2},'Ohm'],
+  F:   [{kg:-1,m:-2,s:4,A:2},'Farad'],
+  C:   [{A:1,s:1},            'Coulomb'],
+  T:   [{kg:1,s:-2,A:-1},     'Tesla'],
+  H:   [{kg:1,m:2,s:-2,A:-2},'Henry'],
+  Wb:  [{kg:1,m:2,s:-2,A:-1},'Weber'],
+  S:   [{kg:-1,m:-2,s:3,A:2},'Siemens'],
+  // Other
+  lm:  [{cd:1},          'Lumen'],
+  lx:  [{cd:1,m:-2},     'Lux'],
+  Gy:  [{m:2,s:-2},      'Gray'],
+  Sv:  [{m:2,s:-2},      'Sievert'],
+  kat: [{mol:1,s:-1},    'Katal'],
+  // Non-SI common (treated dimensionally)
+  g:   [{kg:1},          'Gramm (=kg)'],
+  min: [{s:1},           'Minute (=s)'],
+  h:   [{s:1},           'Stunde (=s)'],
+  d:   [{s:1},           'Tag (=s)'],
+  l:   [{m:3},           'Liter (=m³)'],
+  L:   [{m:3},           'Liter (=m³)'],
+  bar: [{kg:1,m:-1,s:-2},'Bar (=Pa)'],
+  atm: [{kg:1,m:-1,s:-2},'Atmosphäre (=Pa)'],
+  cal: [{kg:1,m:2,s:-2}, 'Kalorie (=J)'],
+  eV:  [{kg:1,m:2,s:-2}, 'Elektronenvolt (=J)'],
+  Bq:  [{s:-1},          'Becquerel (=Hz)'],
+  mol: [{mol:1},         'Mol'],
+};
+
+// Named derived units for recognition (result → name)
+const NAMED = [
+  [{kg:1,m:1,s:-2},'N','Newton'],
+  [{kg:1,m:2,s:-2},'J','Joule'],
+  [{kg:1,m:2,s:-3},'W','Watt'],
+  [{kg:1,m:-1,s:-2},'Pa','Pascal'],
+  [{s:-1},'Hz','Hertz'],
+  [{kg:1,m:2,s:-3,A:-1},'V','Volt'],
+  [{kg:1,m:2,s:-3,A:-2},'Ω','Ohm'],
+  [{kg:-1,m:-2,s:4,A:2},'F','Farad'],
+  [{A:1,s:1},'C','Coulomb'],
+  [{kg:1,s:-2,A:-1},'T','Tesla'],
+  [{kg:1,m:2,s:-2,A:-2},'H','Henry'],
+  [{kg:1,m:2,s:-2,A:-1},'Wb','Weber'],
+  [{kg:-1,m:-2,s:3,A:2},'S','Siemens'],
+  [{cd:1},'lm','Lumen'],
+  [{cd:1,m:-2},'lx','Lux'],
+  [{m:2,s:-2},'Gy/Sv','Gray / Sievert'],
+  [{mol:1,s:-1},'kat','Katal'],
+  [{m:2,s:-2},'Gy','Gray'],
+];
+
+// ═══════════════════════════════════════════════════════
+// PARSER
+// ═══════════════════════════════════════════════════════
+
+// Step 1: convert superscript chars → ^N notation
+function normalize(str) {
+  const sup = {'⁰':'0','¹':'1','²':'2','³':'3','⁴':'4',
+               '⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9'};
+  let res = '', i = 0;
+  while (i < str.length) {
+    const c = str[i];
+    if (c === '⁻' || sup[c]) {
+      // Only add ^ if not already there (fixes ^² → ^^2 bug)
+      if (!res.endsWith('^')) res += '^';
+      let neg = '';
+      if (c === '⁻') { neg = '-'; i++; }
+      let d = '';
+      while (i < str.length && sup[str[i]]) { d += sup[str[i]]; i++; }
+      if (d) { res += neg + d; }
+      else    { res = res.slice(0,-1) + (neg ? '⁻' : ''); } // lone ⁻, undo ^
+    } else {
+      res += c; i++;
+    }
+  }
+  return res.replace(/[×·]/g,'*').replace(/÷/g,'/').replace(/\s+/g,' ').trim();
+}
+
+// Step 2: tokenize normalized string
+function tokenize(str) {
+  str = normalize(str);
+  const tokens = [];
+  let i = 0;
+  while (i < str.length) {
+    const c = str[i];
+    if (c === ' ') { i++; continue; }
+    if ('*/()'.includes(c)) { tokens.push({t:'op',v:c}); i++; }
+    else if (c === '^') {
+      tokens.push({t:'op',v:'^'}); i++;
+      // Consume sign + digits immediately (^-3, ^4, ^+2)
+      let sign = 1;
+      if (i < str.length && str[i] === '-') { sign = -1; i++; }
+      else if (i < str.length && str[i] === '+') { i++; }
+      if (i < str.length && /\d/.test(str[i])) {
+        let d = '';
+        while (i < str.length && /\d/.test(str[i])) d += str[i++];
+        tokens.push({t:'num', v:sign * parseInt(d)});
+      } else if (sign === -1) {
+        tokens.push({t:'num', v:-1});  // bare ^ -
+      }
+    }
+    else if (/\d/.test(c)) {
+      let d = '';
+      while (i < str.length && /\d/.test(str[i])) d += str[i++];
+      tokens.push({t:'num', v:parseInt(d)});
+    }
+    else if (/[a-zA-ZΩμ]/.test(c)) {
+      let s = '';
+      while (i < str.length && /[a-zA-ZΩμ]/.test(str[i])) s += str[i++];
+      if (s === 'Ω') s = 'Ohm';
+      tokens.push({t:'unit', v:s});
+    }
+    else { i++; }
+  }
+  return tokens;
+}
+
+// Parse expression → {unit: exponent, ...} (raw, not expanded)
+function parseExpr(str) {
+  if (!str.trim()) return {};
+  const tokens = tokenize(str);
+  const result = {};
+  let i = 0;
+  let sign = 1; // +1 = multiply, -1 = divide
+
+  while (i < tokens.length) {
+    const tok = tokens[i];
+    if (tok.t === 'unit') {
+      let exp = 1;
+      const next = tokens[i+1];
+      if (next && next.t === 'op' && next.v === '^') {
+        // Explicit ^ operator (e.g. m^2, s^-3)
+        i += 2;
+        if (i < tokens.length && tokens[i].t === 'num') {
+          exp = tokens[i].v;
+        }
+      } else if (next && next.t === 'num') {
+        // Direct digit after unit (fallback, e.g. m2 from inline typed number)
+        i++;
+        exp = tokens[i].v;
+      }
+      result[tok.v] = (result[tok.v] || 0) + sign * exp;
+      i++;
+    } else if (tok.t === 'op' && tok.v === '/') {
+      sign = -1; i++;
+    } else if (tok.t === 'op' && tok.v === '*') {
+      i++;
+    } else {
+      i++;
+    }
+  }
+  return result;
+}
+
+// Expand a {unit: exp} map to SI base units
+function expandToBase(rawMap) {
+  const base = {};
+  const steps = [];
+
+  for (const [unit, exp] of Object.entries(rawMap)) {
+    if (exp === 0) continue;
+    const def = UNITS_DEF[unit];
+    if (!def) {
+      // Unknown unit – treat as new dimension
+      steps.push({unit, exp, expansion: {[unit]: exp}, known: false});
+      base[unit] = (base[unit]||0) + exp;
+      continue;
+    }
+    const [baseMap, name] = def;
+    const expansion = {};
+    for (const [b, e] of Object.entries(baseMap)) {
+      const contrib = e * exp;
+      base[b] = (base[b]||0) + contrib;
+      if (contrib !== 0) expansion[b] = contrib;
+    }
+    steps.push({unit, exp, expansion, name, known: true});
+  }
+
+  // Remove zeros
+  for (const k of Object.keys(base)) {
+    if (base[k] === 0) delete base[k];
+  }
+  return {base, steps};
+}
+
+// Check if a base map matches a named unit
+function recognizeUnit(base) {
+  for (const [def, sym, name] of NAMED) {
+    let match = true;
+    const allKeys = new Set([...Object.keys(base), ...Object.keys(def)]);
+    for (const k of allKeys) {
+      const a = base[k] || 0;
+      const b = def[k] || 0;
+      if (a !== b) { match = false; break; }
+    }
+    if (match) return {sym, name};
+  }
+  return null;
+}
+
+// Format a base map as a nice string
+function formatBase(base) {
+  const pos = [], neg = [];
+  for (const u of BASE) {
+    const e = base[u] || 0;
+    if (e > 0) pos.push(e === 1 ? u : `${u}${superscript(e)}`);
+    if (e < 0) neg.push(Math.abs(e) === 1 ? u : `${u}${superscript(Math.abs(e))}`);
+  }
+  // Unknown units
+  for (const [u, e] of Object.entries(base)) {
+    if (BASE.includes(u)) continue;
+    if (e > 0) pos.push(e === 1 ? u : `${u}${superscript(e)}`);
+    if (e < 0) neg.push(Math.abs(e) === 1 ? u : `${u}${superscript(Math.abs(e))}`);
+  }
+  if (pos.length === 0 && neg.length === 0) return '1 (dimensionslos)';
+  if (neg.length === 0) return pos.join('·');
+  if (pos.length === 0) return '1 / ' + neg.join('·');
+  return pos.join('·') + ' / ' + neg.join('·');
+}
+
+// Format raw expression as pretty string
+function formatRaw(rawMap) {
+  const pos = [], neg = [];
+  for (const [u, e] of Object.entries(rawMap)) {
+    if (e === 0) continue;
+    if (e > 0) pos.push(e === 1 ? u : `${u}${superscript(e)}`);
+    else neg.push(Math.abs(e) === 1 ? u : `${u}${superscript(Math.abs(e))}`);
+  }
+  if (pos.length === 0 && neg.length === 0) return '1';
+  if (neg.length === 0) return pos.join('·');
+  if (pos.length === 0) return '1 / ' + neg.join('·');
+  return pos.join('·') + ' / ' + neg.join('·');
+}
+
+function superscript(n) {
+  const map = {'-':'⁻','0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+  return String(n).split('').map(c => map[c]||c).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// MAIN CALCULATE
+// ═══════════════════════════════════════════════════════
+let currentTarget = 'num';
+
+function calculate() {
+  const numStr = document.getElementById('numInput').value;
+  const denStr = document.getElementById('denInput').value;
+
+  // Parse
+  const numRaw = parseExpr(numStr);
+  const denRaw = parseExpr(denStr);
+
+  // Combine (denominator inverts signs)
+  const combined = {...numRaw};
+  for (const [u, e] of Object.entries(denRaw)) {
+    combined[u] = (combined[u]||0) - e;
+  }
+
+  // Update preview
+  updatePreview(numRaw, denRaw);
+
+  if (!numStr.trim() && !denStr.trim()) {
+    showEmpty();
+    return;
+  }
+
+  // Expand to base units
+  const {base, steps} = expandToBase(combined);
+
+  // Simplified raw format
+  const simplStr = formatRaw(combined);
+  const baseStr = formatBase(base);
+
+  // Recognize
+  const named = recognizeUnit(base);
+
+  // Update UI
+  const simplEl = document.getElementById('simplResult');
+  simplEl.textContent = simplStr || '1';
+  simplEl.className = 'big-result' + (simplStr ? '' : ' empty');
+
+  const namedDiv = document.getElementById('namedBadge');
+  if (named) {
+    namedDiv.style.display = 'block';
+    namedDiv.innerHTML = `
+      <div class="named-badge">
+        <span class="named-badge-sym">${named.sym}</span>
+        <span class="named-badge-name">= ${named.name}</span>
+      </div>`;
+  } else {
+    namedDiv.style.display = 'none';
+  }
+
+  const baseEl = document.getElementById('baseResult');
+  baseEl.textContent = baseStr;
+  baseEl.style.color = 'var(--txt)';
+
+  updateDimTable(base);
+  updateSteps(steps, numRaw, denRaw);
+
+  document.getElementById('statusBar').textContent =
+    `${Object.keys(combined).length} Einheiten · ${Object.keys(base).filter(k=>base[k]).length} Basisdimensionen`;
+
+  // Save to history (debounced – only after 600ms pause)
+  clearTimeout(calculate._histTimer);
+  calculate._histTimer = setTimeout(() => {
+    pushHistory(numStr.trim(), denStr.trim(), simplStr||'1', baseStr);
+  }, 600);
+}
+
+function updatePreview(numRaw, denRaw) {
+  const area = document.getElementById('previewArea');
+  const numStr = formatRaw(numRaw);
+  const denStr = formatRaw(denRaw);
+  const n = document.getElementById('numInput').value.trim();
+  const d = document.getElementById('denInput').value.trim();
+
+  if (!n && !d) {
+    area.innerHTML = `<div class="big-result empty">Einheit eingeben …</div>`;
+    return;
+  }
+
+  if (!d || denStr === '1') {
+    area.innerHTML = `<div class="preview-formula">${numStr || '1'}</div>`;
+  } else if (!n) {
+    area.innerHTML = `<div class="preview-frac">
+      <div class="preview-num">1</div>
+      <div class="preview-line"></div>
+      <div class="preview-den">${denStr}</div>
+    </div>`;
+  } else {
+    area.innerHTML = `<div class="preview-frac">
+      <div class="preview-num">${numStr}</div>
+      <div class="preview-line" style="width:${Math.max(numStr.length,denStr.length)*10}px"></div>
+      <div class="preview-den">${denStr}</div>
+    </div>`;
+  }
+}
+
+function updateDimTable(base) {
+  const tbl = document.getElementById('dimTable');
+  let html = '';
+  let hasAny = false;
+  for (const u of BASE) {
+    const e = base[u] || 0;
+    const cls = e === 0 ? ' class="zero-row"' : '';
+    html += `<tr${cls}><td>${u} <span style="color:var(--txt3);font-size:.75rem">(${BASE_NAMES[u]})</span></td><td>${e !== 0 ? superscript(e) : '—'}</td></tr>`;
+    if (e !== 0) hasAny = true;
+  }
+  // Unknown dims
+  for (const [u,e] of Object.entries(base)) {
+    if (BASE.includes(u)) continue;
+    html += `<tr><td>${u}</td><td>${superscript(e)}</td></tr>`;
+    hasAny = true;
+  }
+  if (!hasAny && html) {
+    // All zero = dimensionless
+  }
+  tbl.innerHTML = html || '<tr><td colspan="2" style="color:var(--txt3);padding:16px;text-align:center">Keine Einheit eingegeben</td></tr>';
+}
+
+function updateSteps(steps, numRaw, denRaw) {
+  const list = document.getElementById('stepsList');
+  if (!steps.length) {
+    list.innerHTML = '<div class="empty-state">Gib eine Formel ein, um die Schritte zu sehen.</div>';
+    return;
+  }
+
+  let html = '';
+  for (const s of steps) {
+    const signedExp = s.exp;
+    const expStr = signedExp === 1 ? '' : superscript(signedExp);
+    const isBase = BASE.includes(s.unit) && s.known;
+
+    if (isBase) {
+      html += `<div class="step-item">
+        <div class="step-unit">${s.unit}${expStr}</div>
+        <div class="step-eq" style="color:var(--txt3)">Basiseinheit</div>
+      </div>`;
+    } else if (s.known) {
+      const expParts = Object.entries(s.expansion)
+        .map(([u,e]) => e === 1 ? u : `${u}${superscript(e)}`).join('·');
+      html += `<div class="step-item highlight">
+        <div class="step-unit">${s.unit}${expStr}</div>
+        <div class="step-eq">= ${expParts}</div>
+      </div>`;
+    } else {
+      html += `<div class="step-item" style="border-left-color:#f97316">
+        <div class="step-unit" style="color:#f97316">${s.unit}${expStr}</div>
+        <div class="step-eq" style="color:var(--txt3)">Unbekannte Einheit</div>
+      </div>`;
+    }
+  }
+  list.innerHTML = html;
+}
+
+function showEmpty() {
+  document.getElementById('simplResult').textContent = '—';
+  document.getElementById('simplResult').className = 'big-result empty';
+  document.getElementById('namedBadge').style.display = 'none';
+  document.getElementById('baseResult').textContent = '—';
+  document.getElementById('baseResult').style.color = 'var(--txt3)';
+  document.getElementById('dimTable').innerHTML =
+    '<tr><td colspan="2" style="color:var(--txt3);padding:16px;text-align:center">Keine Einheit eingegeben</td></tr>';
+  document.getElementById('stepsList').innerHTML =
+    '<div class="empty-state">Gib eine Formel ein, um die Schritte zu sehen.</div>';
+  document.getElementById('statusBar').textContent = 'Bereit';
+  document.getElementById('previewArea').innerHTML =
+    '<div class="big-result empty">Einheit eingeben …</div>';
+}
+
+// ═══════════════════════════════════════════════════════
+// UI CONTROLS
+// ═══════════════════════════════════════════════════════
+function setTarget(t) {
+  currentTarget = t;
+  document.getElementById('btnNum').classList.toggle('active', t==='num');
+  document.getElementById('btnDen').classList.toggle('active', t==='den');
+  document.getElementById(t==='num'?'numInput':'denInput').focus();
+}
+
+function insertUnit(u) {
+  const inp = document.getElementById(currentTarget==='num'?'numInput':'denInput');
+  const v = inp.value;
+  const start = inp.selectionStart, end = inp.selectionEnd;
+  // Add · separator if needed
+  const before = v.slice(0, start);
+  const after = v.slice(end);
+  const sep = (before.trim() && !before.trimEnd().endsWith('·') && !before.trimEnd().endsWith('*') && !before.trimEnd().endsWith('/') && !u.startsWith('^') && u !== '*' && u !== '/') ? '·' : '';
+  const insert = sep + u;
+  inp.value = before + insert + after;
+  inp.selectionStart = inp.selectionEnd = start + insert.length;
+  inp.focus();
+  inp.dispatchEvent(new Event('input'));
+}
+
+function clearTarget() {
+  document.getElementById(currentTarget==='num'?'numInput':'denInput').value = '';
+  calculate();
+}
+
+function clearAll() {
+  document.getElementById('numInput').value = '';
+  document.getElementById('denInput').value = '';
+  calculate();
+}
+
+// Build pads  [label, val, name, SI-Formel, Beschreibung]
+const BASE_BTNS = [
+  ['m',  'm',   'Meter',      'm',     'SI-Basiseinheit der Länge'],
+  ['kg', 'kg',  'Kilogramm',  'kg',    'SI-Basiseinheit der Masse'],
+  ['s',  's',   'Sekunde',    's',     'SI-Basiseinheit der Zeit'],
+  ['A',  'A',   'Ampere',     'A',     'SI-Basiseinheit der elektr. Stromstärke'],
+  ['K',  'K',   'Kelvin',     'K',     'SI-Basiseinheit der Temperatur'],
+  ['mol','mol', 'Mol',        'mol',   'SI-Basiseinheit der Stoffmenge'],
+  ['cd', 'cd',  'Candela',    'cd',    'SI-Basiseinheit der Lichtstärke'],
+];
+const MECH_BTNS = [
+  ['N',  'N',   'Newton',   'kg·m·s⁻²',       'Kraft: F = m·a'],
+  ['J',  'J',   'Joule',    'kg·m²·s⁻²',      'Energie, Arbeit: W = F·s'],
+  ['W',  'W',   'Watt',     'kg·m²·s⁻³',      'Leistung: P = W/t'],
+  ['Pa', 'Pa',  'Pascal',   'kg·m⁻¹·s⁻²',     'Druck: p = F/A'],
+  ['Hz', 'Hz',  'Hertz',    's⁻¹',             'Frequenz: f = 1/T'],
+  ['rad','rad', 'Radiant',  '(dimensionslos)', 'Ebener Winkel: θ = s/r'],
+];
+const EM_BTNS = [
+  ['V',  'V',   'Volt',    'kg·m²·s⁻³·A⁻¹',  'Elektrische Spannung: U = W/Q'],
+  ['Ω',  'Ohm', 'Ohm',     'kg·m²·s⁻³·A⁻²',  'Elektrischer Widerstand: R = U/I'],
+  ['F',  'F',   'Farad',   'kg⁻¹·m⁻²·s⁴·A²', 'Elektrische Kapazität: C = Q/U'],
+  ['C',  'C',   'Coulomb', 'A·s',              'Elektrische Ladung: Q = I·t'],
+  ['T',  'T',   'Tesla',   'kg·s⁻²·A⁻¹',      'Magn. Flussdichte: B = F/(I·l)'],
+  ['H',  'H',   'Henry',   'kg·m²·s⁻²·A⁻²',  'Induktivität: L = Φ/I'],
+  ['Wb', 'Wb',  'Weber',   'kg·m²·s⁻²·A⁻¹',  'Magn. Fluss: Φ = B·A'],
+  ['S',  'S',   'Siemens', 'kg⁻¹·m⁻²·s³·A²', 'Leitwert: G = 1/R'],
+];
+const OTHER_BTNS = [
+  ['lm', 'lm',  'Lumen',      'cd',            'Lichtstrom: Φ = I·Ω'],
+  ['lx', 'lx',  'Lux',        'cd·m⁻²',        'Beleuchtungsstärke: E = Φ/A'],
+  ['Gy', 'Gy',  'Gray',       'm²·s⁻²',        'Energiedosis ionisierender Strahlung'],
+  ['Sv', 'Sv',  'Sievert',    'm²·s⁻²',        'Äquivalentdosis (Strahlenschutz)'],
+  ['kat','kat', 'Katal',      'mol·s⁻¹',       'Katalytische Aktivität'],
+  ['g',  'g',   'Gramm',      '10⁻³ kg',       'Masse (1 g = 0,001 kg)'],
+  ['l',  'l',   'Liter',      '10⁻³ m³',       'Volumen (1 l = 0,001 m³)'],
+  ['min','min', 'Minute',     '60 s',           'Zeit (1 min = 60 s)'],
+  ['h',  'h',   'Stunde',     '3600 s',         'Zeit (1 h = 3600 s)'],
+  ['eV', 'eV',  'Elektronenvolt','1,602·10⁻¹⁹ J','Energie in der Atom-/Kernphysik'],
+];
+const OP_BTNS = [
+  ['×',  '*',    'Multiplizieren', '·',  'Einheiten verknüpfen: m × s'],
+  ['÷',  '/',    'Dividieren',     '/',  'Einheiten teilen: m ÷ s'],
+  ['²',  '²',    'Quadrat',        '²',  'Einheit zum Quadrat: m²'],
+  ['³',  '³',    'Kubik',          '³',  'Einheit hoch 3: m³'],
+  ['⁴',  '⁴',    'Hoch 4',         '⁴',  'Einheit hoch 4: m⁴'],
+  ['⁻¹', '⁻¹',  'Kehrwert',       '⁻¹', 'Einheit hoch −1: s⁻¹ = Hz'],
+  ['⁻²', '⁻²',  'Hoch −2',        '⁻²', 'Einheit hoch −2: m⁻²'],
+  ['⁻³', '⁻³',  'Hoch −3',        '⁻³', 'Einheit hoch −3: m⁻³'],
+  ['⁻⁴', '⁻⁴',  'Hoch −4',        '⁻⁴', 'Einheit hoch −4'],
+  ['(',  '(',    'Klammer auf',    '(',  'Gruppe öffnen'],
+  [')',  ')',    'Klammer zu',     ')',  'Gruppe schließen'],
+  ['⌫',  '⌫',    'Löschen',        '',   'Letztes Zeichen entfernen'],
+  ['C',  'clear','Feld leeren',    '',   'Aktuelles Eingabefeld löschen'],
+  ['CC', 'clearall','Alles leeren','',   'Beide Felder leeren'],
+];
+
+function buildPad(id, btns, cls='') {
+  const grid = document.getElementById(id);
+  grid.innerHTML = '';
+  for (const [label, val, tipName, tipSI, tipDesc] of btns) {
+    const btn = document.createElement('button');
+    btn.className = 'ubt ' + cls;
+    btn.textContent = label;
+
+    if (val === '⌫') {
+      btn.onclick = () => backspace();
+    } else if (val === 'clear') {
+      btn.className += ' clear-btn';
+      btn.onclick = clearTarget;
+    } else if (val === 'clearall') {
+      btn.className += ' clear-btn';
+      btn.onclick = clearAll;
+    } else if (val === '(' ) {
+      btn.onclick = () => { insertUnit('('); };
+    } else if (val === ')' ) {
+      btn.onclick = () => { insertUnit(')'); };
+    } else if (val === '²') {
+      btn.onclick = () => { insertUnit('^²'); };
+    } else if (val === '³') {
+      btn.onclick = () => { insertUnit('^³'); };
+    } else if (val === '⁴') {
+      btn.onclick = () => { insertUnit('^⁴'); };
+    } else if (val === '⁻¹') {
+      btn.onclick = () => { insertUnit('^⁻¹'); };
+    } else if (val === '⁻²') {
+      btn.onclick = () => { insertUnit('^⁻²'); };
+    } else if (val === '⁻³') {
+      btn.onclick = () => { insertUnit('^⁻³'); };
+    } else if (val === '⁻⁴') {
+      btn.onclick = () => { insertUnit('^⁻⁴'); };
+    } else {
+      btn.onclick = () => insertUnit(val);
+    }
+
+    // Wrap in tooltip if we have tooltip data
+    if (tipName) {
+      const wrap = document.createElement('div');
+      wrap.className = 'tip-wrap';
+      wrap.appendChild(btn);
+      const box = document.createElement('div');
+      box.className = 'tip-box';
+      box.innerHTML = `
+        <div class="tip-name">${tipName}</div>
+        ${tipSI ? `<div class="tip-si">${tipSI}</div>` : ''}
+        ${tipDesc ? `<div class="tip-desc">${tipDesc}</div>` : ''}
+        <div class="tip-arrow"></div>`;
+      wrap.appendChild(box);
+      grid.appendChild(wrap);
+    } else {
+      grid.appendChild(btn);
+    }
+  }
+}
+
+function backspace() {
+  const inp = document.getElementById(currentTarget==='num'?'numInput':'denInput');
+  const s = inp.selectionStart, e = inp.selectionEnd;
+  if (s === e && s > 0) {
+    inp.value = inp.value.slice(0,s-1) + inp.value.slice(s);
+    inp.selectionStart = inp.selectionEnd = s-1;
+  } else if (s !== e) {
+    inp.value = inp.value.slice(0,s) + inp.value.slice(e);
+    inp.selectionStart = inp.selectionEnd = s;
+  }
+  inp.dispatchEvent(new Event('input'));
+  inp.focus();
+}
+
+// Color themes
+function setAccent(color) {
+  document.documentElement.style.setProperty('--ac', color);
+  // Compute dim/glow
+  const hex2rgb = h => [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
+  const [r,g,b] = hex2rgb(color);
+  document.documentElement.style.setProperty('--ac-dim', `rgba(${r},${g},${b},0.12)`);
+  document.documentElement.style.setProperty('--ac-glow', `rgba(${r},${g},${b},0.28)`);
+}
+
+document.getElementById('swatches').addEventListener('click', e => {
+  const sw = e.target.closest('.swatch');
+  if (!sw) return;
+  document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+  sw.classList.add('active');
+  setAccent(sw.dataset.color);
+});
+
+// Fullscreen
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(()=>{});
+  } else {
+    document.exitFullscreen();
+  }
+}
+document.addEventListener('fullscreenchange', () => {
+  const btn = document.getElementById('fsBtn');
+  btn.title = document.fullscreenElement ? 'Vollbild beenden' : 'Vollbild';
+  btn.textContent = document.fullscreenElement ? '✕' : '⛶';
+});
+
+// Keyboard shortcut: Escape exits fullscreen handled by browser
+// Tab to switch targets
+document.addEventListener('keydown', e => {
+  if (e.key === 'F11') { e.preventDefault(); toggleFullscreen(); }
+});
+
+// ═══════════════════════════════════════════════════════
+// SUGGESTIONS
+// ═══════════════════════════════════════════════════════
+const SUGGESTIONS = [
+  // Mechanik
+  { name:'Kraft (Newton)',      num:'kg·m',    den:'s²' },
+  { name:'Energie (Joule)',     num:'N·m',     den:'' },
+  { name:'Leistung (Watt)',     num:'J',       den:'s' },
+  { name:'Druck (Pascal)',      num:'N',       den:'m²' },
+  { name:'Frequenz (Hertz)',    num:'1',       den:'s' },
+  { name:'Impuls',              num:'kg·m',    den:'s' },
+  { name:'Drehmoment',          num:'N·m',     den:'' },
+  { name:'Beschleunigung',      num:'m',       den:'s²' },
+  { name:'Geschwindigkeit',     num:'m',       den:'s' },
+  { name:'Dichte',              num:'kg',      den:'m³' },
+  { name:'Dyn. Viskosität',     num:'kg',      den:'m·s' },
+  { name:'Kin. Viskosität',     num:'m²',      den:'s' },
+  { name:'Oberflächenspannung', num:'N',       den:'m' },
+  { name:'Federkonstante',      num:'N',       den:'m' },
+  { name:'Wärmekapazität',      num:'J',       den:'kg·K' },
+  { name:'Wärmeleitung λ',      num:'W',       den:'m·K' },
+  { name:'Wärmeübergang',       num:'W',       den:'m²·K' },
+  // Elektro
+  { name:'Spannung (Volt)',     num:'W',       den:'A' },
+  { name:'Widerstand (Ohm)',    num:'V',       den:'A' },
+  { name:'Kapazität (Farad)',   num:'C',       den:'V' },
+  { name:'Ladung (Coulomb)',    num:'A·s',     den:'' },
+  { name:'Induktivität (Henry)',num:'V·s',     den:'A' },
+  { name:'Magn. Flussdichte',   num:'V·s',     den:'m²' },
+  { name:'Leitwert (Siemens)',  num:'A',       den:'V' },
+  { name:'Elektr. Feldstärke', num:'V',        den:'m' },
+  { name:'Magn. Feldstärke',   num:'A',        den:'m' },
+  // Optik / Strahlung
+  { name:'Beleuchtungsstärke',  num:'lm',      den:'m²' },
+  { name:'Strahlendosis (Gray)',num:'J',        den:'kg' },
+  { name:'Aktivität (Becquerel)',num:'1',       den:'s' },
+  // Thermo / Chem
+  { name:'Molmasse',            num:'kg',      den:'mol' },
+  { name:'Katalytische Akt.',   num:'mol',     den:'s' },
+  { name:'Molare Energie',      num:'J',       den:'mol' },
+];
+
+function buildSuggestions() {
+  const grid = document.getElementById('suggestGrid');
+  for (const s of SUGGESTIONS) {
+    const wrap = document.createElement('div');
+    wrap.className = 'tip-wrap';
+    const btn = document.createElement('button');
+    btn.className = 'sug-btn';
+    const label = s.den ? `${s.num} / ${s.den}` : s.num;
+    btn.innerHTML = `<span class="sug-formula">${label}</span><span class="sug-name">${s.name}</span>`;
+    btn.onclick = () => {
+      document.getElementById('numInput').value = s.num === '1' ? '' : s.num;
+      document.getElementById('denInput').value = s.den;
+      calculate();
+    };
+    // Tooltip: show SI expansion if available
+    const box = document.createElement('div');
+    box.className = 'tip-box';
+    const numTxt = s.num === '1' ? '—' : s.num;
+    const fracTxt = s.den ? `${numTxt} / ${s.den}` : numTxt;
+    box.innerHTML = `
+      <div class="tip-name">${s.name}</div>
+      <div class="tip-si">${fracTxt}</div>
+      <div class="tip-desc">Klicken zum Einfügen</div>
+      <div class="tip-arrow"></div>`;
+    wrap.appendChild(btn);
+    wrap.appendChild(box);
+    grid.appendChild(wrap);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// THEME
+// ═══════════════════════════════════════════════════════
+function toggleTheme() {
+  const isLight = document.documentElement.classList.toggle('light');
+  document.getElementById('themeBtn').textContent = isLight ? '🌙' : '☀';
+  localStorage.setItem('uc-theme', isLight ? 'light' : 'dark');
+}
+(function initTheme() {
+  const saved = localStorage.getItem('uc-theme');
+  if (saved === 'light') {
+    document.documentElement.classList.add('light');
+    document.addEventListener('DOMContentLoaded', () => {
+      const btn = document.getElementById('themeBtn');
+      if (btn) btn.textContent = '🌙';
+    });
+  }
+})();
+
+// ═══════════════════════════════════════════════════════
+// HISTORY  (localStorage key: 'uc-history')
+// Each entry: { id, num, den, result, base, ts, pinned }
+// ═══════════════════════════════════════════════════════
+const HIST_MAX = 50;
+let history_entries = [];
+
+function loadHistory() {
+  try { history_entries = JSON.parse(localStorage.getItem('uc-history') || '[]'); }
+  catch { history_entries = []; }
+  renderHistory();
+}
+
+function saveHistory() {
+  localStorage.setItem('uc-history', JSON.stringify(history_entries));
+}
+
+function pushHistory(num, den, result, base) {
+  if (!num && !den) return;
+  const formula = den ? `${num||'1'} / ${den}` : (num||'1');
+  // Avoid duplicate consecutive entry (ignore pinned)
+  const unpinned = history_entries.filter(e => !e.pinned);
+  if (unpinned.length && unpinned[0].formula === formula) return;
+
+  const entry = {
+    id: Date.now(),
+    num, den, formula, result, base,
+    ts: new Date().toLocaleTimeString('de-DE', {hour:'2-digit',minute:'2-digit'}),
+    pinned: false
+  };
+  // Insert at top (after pinned ones)
+  const firstUnpinned = history_entries.findIndex(e => !e.pinned);
+  if (firstUnpinned === -1) history_entries.push(entry);
+  else history_entries.splice(firstUnpinned, 0, entry);
+
+  // Trim unpinned to max
+  const unpinnedAll = history_entries.filter(e => !e.pinned);
+  if (unpinnedAll.length > HIST_MAX) {
+    const lastUnpinned = history_entries.map((e,i)=>[e,i]).filter(([e])=>!e.pinned).pop();
+    if (lastUnpinned) history_entries.splice(lastUnpinned[1], 1);
+  }
+  saveHistory();
+  renderHistory();
+}
+
+function togglePin(id) {
+  const e = history_entries.find(e => e.id === id);
+  if (!e) return;
+  e.pinned = !e.pinned;
+  // Re-sort: pinned first
+  history_entries.sort((a,b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
+  saveHistory();
+  renderHistory();
+}
+
+function deleteEntry(id) {
+  history_entries = history_entries.filter(e => e.id !== id);
+  saveHistory();
+  renderHistory();
+}
+
+function clearHistory() {
+  if (!confirm('Gesamten Verlauf löschen?')) return;
+  history_entries = [];
+  saveHistory();
+  renderHistory();
+}
+
+function loadEntry(entry) {
+  document.getElementById('numInput').value = entry.num || '';
+  document.getElementById('denInput').value = entry.den || '';
+  calculate();
+}
+
+function timeAgo(ts) { return ts; }
+
+function renderHistory() {
+  const list = document.getElementById('histList');
+  if (!history_entries.length) {
+    list.innerHTML = '<div class="hist-empty">Noch kein Verlauf.</div>';
+    return;
+  }
+  list.innerHTML = history_entries.map(e => `
+    <div class="hist-item${e.pinned ? ' pinned' : ''}" onclick="loadEntry(${JSON.stringify(e).replace(/"/g,'&quot;')})">
+      <div class="pin-dot"></div>
+      <div class="hist-item-main">
+        <div class="hist-formula">${e.formula}</div>
+        <div class="hist-result">= ${e.result}${e.base && e.base !== e.result ? ' → '+e.base : ''}</div>
+      </div>
+      <span class="hist-time">${e.ts}</span>
+      <div class="hist-item-btns" onclick="event.stopPropagation()">
+        <button class="hist-ibtn pin" title="${e.pinned ? 'Ablösen' : 'Anheften'}"
+          onclick="togglePin(${e.id})">${e.pinned ? '📌' : '📍'}</button>
+        <button class="hist-ibtn del" title="Löschen"
+          onclick="deleteEntry(${e.id})">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// EXPORT / IMPORT
+// ═══════════════════════════════════════════════════════
+
+function showToast(msg, color) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.borderColor = color || 'var(--ac)';
+  t.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+function triggerDownload(content, filename, mime) {
+  const blob = new Blob([content], {type: mime});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 500);
+}
+
+function exportJSON() {
+  if (!history_entries.length) { showToast('Verlauf ist leer.', '#f97316'); return; }
+  const data = {
+    app: 'Einheiten-Rechner',
+    exportedAt: new Date().toISOString(),
+    count: history_entries.length,
+    entries: history_entries
+  };
+  const ts = new Date().toISOString().slice(0,16).replace('T','_').replace(':','-');
+  triggerDownload(JSON.stringify(data, null, 2), `verlauf_${ts}.json`, 'application/json');
+  showToast(`✓ ${history_entries.length} Einträge als JSON gespeichert.`, '#f97316');
+}
+
+function exportMD() {
+  if (!history_entries.length) { showToast('Verlauf ist leer.', '#a855f7'); return; }
+  const ts = new Date().toLocaleString('de-DE');
+  let md = `# Einheiten-Rechner — Verlauf\n\n`;
+  md    += `_Exportiert: ${ts}_\n\n`;
+  md    += `---\n\n`;
+
+  const pinned   = history_entries.filter(e => e.pinned);
+  const unpinned = history_entries.filter(e => !e.pinned);
+
+  if (pinned.length) {
+    md += `## 📌 Angeheftete Formeln\n\n`;
+    md += `| Zeit | Formel | Ergebnis | SI-Grundeinheiten |\n`;
+    md += `|------|--------|----------|-------------------|\n`;
+    for (const e of pinned) {
+      md += `| ${e.ts} | \`${e.formula}\` | \`${e.result}\` | \`${e.base}\` |\n`;
+    }
+    md += `\n`;
+  }
+
+  if (unpinned.length) {
+    md += `## 🕐 Verlauf\n\n`;
+    md += `| Zeit | Formel | Ergebnis | SI-Grundeinheiten |\n`;
+    md += `|------|--------|----------|-------------------|\n`;
+    for (const e of unpinned) {
+      md += `| ${e.ts} | \`${e.formula}\` | \`${e.result}\` | \`${e.base}\` |\n`;
+    }
+    md += `\n`;
+  }
+
+  md += `---\n_${history_entries.length} Einträge · SI-Einheitensystem_\n`;
+  const dateStr = new Date().toISOString().slice(0,10);
+  triggerDownload(md, `verlauf_${dateStr}.md`, 'text/markdown');
+  showToast(`✓ ${history_entries.length} Einträge als Markdown gespeichert.`, '#a855f7');
+}
+
+function importJSON(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      const incoming = Array.isArray(data) ? data : (data.entries || []);
+      if (!incoming.length) { showToast('Keine Einträge gefunden.', '#f97316'); return; }
+
+      // Merge: avoid duplicate ids
+      const existingIds = new Set(history_entries.map(e => e.id));
+      let added = 0;
+      for (const e of incoming) {
+        if (!existingIds.has(e.id)) {
+          history_entries.push(e);
+          existingIds.add(e.id);
+          added++;
+        }
+      }
+      // Re-sort: pinned first, then by id desc (newest first among unpinned)
+      history_entries.sort((a,b) => {
+        if (a.pinned !== b.pinned) return b.pinned ? 1 : -1;
+        return b.id - a.id;
+      });
+      saveHistory();
+      renderHistory();
+      showToast(`✓ ${added} neue Einträge importiert.`, '#22c55e');
+    } catch {
+      showToast('Fehler: Ungültige JSON-Datei.', '#ff6b6b');
+    }
+    input.value = ''; // reset so same file can be re-imported
+  };
+  reader.readAsText(file);
+}
+
+// ── Tooltip position correction (prevent left/right overflow) ──
+document.addEventListener('mouseover', e => {
+  const wrap = e.target.closest('.tip-wrap');
+  if (!wrap) return;
+  const box = wrap.querySelector('.tip-box');
+  const arrow = wrap.querySelector('.tip-arrow');
+  if (!box) return;
+
+  // Reset first so we can measure natural position
+  wrap.style.setProperty('--tip-tx', '-50%');
+  box.style.left = '50%';
+
+  requestAnimationFrame(() => {
+    const bRect = box.getBoundingClientRect();
+    const vw = document.documentElement.clientWidth;
+    const MARGIN = 8;
+    let shift = 0;
+
+    if (bRect.left < MARGIN) {
+      shift = MARGIN - bRect.left;
+    } else if (bRect.right > vw - MARGIN) {
+      shift = (vw - MARGIN) - bRect.right;
+    }
+
+    if (shift !== 0) {
+      // Adjust translateX and move arrow inversely
+      const pct = -50 + (shift / bRect.width * 100);
+      wrap.style.setProperty('--tip-tx', pct.toFixed(1) + '%');
+      // Arrow stays pointing at button center: counteract the shift
+      const btnRect = wrap.getBoundingClientRect();
+      const btnCenterRel = (btnRect.left + btnRect.width/2) - (bRect.left + shift);
+      const arrPct = (btnCenterRel / bRect.width * 100).toFixed(1) + '%';
+      if (arrow) arrow.style.setProperty('--arr-left', arrPct);
+    } else {
+      if (arrow) arrow.style.setProperty('--arr-left', '50%');
+    }
+  });
+});
+
+// Init
+buildPad('baseGrid', BASE_BTNS, 'base-unit');
+buildPad('mechGrid', MECH_BTNS);
+buildPad('emGrid', EM_BTNS);
+buildPad('otherGrid', OTHER_BTNS);
+buildPad('opGrid', OP_BTNS, 'op-btn');
+buildSuggestions();
+loadHistory();
+
+// Apply saved theme icon
+if (document.documentElement.classList.contains('light')) {
+  document.getElementById('themeBtn').textContent = '🌙';
+}
+
+// Load example
+document.getElementById('numInput').value = 'N·m';
+document.getElementById('denInput').value = 's';
+calculate();
+</script>
+</body>
+</html>

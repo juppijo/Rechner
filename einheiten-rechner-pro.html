@@ -470,7 +470,7 @@ footer{
   <div class="logo">
     <img src="Zami_Calc.jpg" alt="Zaminia" class="header-img">
     <div class="logo-icon">f</div>
-    Einheiten-Rechner 🚀 Pro
+    ✨  Einheiten-Rechner  💫  Pro  🚀
   </div>
   <div class="header-right">
     <div class="swatches" id="swatches">
@@ -968,17 +968,17 @@ function formatBase(base) {
     if (ratIsZero(e)) continue;
     const isPos = e.n > 0;
     const absE = {n:Math.abs(e.n), d:e.d};
-    const suf = ratEq(absE, RAT1) ? '' : superscript(e);
+    const suf = ratEq(absE, RAT1) ? '' : superscript(absE);
     if (isPos) pos.push(u + suf);
-    else neg.push(u + superscript(absE));
+    else neg.push(u + suf);
   }
   for (const [u, e] of Object.entries(base)) {
     if (BASE.includes(u) || ratIsZero(e)) continue;
     const isPos = e.n > 0;
     const absE = {n:Math.abs(e.n), d:e.d};
-    const suf = ratEq(absE, RAT1) ? '' : superscript(e);
+    const suf = ratEq(absE, RAT1) ? '' : superscript(absE);
     if (isPos) pos.push(u + suf);
-    else neg.push(u + superscript(absE));
+    else neg.push(u + suf);
   }
   if (pos.length === 0 && neg.length === 0) return '1 (dimensionslos)';
   if (neg.length === 0) return pos.join('·');
@@ -993,9 +993,9 @@ function formatRaw(rawMap) {
     if (ratIsZero(e)) continue;
     const isPos = e.n > 0;
     const absE = {n:Math.abs(e.n), d:e.d};
-    const suf = ratEq(absE, RAT1) ? '' : superscript(e);
+    const suf = ratEq(absE, RAT1) ? '' : superscript(absE);
     if (isPos) pos.push(u + suf);
-    else neg.push(u + superscript(absE));
+    else neg.push(u + suf);
   }
   if (pos.length === 0 && neg.length === 0) return '1';
   if (neg.length === 0) return pos.join('·');

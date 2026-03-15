@@ -2094,27 +2094,27 @@ function niceStep(v) {
 // ═══════════════════════════════════════════════════════════════
 const EXAMPLES = {
   planck: `// Planck-Strahlung: Energie eines Photons
-// E = h·f = h·c / λ
+// Ep = h·f = h·c / λ
 let lambda_nm = 500;          // Wellenlänge in nm (grünes Licht)
 let lambda = lambda_nm * 1e-9;  // in Meter
-let E = h * c / lambda;
+let Ep = h * c / lambda;
 print("λ = " + lambda_nm + " nm");
-print("E = " + E.toExponential(4) + " J");
-print("E = " + (E/eV).toFixed(2) + " eV");`,
+print("Ep = " + Ep.toExponential(4) + " J");
+print("Ep = " + (Ep/eV).toFixed(2) + " eV");`,
 
   relativity: `// Spezielle Relativitätstheorie
-// Lorentz-Faktor und relativistische kinetische Energie
+// Lorentz-Faktor und relativistische kinetische Energie gamma_r
 let v_percent = 90;             // Geschwindigkeit in % von c
 let v = v_percent/100 * c;
-let gamma = 1 / sqrt(1 - (v/c)**2);
+let gamma_r = 1 / sqrt(1 - (v/c)**2);
 let m = 1;                      // Ruhemasse in kg
-let Ekin = (gamma - 1) * m * c**2;
+let Ekin = (gamma_r - 1) * m * c**2;
 let Erest = m * c**2;
 print("v = " + v_percent + "% · c");
-print("γ (Lorentz-Faktor) = " + gamma.toFixed(4));
+print("γ (Lorentz-Faktor) = " + gamma_r.toFixed(4));
 print("E_Ruhe = " + Erest.toExponential(4) + " J");
 print("E_kin  = " + Ekin.toExponential(4) + " J");
-print("E_ges  = " + (gamma * m * c**2).toExponential(4) + " J");`,
+print("E_ges  = " + (gamma_r * m * c**2).toExponential(4) + " J");`,
 
   hydrogen: `// Wasserstoff-Atom: Energieniveaus (Bohr-Modell)
 // E_n = -13.6 eV / n²

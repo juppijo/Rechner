@@ -301,13 +301,74 @@ body.sidebar-closed #sidebar-toggle {
 body.sidebar-closed #sidebar-toggle {
   content: "»"; /* Wir ändern das Zeichen via JS, aber hier ist die Logik */
 }
-#hl-color-input {
+#note-editor img {
+  max-width: 100%;
+  border-radius: 6px;
+  margin: 8px 0;
+  cursor: pointer;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+  transition: box-shadow .2s;
+  display: block;
+}
+#note-editor img:hover { box-shadow: 0 4px 18px rgba(0,0,0,0.18); }
+#note-editor a { color: var(--accent); text-decoration: underline; cursor: pointer; }
+#note-editor a:hover { color: #a93226; }
+
+/* ── IMAGE RESIZE UI ── */
+#img-resize-wrap {
   position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
+  pointer-events: none;
+  z-index: 800;
+  display: none;
+}
+#img-resize-wrap.active { display: block; }
+#img-resize-border {
+  position: absolute; inset: 0;
+  border: 2px solid var(--accent);
+  border-radius: 6px;
   pointer-events: none;
 }
+.img-handle {
+  position: absolute;
+  width: 10px; height: 10px;
+  background: #fff;
+  border: 2px solid var(--accent);
+  border-radius: 2px;
+  pointer-events: all;
+  z-index: 801;
+}
+.img-handle.nw { top:-5px;  left:-5px;  cursor: nw-resize; }
+.img-handle.ne { top:-5px;  right:-5px; cursor: ne-resize; }
+.img-handle.sw { bottom:-5px; left:-5px;  cursor: sw-resize; }
+.img-handle.se { bottom:-5px; right:-5px; cursor: se-resize; }
+.img-handle.n  { top:-5px;  left:50%; transform:translateX(-50%); cursor: n-resize; }
+.img-handle.s  { bottom:-5px; left:50%; transform:translateX(-50%); cursor: s-resize; }
+.img-handle.w  { left:-5px; top:50%; transform:translateY(-50%); cursor: w-resize; }
+.img-handle.e  { right:-5px; top:50%; transform:translateY(-50%); cursor: e-resize; }
+#img-size-label {
+  position: absolute;
+  bottom: -24px; left: 50%; transform: translateX(-50%);
+  background: rgba(0,0,0,0.65); color: #fff;
+  font-size: .65rem; font-family: 'Inter', sans-serif;
+  padding: 2px 7px; border-radius: 4px; white-space: nowrap;
+  pointer-events: none;
+}
+#img-toolbar {
+  position: absolute;
+  top: -34px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 4px;
+  pointer-events: all;
+}
+.img-tb-btn {
+  background: rgba(0,0,0,0.72); color: #fff;
+  border: none; border-radius: 4px;
+  font-size: .68rem; padding: 4px 8px;
+  cursor: pointer; white-space: nowrap;
+  font-family: 'Inter', sans-serif;
+  transition: background .15s;
+}
+.img-tb-btn:hover { background: var(--accent); }
+.img-tb-btn.del { background: rgba(180,0,0,.75); }
 </style>
 </head>
 <body>
@@ -480,7 +541,39 @@ body.sidebar-closed #sidebar-toggle {
       <!-- Clear formatting -->
       <button class="fbtn" onclick="fmt('removeFormat')" title="Formatierung entfernen" style="font-size:.7rem;width:auto;padding:0 7px;color:#999;">✕ fmt</button>
 
+      <div class="fsep"></div>
+
+      <!-- Bild einfügen -->
+      <button class="fbtn" onclick="document.getElementById('img-upload').click()" title="Bild einfügen" style="font-size:.85rem;width:auto;padding:0 8px;">🖼</button>
+      <input type="file" id="img-upload" accept="image/*" style="display:none" onchange="insertImage(this)">
+
+      <!-- Hyperlink -->
+      <button class="fbtn" id="btn-link" onclick="toggleLinkDialog()" title="Link einfügen / entfernen" style="font-size:.78rem;width:auto;padding:0 8px;">🔗</button>
+
     </div>
+
+    <!-- LINK DIALOG -->
+    <div id="link-dialog" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+         background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,.18);
+         z-index:2000;padding:22px 24px;min-width:320px;font-family:'Lora',serif;">
+      <div style="font-size:.9rem;font-weight:600;margin-bottom:14px;color:var(--ink);">🔗 Link einfügen</div>
+      <input id="link-text" type="text" placeholder="Linktext (leer = markierter Text)"
+             style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;
+                    font-family:'Lora',serif;font-size:.82rem;margin-bottom:9px;outline:none;box-sizing:border-box;">
+      <input id="link-url" type="url" placeholder="https://..." autofocus
+             style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;
+                    font-family:'Lora',serif;font-size:.82rem;margin-bottom:14px;outline:none;box-sizing:border-box;"
+             onkeydown="if(event.key==='Enter')insertLink()">
+      <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <button onclick="closeLinkDialog()" style="padding:7px 14px;border:1px solid var(--border);border-radius:6px;
+                background:white;font-family:'Lora',serif;font-size:.78rem;cursor:pointer;">Abbrechen</button>
+        <button onclick="removeLink()" style="padding:7px 14px;border:1px solid var(--border);border-radius:6px;
+                background:#f5f0e8;font-family:'Lora',serif;font-size:.78rem;cursor:pointer;">Link entfernen</button>
+        <button onclick="insertLink()" style="padding:7px 14px;border:none;border-radius:6px;
+                background:var(--accent);color:#fff;font-family:'Lora',serif;font-size:.78rem;cursor:pointer;">Einfügen</button>
+      </div>
+    </div>
+    <div id="link-overlay" style="display:none;position:fixed;inset:0;z-index:1999;" onclick="closeLinkDialog()"></div>
 
     <!-- PAPER -->
     <div id="paper-wrap">
@@ -496,6 +589,29 @@ body.sidebar-closed #sidebar-toggle {
       </div>
     </div>
   </div>
+</div>
+
+<div id="img-resize-wrap">
+  <div id="img-toolbar">
+    <button class="img-tb-btn" onclick="imgSetSize('25%')">25%</button>
+    <button class="img-tb-btn" onclick="imgSetSize('50%')">50%</button>
+    <button class="img-tb-btn" onclick="imgSetSize('75%')">75%</button>
+    <button class="img-tb-btn" onclick="imgSetSize('100%')">100%</button>
+    <button class="img-tb-btn" onclick="imgSetAlign('left')"  title="Links">⬅</button>
+    <button class="img-tb-btn" onclick="imgSetAlign('center')" title="Mitte">↔</button>
+    <button class="img-tb-btn" onclick="imgSetAlign('right')" title="Rechts">➡</button>
+    <button class="img-tb-btn del" onclick="imgDelete()" title="Bild löschen">🗑</button>
+  </div>
+  <div id="img-resize-border"></div>
+  <div class="img-handle nw" data-dir="nw"></div>
+  <div class="img-handle ne" data-dir="ne"></div>
+  <div class="img-handle sw" data-dir="sw"></div>
+  <div class="img-handle se" data-dir="se"></div>
+  <div class="img-handle n"  data-dir="n"></div>
+  <div class="img-handle s"  data-dir="s"></div>
+  <div class="img-handle w"  data-dir="w"></div>
+  <div class="img-handle e"  data-dir="e"></div>
+  <div id="img-size-label"></div>
 </div>
 
 <div id="toast"></div>
@@ -864,6 +980,243 @@ function showToast(msg){
 function toggleSidebar() {
   document.body.classList.toggle('sidebar-closed');
   document.getElementById('sidebar-toggle').textContent = document.body.classList.contains('sidebar-closed') ? '»' : '«';
+}
+
+// ── IMAGE RESIZE ──
+let activeImg = null;
+let resizing = false, resizeDir = '', resizeStartX = 0, resizeStartY = 0, resizeStartW = 0, resizeStartH = 0;
+
+function positionResizeWrap() {
+  if (!activeImg) return;
+  const wrap = document.getElementById('img-resize-wrap');
+  const paperWrap = document.getElementById('paper-wrap');
+  const imgRect  = activeImg.getBoundingClientRect();
+  const contRect = paperWrap.getBoundingClientRect();
+  wrap.style.left   = (imgRect.left - contRect.left + paperWrap.scrollLeft) + 'px';
+  wrap.style.top    = (imgRect.top  - contRect.top  + paperWrap.scrollTop)  + 'px';
+  wrap.style.width  = imgRect.width  + 'px';
+  wrap.style.height = imgRect.height + 'px';
+  document.getElementById('img-size-label').textContent =
+    Math.round(imgRect.width) + ' × ' + Math.round(imgRect.height) + ' px';
+}
+
+function selectImg(img) {
+  activeImg = img;
+  const wrap = document.getElementById('img-resize-wrap');
+  wrap.classList.add('active');
+  // Move wrap into paper-wrap so offsets are relative
+  const paperWrap = document.getElementById('paper-wrap');
+  if (wrap.parentElement !== paperWrap) {
+    paperWrap.style.position = 'relative';
+    paperWrap.appendChild(wrap);
+  }
+  positionResizeWrap();
+}
+
+function deselectImg() {
+  activeImg = null;
+  document.getElementById('img-resize-wrap').classList.remove('active');
+}
+
+// Click on image → select
+document.addEventListener('click', e => {
+  const ed = document.getElementById('note-editor');
+  if (e.target.tagName === 'IMG' && ed.contains(e.target)) {
+    e.preventDefault();
+    selectImg(e.target);
+  } else if (!e.target.closest('#img-resize-wrap')) {
+    deselectImg();
+  }
+});
+
+// Reposition on scroll
+document.getElementById('paper-wrap')?.addEventListener('scroll', () => {
+  if (activeImg) positionResizeWrap();
+});
+
+// Drag-resize handles
+document.addEventListener('mousedown', e => {
+  const handle = e.target.closest('.img-handle');
+  if (!handle || !activeImg) return;
+  e.preventDefault();
+  resizing    = true;
+  resizeDir   = handle.dataset.dir;
+  resizeStartX = e.clientX;
+  resizeStartY = e.clientY;
+  resizeStartW = activeImg.getBoundingClientRect().width;
+  resizeStartH = activeImg.getBoundingClientRect().height;
+});
+
+document.addEventListener('mousemove', e => {
+  if (!resizing || !activeImg) return;
+  const dx = e.clientX - resizeStartX;
+  const dy = e.clientY - resizeStartY;
+  let newW = resizeStartW, newH = resizeStartH;
+  const aspect = resizeStartW / resizeStartH;
+
+  if (resizeDir === 'se') { newW = Math.max(40, resizeStartW + dx); newH = newW / aspect; }
+  else if (resizeDir === 'sw') { newW = Math.max(40, resizeStartW - dx); newH = newW / aspect; }
+  else if (resizeDir === 'ne') { newW = Math.max(40, resizeStartW + dx); newH = newW / aspect; }
+  else if (resizeDir === 'nw') { newW = Math.max(40, resizeStartW - dx); newH = newW / aspect; }
+  else if (resizeDir === 'e')  { newW = Math.max(40, resizeStartW + dx); }
+  else if (resizeDir === 'w')  { newW = Math.max(40, resizeStartW - dx); }
+  else if (resizeDir === 's')  { newH = Math.max(20, resizeStartH + dy); }
+  else if (resizeDir === 'n')  { newH = Math.max(20, resizeStartH - dy); }
+
+  activeImg.style.width  = Math.round(newW) + 'px';
+  activeImg.style.height = (resizeDir === 'e' || resizeDir === 'w') ? '' : Math.round(newH) + 'px';
+  positionResizeWrap();
+});
+
+document.addEventListener('mouseup', () => {
+  if (resizing) { resizing = false; markDirty(); }
+});
+
+function imgSetSize(pct) {
+  if (!activeImg) return;
+  const paper = document.getElementById('paper');
+  const maxW  = paper.clientWidth - 108; // Padding abziehen
+  activeImg.style.width  = pct === '100%' ? '100%' : (maxW * parseInt(pct) / 100) + 'px';
+  activeImg.style.height = '';
+  setTimeout(positionResizeWrap, 30);
+  markDirty();
+}
+
+function imgSetAlign(align) {
+  if (!activeImg) return;
+  activeImg.style.marginLeft  = align === 'center' ? 'auto' : (align === 'right' ? 'auto' : '0');
+  activeImg.style.marginRight = align === 'center' ? 'auto' : (align === 'right' ? '0' : 'auto');
+  activeImg.style.display     = 'block';
+  setTimeout(positionResizeWrap, 30);
+  markDirty();
+}
+
+function imgDelete() {
+  if (!activeImg) return;
+  if (!confirm('Bild wirklich löschen?')) return;
+  activeImg.remove();
+  deselectImg();
+  markDirty();
+  showToast('Bild gelöscht');
+}
+
+// ── BILD EINFÜGEN ──
+function insertImage(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const ed = document.getElementById('note-editor');
+    ed.focus();
+    restoreSelection();
+    const img = document.createElement('img');
+    img.src = e.target.result;
+    img.alt = file.name.replace(/\.[^.]+$/, '');
+    img.title = img.alt;
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount > 0) {
+      const range = sel.getRangeAt(0);
+      range.deleteContents();
+      range.insertNode(img);
+      range.setStartAfter(img);
+      range.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    } else {
+      ed.appendChild(img);
+    }
+    markDirty();
+    showToast('✓ Bild eingefügt');
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+
+// ── HYPERLINK ──
+function toggleLinkDialog() {
+  const dlg = document.getElementById('link-dialog');
+  const ov  = document.getElementById('link-overlay');
+  if (dlg.style.display === 'none') {
+    // Prä-füllen: markierter Text
+    const sel = window.getSelection();
+    const selText = sel && sel.rangeCount > 0 ? sel.toString() : '';
+    document.getElementById('link-text').value = selText;
+    document.getElementById('link-url').value = '';
+    // Prüfe ob Cursor auf einem Link sitzt
+    const anchor = getAnchorAtCursor();
+    if (anchor) {
+      document.getElementById('link-url').value = anchor.href;
+      document.getElementById('link-text').value = anchor.textContent;
+    }
+    dlg.style.display = 'block';
+    ov.style.display  = 'block';
+    setTimeout(() => document.getElementById('link-url').focus(), 50);
+  } else {
+    closeLinkDialog();
+  }
+}
+
+function closeLinkDialog() {
+  document.getElementById('link-dialog').style.display = 'none';
+  document.getElementById('link-overlay').style.display = 'none';
+}
+
+function getAnchorAtCursor() {
+  const sel = window.getSelection();
+  if (!sel || sel.rangeCount === 0) return null;
+  let node = sel.getRangeAt(0).startContainer;
+  while (node && node !== document) {
+    if (node.nodeName === 'A') return node;
+    node = node.parentNode;
+  }
+  return null;
+}
+
+function insertLink() {
+  const url  = document.getElementById('link-url').value.trim();
+  const text = document.getElementById('link-text').value.trim();
+  if (!url) { showToast('Bitte eine URL eingeben'); return; }
+  const fullUrl = /^https?:\/\//i.test(url) ? url : 'https://' + url;
+  closeLinkDialog();
+  const ed = document.getElementById('note-editor');
+  ed.focus();
+  restoreSelection();
+  const sel = window.getSelection();
+  if (sel && sel.rangeCount > 0 && !sel.isCollapsed) {
+    // Text ist markiert → als Link umwandeln
+    document.execCommand('createLink', false, fullUrl);
+    // Öffnet Links in neuem Tab
+    const links = ed.querySelectorAll('a[href="' + fullUrl + '"]');
+    links.forEach(a => a.target = '_blank');
+  } else {
+    // Kein Text markiert → Link mit eigenem Text einfügen
+    const a = document.createElement('a');
+    a.href   = fullUrl;
+    a.target = '_blank';
+    a.textContent = text || fullUrl;
+    const range = sel && sel.rangeCount > 0 ? sel.getRangeAt(0) : null;
+    if (range) { range.deleteContents(); range.insertNode(a); }
+    else ed.appendChild(a);
+  }
+  markDirty();
+  showToast('✓ Link eingefügt');
+}
+
+function removeLink() {
+  closeLinkDialog();
+  const ed = document.getElementById('note-editor');
+  ed.focus();
+  const anchor = getAnchorAtCursor();
+  if (anchor) {
+    const text = document.createTextNode(anchor.textContent);
+    anchor.parentNode.replaceChild(text, anchor);
+    markDirty();
+    showToast('Link entfernt');
+  } else {
+    restoreSelection();
+    document.execCommand('unlink', false, null);
+    markDirty();
+  }
 }
 
 // ── IMPORT ──

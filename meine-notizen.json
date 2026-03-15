@@ -1,0 +1,72 @@
+[
+  {
+    "id": "1773432039924",
+    "title": "Xi",
+    "body": "<span class=\"math-inline\" data-math=\"\\Xi \\approx 5,897427 \\times 10^{-19}\" data-index-in-node=\"212\" style=\"font-family: &quot;Google Sans Text&quot;, sans-serif !important; line-height: 1.15 !important;\">$\\Xi \\approx 5,897427 \\times 10^{-19}$</span> kg/m<div><br></div>",
+    "color": 3,
+    "fontFamily": "Lora, Georgia, serif",
+    "fontSize": "1rem",
+    "created": 1773432039924,
+    "updated": 1773578426937
+  },
+  {
+    "id": "1773430438458",
+    "title": "fullscreen",
+    "body": "<div>:fullscreen #sidebar,:-webkit-full-screen #sidebar { display:none; }</div><div>:fullscreen #paper-wrap,:-webkit-full-screen #paper-wrap { padding:56px; }</div>",
+    "color": 0,
+    "fontFamily": "Lora, Georgia, serif",
+    "fontSize": "1rem",
+    "created": 1773430438458,
+    "updated": 1773432014839
+  },
+  {
+    "id": "1773429539418",
+    "title": "div",
+    "body": "<div>// ── FORMAT HELPERS ──</div><div>functio<span style=\"background-color: rgb(135, 127, 54);\">n fmt(cmd,val=null){</span></div><div>&nbsp; document.getElementById('note-editor').focus();</div><div>&nbsp; document.exec<font color=\"#34386f\">Command(cmd,false,val);</font></div><div>&nbsp; updateFormatState();</div><div>&nbsp; markDirty();</div><div>}</div><div>function applyFont(val){</div><div>&nbsp; const ed=document.getElementById('note-editor');</div><div>&nbsp; ed.style.fontFamily=val;</div><div>&nbsp; if(currentNote){currentNote.fontFamily=val;markDirty();}</div><div>}</div><div>function applySize(val){</div><div>&nbsp; const ed=document.getElementById('note-editor');</div><div>&nbsp; ed.style.fontSize=val;</div><div>&nbsp; ed.style.lineHeight=parseFloat(val)&gt;1.3?'2.4rem':'2rem';</div><div>&nbsp; if(currentNote){currentNote.fontSize=val;markDirty();}</div><div>}</div><div>function applyTextColor(hex){</div><div>&nbsp; document.getElementById('tc-letter').style.color=hex;</div><div>&nbsp; document.getElementById('tc-bar').style.background=hex;</div><div>&nbsp; document.getElementById('note-editor').focus();</div><div>&nbsp; document.execCommand('foreColor',false,hex);</div><div>&nbsp; markDirty();</div><div>}</div><div>function applyHighlight(hex){</div><div>&nbsp; document.getElementById('hl-bar').style.background=hex;</div><div>&nbsp; document.getElementById('note-editor').focus();</div><div>&nbsp; document.execCommand('hiliteColor',false,hex);</div><div>&nbsp; markDirty();</div><div>}</div><div>function updateFormatState(){</div><div>&nbsp; document.getElementById('btn-bold').classList.toggle('active',document.queryCommandState('bold'));</div><div>&nbsp; document.getElementById('btn-italic').classList.toggle('active',document.queryCommandState('italic'));</div><div>&nbsp; document.getElementById('btn-under').classList.toggle('active',document.queryCommandState('underline'));</div><div>&nbsp; document.getElementById('btn-strike').classList.toggle('active',document.queryCommandState('strikeThrough'));</div><div>}</div><div>function handleEditorKey(e){</div><div>&nbsp; if((e.ctrlKey||e.metaKey)){</div><div>&nbsp; &nbsp; if(e.key==='b'){e.preventDefault();fmt('bold');}</div><div>&nbsp; &nbsp; else if(e.key==='i'){e.preventDefault();fmt('italic');}</div><div>&nbsp; &nbsp; else if(e.key==='u'){e.preventDefault();fmt('underline');}</div><div>&nbsp; &nbsp; else if(e.key==='s'){e.preventDefault();saveNote();}</div><div>&nbsp; }</div><div>}</div>",
+    "color": 0,
+    "fontFamily": "Lora, Georgia, serif",
+    "fontSize": "1rem",
+    "created": 1773429539418,
+    "updated": 1773431379263
+  },
+  {
+    "id": "1773428776495",
+    "title": "test",
+    "body": "<p></p><h1></h1><h2></h2><h1><p></p><p></p><p></p><ol><li>tznmk,</li></ol><p></p><p></p><p></p></h1><p></p><div>ooooo</div><h2 style=\"\">hjjkk</h2><h1>jjjj</h1>",
+    "color": 1,
+    "fontFamily": "Lora, Georgia, serif",
+    "fontSize": "0.75rem",
+    "created": 1773428776495,
+    "updated": 1773432050333
+  },
+  {
+    "id": "1773409181205",
+    "title": "Cache (Zwischenspeicher)",
+    "body": "<h3 data-path-to-node=\"10\" style=\"background-color: rgb(237, 245, 253);\">4. Cache (Zwischenspeicher)</h3><p data-path-to-node=\"11\" style=\"background-color: rgb(237, 245, 253);\">Wenn es um Texte geht, die du mal gesehen hast, die aber jetzt weg sind, liegen diese im Cache. Di<span style=\"background-color: rgb(219, 207, 97);\">ese sind jedoch nicht so leicht lesba</span>r (binär gespeichert). Hierfür gibt es externe kleine Tools wie den&nbsp;ChromeCacheView&nbsp;von NirSoft, mit dem man diese Dateien durchsuchen kann.</p><hr data-path-to-node=\"12\" style=\"background-color: rgb(237, 245, 253);\"><p data-path-to-node=\"13\" style=\"background-color: rgb(237, 245, 253);\">Sicherheitshinweis:&nbsp;Wenn du in den Entwicklertools (F12) arbeitest, sei vorsichtig beim Löschen von Werten, da dies dazu führen kann, dass du auf der jeweiligen Seite ausgeloggt wirst oder Einstellungen verlierst.</p>",
+    "color": 0,
+    "fontFamily": "Lora, Georgia, serif",
+    "fontSize": "1rem",
+    "created": 1773409181205,
+    "updated": 1773431083988
+  },
+  {
+    "id": "1773406999130",
+    "title": "Daten im \"Local Storage\" oder \"Session Storage\" & Cookies",
+    "body": "<div style=\"text-align: left;\"><h3 data-path-to-node=\"4\" style=\"background-color: rgb(237, 245, 253);\"><font color=\"#2914c8\">2. Daten im \"Lo</font><font color=\"#973b3b\">cal Storage\" oder \"Ses</font><font color=\"#2914c8\">sion Storage\"</font></h3><p data-path-to-node=\"5\" style=\"background-color: rgb(237, 245, 253);\">Viele moderne Web-Apps speichern Variablen und Texte (z. B. Entwürfe von Nachrichten ode<span style=\"background-color: rgb(203, 188, 58);\">r Einstellungen) lokal in deinem Brow</span>ser, ohne dass sie direkt in den Chrome-Einstellungen auftauchen.</p><ol start=\"1\" data-path-to-node=\"6\" style=\"text-align: right; background-color: rgb(237, 245, 253);\"><li><p data-path-to-node=\"6,0,0\" style=\"text-align: left;\">Öffne die Website, deren Daten dich interessieren.</p></li><li><p data-path-to-node=\"6,1,0\" style=\"text-align: left;\">Drücke&nbsp;<b data-path-to-node=\"6,1,0\" data-index-in-node=\"7\">F12</b>&nbsp;(oder Rechtsklick &gt;&nbsp;<i data-path-to-node=\"6,1,0\" data-index-in-node=\"31\">Untersuchen</i>), um die&nbsp;<b data-path-to-node=\"6,1,0\" data-index-in-node=\"52\" style=\"background-color: rgb(255, 237, 77);\">Entwicklertools</b>&nbsp;zu öffnen.</p></li><li><p data-path-to-node=\"6,2,0\" style=\"text-align: left;\">Klicke oben auf den Reiter&nbsp;<b data-path-to-node=\"6,2,0\" data-index-in-node=\"27\">Anwendung</b>&nbsp;(oder&nbsp;<i data-path-to-node=\"6,2,0\" data-index-in-node=\"43\">Application</i>). Falls du ihn nicht siehst, klicke auf die zwei kleinen Pfeile&nbsp;<code data-path-to-node=\"6,2,0\" data-index-in-node=\"119\">&gt;&gt;</code>.</p></li><li><p data-path-to-node=\"6,3,0\" style=\"text-align: left;\">Wähle in der linken Leiste&nbsp;<b data-path-to-node=\"6,3,0\" data-index-in-node=\"27\">Lokaler Speicher</b>&nbsp;(Local Storage) oder&nbsp;<b data-path-to-node=\"6,3,0\" data-index-in-node=\"65\">Sitzungsspeicher</b>&nbsp;(Session Storage) aus.</p></li><li><p data-path-to-node=\"6,4,0\" style=\"text-align: left;\">Dort siehst du eine Tabelle mit \"Schlüssel\" und \"Wert\" – hier liegen oft die Variablen der Website im Klartext.</p></li></ol><h3 data-path-to-node=\"7\" style=\"background-color: rgb(237, 245, 253);\">3. Cookies</h3><p data-path-to-node=\"8\" style=\"background-color: rgb(237, 245, 253);\">Texte und Identifikations-Variablen werden auch oft in Cookies abgelegt:</p><ul data-path-to-node=\"9\" style=\"text-align: right; background-color: rgb(237, 245, 253);\"><li><p data-path-to-node=\"9,0,0\" style=\"text-align: left;\">Ebenfalls in den&nbsp;<b data-path-to-node=\"9,0,0\" data-index-in-node=\"17\">Entwicklertools</b>&nbsp;(F12) unter dem Reiter&nbsp;<b data-path-to-node=\"9,0,0\" data-index-in-node=\"56\">Anwendung</b>&nbsp;&gt;&nbsp;<b data-path-to-node=\"9,0,0\" data-index-in-node=\"68\">Cookies</b>. Dort kannst du genau sehen, welche Text-Informationen eine Seite über dich lokal abgelegt hat.</p></li></ul></div>",
+    "color": 4,
+    "fontFamily": "Lora, Georgia, serif",
+    "fontSize": "1rem",
+    "created": 1773406999130,
+    "updated": 1773425626134
+  },
+  {
+    "id": "1773405720722",
+    "title": "WRTZ",
+    "body": "<div style=\"text-align: right;\"><p style=\"text-align: center;\"></p><h3 data-path-to-node=\"4\" style=\"text-align: left;\"><ul><li><span style=\"background-color: rgb(245, 236, 158);\"><font color=\"#0e0495\"><u style=\"\"><i>WRZT &amp; WRZNT</i></u></font></span></li></ul></h3><div style=\"text-align: left;\"><br></div><div style=\"text-align: left;\"><br></div><h3 data-path-to-node=\"10\" style=\"text-align: left;\"><br></h3><p></p></div>",
+    "color": 2,
+    "created": 1773405720722,
+    "updated": 1773427080820,
+    "fontFamily": "Lora, Georgia, serif",
+    "fontSize": "1.4rem"
+  }
+]

@@ -349,7 +349,21 @@ body.sidebar-closed #sidebar-toggle {
     </div>
       <input type="color" id="custom-bg" value="#f5f0e8" oninput="applyCustomBg(this.value)">
     </div>
+
+  <!-- Import: JSON-Backup laden (Sidebar) -->
+  <div style="padding:10px 14px 14px;">
+    <label style="font-size:.65rem;color:#777;text-transform:uppercase;letter-spacing:.09em;display:block;margin-bottom:8px;">📥 Notizen laden</label>
+    <button onclick="document.getElementById('import-json').click()" style="width:100%;padding:8px 10px;background:rgba(255,255,255,0.08);color:#d4cfc4;border:1px solid rgba(255,255,255,0.12);border-radius:5px;font-size:.77rem;cursor:pointer;text-align:left;transition:background .15s;" onmouseover="this.style.background='rgba(255,255,255,0.14)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">
+      📦 JSON-Backup laden
+    </button>
+    <button onclick="document.getElementById('import-file').click()" style="width:100%;margin-top:5px;padding:8px 10px;background:rgba(255,255,255,0.08);color:#d4cfc4;border:1px solid rgba(255,255,255,0.12);border-radius:5px;font-size:.77rem;cursor:pointer;text-align:left;transition:background .15s;" onmouseover="this.style.background='rgba(255,255,255,0.14)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">
+      📄 Textdatei als Notiz
+    </button>
+  </div>
 </div>
+
+<input type="file" id="import-json" accept=".json" style="display:none" onchange="importJson(this)">
+<input type="file" id="import-file" accept=".txt,.md,.html" style="display:none" onchange="importTextFile(this)">
 
 <!-- MAIN -->
 <div id="main">
@@ -850,6 +864,70 @@ function showToast(msg){
 function toggleSidebar() {
   document.body.classList.toggle('sidebar-closed');
   document.getElementById('sidebar-toggle').textContent = document.body.classList.contains('sidebar-closed') ? '»' : '«';
+}
+
+// ── IMPORT ──
+function importJson(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!Array.isArray(data)) { showToast('❌ Ungültiges Format'); return; }
+      let added = 0, skipped = 0;
+      data.forEach(n => {
+        if (!n.id || !n.hasOwnProperty('body')) { skipped++; return; }
+        const exists = notes.find(x => x.id === n.id);
+        if (exists) { skipped++; return; }
+        notes.unshift(n);
+        added++;
+      });
+      saveAll(); renderList();
+      if (added > 0) openNote(notes[0].id);
+      showToast(`✓ ${added} Notiz(en) geladen${skipped ? ', ' + skipped + ' übersprungen' : ''}`);
+    } catch(err) {
+      showToast('❌ Datei konnte nicht gelesen werden');
+    }
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
+function importTextFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const text = e.target.result;
+    const titleRaw = file.name.replace(/\.(txt|md|html?)$/i, '');
+    let body = '';
+    if (file.name.endsWith('.html')) {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = text;
+      // Versuche, nur den Body-Inhalt zu extrahieren
+      const bodyEl = tmp.querySelector('body');
+      body = bodyEl ? bodyEl.innerHTML : tmp.innerHTML;
+    } else {
+      // txt / md: Zeilenumbrüche in <br> umwandeln
+      body = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+    }
+    const n = {
+      id: Date.now().toString(),
+      title: titleRaw,
+      body: body,
+      color: 0,
+      fontFamily: 'Lora, Georgia, serif',
+      fontSize: '1rem',
+      created: Date.now(),
+      updated: Date.now()
+    };
+    notes.unshift(n);
+    saveAll(); renderList(); openNote(n.id);
+    showToast('✓ Datei als neue Notiz geladen');
+  };
+  reader.readAsText(file);
+  input.value = '';
 }
 
 // ── INIT ──

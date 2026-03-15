@@ -22,9 +22,9 @@
   --accent3-dim: rgba(109,255,138,0.12);
   --accent4: #ffcc00;
   --accent4-dim: rgba(255,204,0,0.12);
-  --text: #b8ccd8;
-  --text2: #7a90a0;
-  --text-dim: #3a4a58;
+  --text: #b8cca8;
+  --text2: #7a90b0;
+  --text-dim: #3a4aa8;
   --display-bg: #03050a;
   --shadow: 0 8px 32px rgba(0,0,0,0.7);
   --glow: 0 0 16px rgba(0,207,255,0.25);
@@ -65,7 +65,7 @@ header h1 {
   text-shadow: 0 0 20px rgba(0,207,255,0.5), 0 0 60px rgba(0,207,255,0.2);
 }
 header p {
-  font-size: 0.68rem;
+  font-size: 0.78rem;
   color: var(--text-dim);
   letter-spacing: 0.25em;
   text-transform: uppercase;
@@ -113,7 +113,7 @@ header p {
 }
 .display-badges { display: flex; gap: 6px; }
 .badge {
-  font-size: 0.58rem;
+  font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.15em;
   padding: 2px 7px;
@@ -402,7 +402,7 @@ button:active { transform: scale(0.94); }
   border-radius: 7px;
   padding: 8px 10px;
 }
-.stat-label { font-size:0.58rem; font-weight:700; letter-spacing:0.15em; color:var(--text-dim); text-transform:uppercase; }
+.stat-label { font-size:0.68rem; font-weight:700; letter-spacing:0.15em; color:var(--text-dim); text-transform:uppercase; }
 .stat-value { font-family:'Share Tech Mono',monospace; font-size:0.85rem; color:var(--accent); margin-top:2px; }
 .btn-analyze {
   background: rgba(0,207,255,0.08); color:var(--accent);
@@ -822,6 +822,133 @@ body.is-fullscreen .app { max-width: 100%; }
 .gk.upper { color: var(--accent); border-color: rgba(0,207,255,0.2); }
 .gk.upper:hover { background: rgba(0,207,255,0.1); border-color: var(--accent); }
 
+/* ── THEME SWITCHER ── */
+.theme-bar {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.theme-label {
+  font-family: 'Exo 2', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+.theme-dots { display: flex; gap: 5px; align-items: center; }
+.theme-dot {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+  flex-shrink: 0;
+}
+.theme-dot:hover { transform: scale(1.25); }
+.theme-dot.active { border-color: #fff; box-shadow: 0 0 8px rgba(255,255,255,0.4); transform: scale(1.15); }
+
+/* ═══ THEMES — only CSS variables change ═══ */
+body[data-theme="cyber"] {
+  --bg:#07090d; --panel:#0d1017; --panel2:#131820; --panel3:#181f2a;
+  --border:#1e2a38; --border2:#253040;
+  --accent:#00cfff; --accent-dim:rgba(0,207,255,0.15);
+  --accent2:#ff6b35; --accent2-dim:rgba(255,107,53,0.12);
+  --accent3:#6dff8a; --accent3-dim:rgba(109,255,138,0.12);
+  --accent4:#ffcc00; --accent4-dim:rgba(255,204,0,0.12);
+  --text:#b8ccd8; --text2:#7a90a0; --text-dim:#3a4aa8;  /* --text-dim:#3a4a58; */
+  --display-bg:#03050a; --shadow:0 8px 32px rgba(0,0,0,0.7);
+  --glow:0 0 16px rgba(0,207,255,0.25); --glow2:0 0 12px rgba(109,255,138,0.2);
+}
+body[data-theme="amber"] {
+  --bg:#0d0a05; --panel:#141008; --panel2:#1c160a; --panel3:#231c0e;
+  --border:#332510; --border2:#443215;
+  --accent:#ffaa00; --accent-dim:rgba(255,170,0,0.15);
+  --accent2:#ff4444; --accent2-dim:rgba(255,68,68,0.12);
+  --accent3:#ffe066; --accent3-dim:rgba(255,224,102,0.12);
+  --accent4:#ff7700; --accent4-dim:rgba(255,119,0,0.12);
+  --text:#e8d4a0; --text2:#9a8060; --text-dim:#aa3820;
+  --display-bg:#060400; --shadow:0 8px 32px rgba(0,0,0,0.7);
+  --glow:0 0 16px rgba(255,170,0,0.3); --glow2:0 0 12px rgba(255,224,102,0.2);
+}
+body[data-theme="matrix"] {
+  --bg:#000800; --panel:#010d01; --panel2:#031303; --panel3:#051a05;
+  --border:#0a2a0a; --border2:#0f3a0f;
+  --accent:#00ff41; --accent-dim:rgba(0,255,65,0.15);
+  --accent2:#ff3300; --accent2-dim:rgba(255,51,0,0.12);
+  --accent3:#aaff66; --accent3-dim:rgba(170,255,102,0.12);
+  --accent4:#88ff00; --accent4-dim:rgba(136,255,0,0.12);
+  --text:#88cc88; --text2:#558855; --text-dim:#1aaa1a;
+  --display-bg:#000300; --shadow:0 8px 32px rgba(0,0,0,0.8);
+  --glow:0 0 20px rgba(0,255,65,0.35); --glow2:0 0 14px rgba(170,255,102,0.25);
+}
+body[data-theme="nebula"] {
+  --bg:#08060f; --panel:#0f0c1a; --panel2:#161222; --panel3:#1d182c;
+  --border:#2a2040; --border2:#352850;
+  --accent:#b06aff; --accent-dim:rgba(176,106,255,0.15);
+  --accent2:#ff4488; --accent2-dim:rgba(255,68,136,0.12);
+  --accent3:#66eeff; --accent3-dim:rgba(102,238,255,0.12);
+  --accent4:#ffaa44; --accent4-dim:rgba(255,170,68,0.12);
+  --text:#c4b0e0; --text2:#8070a0; --text-dim:#3c28a9;
+  --display-bg:#040208; --shadow:0 8px 32px rgba(0,0,0,0.8);
+  --glow:0 0 18px rgba(176,106,255,0.3); --glow2:0 0 12px rgba(102,238,255,0.2);
+}
+body[data-theme="solar"] {
+  --bg:#0f0d08; --panel:#17140a; --panel2:#201b0e; --panel3:#282215;
+  --border:#3a2e14; --border2:#4a3c1e;
+  --accent:#ffd700; --accent-dim:rgba(255,215,0,0.15);
+  --accent2:#ff6644; --accent2-dim:rgba(255,102,68,0.12);
+  --accent3:#88ffaa; --accent3-dim:rgba(136,255,170,0.12);
+  --accent4:#ff9922; --accent4-dim:rgba(255,153,34,0.12);
+  --text:#ead8a0; --text2:#9a8860; --text-dim:#a04020;
+  --display-bg:#080600; --shadow:0 8px 32px rgba(0,0,0,0.75);
+  --glow:0 0 18px rgba(255,215,0,0.28); --glow2:0 0 12px rgba(136,255,170,0.2);
+}
+body[data-theme="crimson"] {
+  --bg:#0d0507; --panel:#15080b; --panel2:#1d0c10; --panel3:#251015;
+  --border:#3a1020; --border2:#4a1828;
+  --accent:#ff3355; --accent-dim:rgba(255,51,85,0.15);
+  --accent2:#ff8800; --accent2-dim:rgba(255,136,0,0.12);
+  --accent3:#ff99bb; --accent3-dim:rgba(255,153,187,0.12);
+  --accent4:#ffdd44; --accent4-dim:rgba(255,221,68,0.12);
+  --text:#e8b0c0; --text2:#906070; --text-dim:#aa1828;
+  --display-bg:#060204; --shadow:0 8px 32px rgba(0,0,0,0.8);
+  --glow:0 0 18px rgba(255,51,85,0.3); --glow2:0 0 12px rgba(255,153,187,0.2);
+}
+body[data-theme="arctic"] {
+  --bg:#f0f4f8; --panel:#ffffff; --panel2:#e8eef4; --panel3:#dde5ed;
+  --border:#c8d8e8; --border2:#b0c8dc;
+  --accent:#0077cc; --accent-dim:rgba(0,119,204,0.12);
+  --accent2:#e05500; --accent2-dim:rgba(224,85,0,0.1);
+  --accent3:#007744; --accent3-dim:rgba(0,119,68,0.1);
+  --accent4:#886600; --accent4-dim:rgba(136,102,0,0.1);
+  --text:#1a2a3a; --text2:#4a6070; --text-dim:#aaA0b0;
+  --display-bg:#e4eef8; --shadow:0 4px 20px rgba(0,0,0,0.12);
+  --glow:0 0 12px rgba(0,119,204,0.2); --glow2:0 0 8px rgba(0,119,68,0.15);
+}
+body[data-theme="phosphor"] {
+  --bg:#040a04; --panel:#060e06; --panel2:#091409; --panel3:#0c1a0c;
+  --border:#102010; --border2:#183018;
+  --accent:#a0ff80; --accent-dim:rgba(160,255,128,0.12);
+  --accent2:#ffcc00; --accent2-dim:rgba(255,204,0,0.12);
+  --accent3:#ccff99; --accent3-dim:rgba(204,255,153,0.12);
+  --accent4:#80ffcc; --accent4-dim:rgba(128,255,204,0.12);
+  --text:#80cc60; --text2:#508040; --text-dim:#209020;
+  --display-bg:#010401; --shadow:0 8px 32px rgba(0,0,0,0.9);
+  --glow:0 0 20px rgba(160,255,128,0.3); --glow2:0 0 14px rgba(204,255,153,0.2);
+}
+
+/* Arctic light theme — invert some dark-only styles */
+body[data-theme="arctic"] .display-wrap,
+body[data-theme="arctic"] .display-area { border-color: var(--border); }
+body[data-theme="arctic"] button { box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+body[data-theme="arctic"] body { background-image: none; }
+
+/* Bild */
 .header-img {
   width: 245px;        /* Breite des Bildes */
   height: 140px;        /* Höhe des Bildes */
@@ -833,22 +960,25 @@ body.is-fullscreen .app { max-width: 100%; }
   float: left;
   margin-right: 100px;
 }
+
 </style>
 </head>
 <body>
 <div class="header-row">
+  <div class="theme-bar">
+    <span class="theme-label">Theme</span>
+    <div class="theme-dots" id="theme-dots"></div>
+  </div>
   <header>
     <img src="Zami_Calc.jpg" alt="Zaminia" class="header-img">
-        <button class="btn-fullscreen" id="btn-fs" onclick="toggleFullscreen()">
-      <svg id="fs-icon-expand" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
-      <svg id="fs-icon-shrink" viewBox="0 0 24 24" style="display:none"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
-      <span id="fs-label">Vollbild</span>
-    </button>
-    <h1>ZAMI PHYSCALC PRO</h1>
+    <h1>🧮 ZAMI PHYSCALC PRO</h1>
     <p>Wissenschaftlicher Rechner · CODATA 2022 · SI-Einheiten · Analyse &amp; Grafik</p>
-
   </header>
-
+  <button class="btn-fullscreen" id="btn-fs" onclick="toggleFullscreen()">
+    <svg id="fs-icon-expand" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+    <svg id="fs-icon-shrink" viewBox="0 0 24 24" style="display:none"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
+    <span id="fs-label">Vollbild</span>
+  </button>
 </div>
 <div class="toast" id="toast"></div>
 
@@ -966,6 +1096,7 @@ body.is-fullscreen .app { max-width: 100%; }
           <button class="cat-btn" onclick="showCat('atomic',this)">Atom</button>
           <button class="cat-btn" onclick="showCat('thermo',this)">Thermo</button>
           <button class="cat-btn" onclick="showCat('nuclear',this)">Nuklear</button>
+          <button class="cat-btn" onclick="showCat('wrzt',this)" style="color:var(--accent4);border-color:rgba(255,204,0,0.3);">WRZT</button>
         </div>
         <div class="const-list" id="const-list"></div>
       </div>
@@ -1218,6 +1349,15 @@ const PHYS_CONST = {
     {sym:'r₀',  name:'Kernradius-Konstante',       val:1.2e-15,              unit:'m',        desc:'1.2×10⁻¹⁵'},
     {sym:'τn',  name:'Neutron Halbwertszeit',      val:879.4,                unit:'s',        desc:'879.4 s'},
     {sym:'σT',  name:'Thomson-Querschnitt',        val:6.6524587158e-29,     unit:'m²',       desc:'6.65246×10⁻²⁹'},
+  ],
+  wrzt: [
+    {sym:'Ξ',    name:'Raumzeit-Spannung',          val:5.897427e-19,          unit:'kg/m',     desc:'Ur-Konstante der Raumzeit (Netzspannung) 5.897427×10⁻¹⁹'},
+    {sym:'η',    name:'Raumzeit-Trägheit',          val:4.5543e-31,            unit:'kg',       desc:'Trägheit einer Raumzeit-Zelle 4.5543×10⁻³¹'},
+    {sym:'Rmin', name:'Minimales Rastermaß',        val:7.716e-13,             unit:'m',        desc:'Minimaler Radius einer Raumzeit-Zelle 7.716×10⁻¹³'},
+    {sym:'FΞ',   name:'Raumzeit-Spannkraft',        val:5.300315e4,            unit:'N',        desc:'Spannkraft des Mediums (Ξ · c²) 5.300315×10⁴'},
+    {sym:'ρE',   name:'Maximale Energiedichte',     val:2.12e22,               unit:'J/m³',     desc:'Energiedichte einer Raumzeit-Zelle 2.12×10²²'},
+    {sym:'ρm',   name:'Äquivalente Massendichte',   val:2.36e5,                unit:'kg/m³',    desc:'Massendichte aus E = mc² 2.36×10⁵'},
+    {sym:'α',    name:'Feinstruktur-Verhältnis',    val:7.2973525693e-3,       unit:'1',        desc:'Geschwindigkeitsverhältnis der Raumzeit-Zellen 7.2973525693×10⁻³'},
   ]
 };
 
@@ -1449,6 +1589,9 @@ function buildScope() {
     Phi0:2.067833848e-15, KJ:483597.9e9, RK:25812.80745, Cp:1005,
     r0:1.2e-15, taun:879.4, sigmaT:6.6524587158e-29,
     malpha:6.6446573357e-27, mD:3.3435837768e-27,
+    // WRZT — Raumzeit-Konstanten
+    Xi:5.897427e-19, eta_rz:4.5543e-31, Rmin:7.716e-13,
+    Fxi:5.300315e4, rhoE:2.12e22, rhom:2.36e5,
   };
 }
 
@@ -2077,6 +2220,51 @@ function clearProgram() {
 }
 
 // ═══════════════════════════════════════════════════════════════
+//  THEME SWITCHER
+// ═══════════════════════════════════════════════════════════════
+const THEMES = [
+  { id:'cyber',    label:'Cyber Blue',  dot:'#00cfff', dot2:'#0d1017' },
+  { id:'amber',    label:'Amber',       dot:'#ffaa00', dot2:'#141008' },
+  { id:'matrix',   label:'Matrix',      dot:'#00ff41', dot2:'#010d01' },
+  { id:'nebula',   label:'Nebula',      dot:'#b06aff', dot2:'#0f0c1a' },
+  { id:'solar',    label:'Solar',       dot:'#ffd700', dot2:'#17140a' },
+  { id:'crimson',  label:'Crimson',     dot:'#ff3355', dot2:'#15080b' },
+  { id:'arctic',   label:'Arctic',      dot:'#0077cc', dot2:'#f0f4f8' },
+  { id:'phosphor', label:'Phosphor',    dot:'#a0ff80', dot2:'#060e06' },
+];
+
+let currentTheme = localStorage.getItem('physcalc_theme') || 'cyber';
+
+function applyTheme(id) {
+  currentTheme = id;
+  document.body.setAttribute('data-theme', id);
+  localStorage.setItem('physcalc_theme', id);
+  document.querySelectorAll('.theme-dot').forEach(d => {
+    d.classList.toggle('active', d.dataset.theme === id);
+  });
+  // Re-plot graph so canvas colors update
+  if (document.getElementById('tab-graph')?.classList.contains('active')) {
+    plotGraph();
+  }
+  const t = THEMES.find(t=>t.id===id);
+  if (t) showToast('Theme: ' + t.label, 'var(--accent)');
+}
+
+function buildThemeDots() {
+  const cont = document.getElementById('theme-dots');
+  THEMES.forEach(t => {
+    const dot = document.createElement('div');
+    dot.className = 'theme-dot' + (t.id === currentTheme ? ' active' : '');
+    dot.dataset.theme = t.id;
+    dot.title = t.label;
+    dot.style.background = `radial-gradient(circle at 35% 35%, ${t.dot}, ${t.dot2})`;
+    dot.style.boxShadow = `0 0 6px ${t.dot}66`;
+    dot.onclick = () => applyTheme(t.id);
+    cont.appendChild(dot);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
 //  FULLSCREEN
 // ═══════════════════════════════════════════════════════════════
 function toggleFullscreen() {
@@ -2374,6 +2562,8 @@ loadVarStorage();
 renderVarList();
 buildVarSlots();
 buildGreekBar();
+buildThemeDots();
+applyTheme(currentTheme);
 </script>
 </body>
 </html>

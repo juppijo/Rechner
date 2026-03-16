@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Luminara Font Test</title>
+    <style>
+        /* Hier definierst du deine eigene Schriftart */
+        @font-face {
+            font-family: 'Luminara';
+            src: url('Luminara.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        body {
+            background-color: #1a1a2e; /* Dunkler Hintergrund passend zum Thema */
+            color: #e0f7fa;           /* Licht-Blau für den Text */
+            font-family: Arial, sans-serif; /* Fallback-Schriftart */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        /* Diese Klasse nutzt deine neue Schriftart */
+        .luminara-text {
+            font-family: 'Luminara', serif;
+            font-size: 12rem;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(224, 247, 250, 0.8); /* Leuchteffekt */
+        }
+
+        .subtitle {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="luminara-text">
+         0123456789
+    </div> 
+    <div class="luminara-text">
+        abc defghijklmnopqrstuvwxyz
+    </div>
+    <div class="luminara-text">
+        ABC DEFGHIJKLMNOPQRSTUVWXZZ
+    </div>
+    <div class="luminara-text">
+        ,;.:-+=()?{}
+    </div>     
+    <div class="subtitle">
+        Anzeige der Luminara.ttf (Shambala Luminia Style)
+    </div>
+
+</body>
+</html>

@@ -51,7 +51,8 @@ body {
 /* ── HEADER ── */
 header {
   text-align: center;
-  margin-bottom: 14px;
+  margin-top: 30px;
+  margin-bottom: 10px;
   animation: fadeDown 0.6s ease;
 }
 @keyframes fadeDown { from { opacity:0; transform:translateY(-12px); } to { opacity:1; transform:none; } }
@@ -590,11 +591,11 @@ button:active { transform: scale(0.94); }
   max-width: 1100px;
   margin-bottom: 14px;
 }
-.header-row header { margin-bottom: 0; flex: 1; }
+.header-row header { margin-top: 60; margin-bottom: 0; flex: 1; }
 .btn-fullscreen {
   position: absolute;
   right: 0;
-  top: 50%;
+  top: 10%;
   transform: translateY(-50%);
   background: rgba(0,207,255,0.07);
   border: 1px solid rgba(0,207,255,0.25);
@@ -621,8 +622,8 @@ body.is-fullscreen {
   padding: 8px;
   justify-content: flex-start;
 }
-body.is-fullscreen .header-row { margin-bottom: 8px; }
-body.is-fullscreen header h1 { font-size: 1.2rem; }
+body.is-fullscreen .header-row { margin-top: 30px; margin-bottom: 10px; }
+body.is-fullscreen header h1 { margin-top: 20; font-size: 1.2rem; }
 body.is-fullscreen header p { display: none; }
 body.is-fullscreen .app { max-width: 100%; }
 
@@ -825,8 +826,8 @@ body.is-fullscreen .app { max-width: 100%; }
 /* ── THEME SWITCHER ── */
 .theme-bar {
   position: absolute;
-  left: 50%;
-  top: 50%;
+  left: 5%;
+  top: 5%;
   transform: translateY(-50%);
   display: flex;
   align-items: center;
@@ -960,11 +961,37 @@ body[data-theme="arctic"] body { background-image: none; }
   float: left;
   margin-right: 100px;
 }
+/* LINK */
+@keyframes glowPulse {
+  0%   { text-shadow: 0 0 5px #111144; }
+  50%  { text-shadow: 0 0 10px #662233; }
+  100% { text-shadow: 0 0 15px #cc4422; }
+}
+
+.glow-link {
+  color: #3333ff;
+  margin-top: 36px;
+  font-style: italic;   /* ← schräg */
+  animation: glowPulse 6s infinite;
+}
+.glow-link:hover {
+  color: #ffd176;
+  text-shadow:
+    0 0 5px #ffd84d,
+    0 0 10px #ffd84d,
+    0 0 20px #ffcc00,
+    0 0 40px #ffcc00;
+}
 
 </style>
 </head>
 <body>
 <div class="header-row">
+   <button class="btn-fullscreen" id="btn-fs" onclick="toggleFullscreen()">
+      <svg id="fs-icon-expand" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+      <svg id="fs-icon-shrink" viewBox="0 0 24 24" style="display:none"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
+      <span id="fs-label"></span>
+    </button>
   <div class="theme-bar">
     <span class="theme-label">Theme</span>
     <div class="theme-dots" id="theme-dots"></div>
@@ -973,12 +1000,8 @@ body[data-theme="arctic"] body { background-image: none; }
     <img src="Zami_Calc.jpg" alt="Zaminia" class="header-img">
     <h1>🧮 ZAMI PHYSCALC PRO</h1>
     <p>Wissenschaftlicher Rechner · CODATA 2022 · SI-Einheiten · Analyse &amp; Grafik</p>
+    <h2><a class="glow-link" href="https://juppijo.github.io/Rechner/favorites_dashboard.html">* NEXUS - PORTAL *</a></h2>
   </header>
-  <button class="btn-fullscreen" id="btn-fs" onclick="toggleFullscreen()">
-    <svg id="fs-icon-expand" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
-    <svg id="fs-icon-shrink" viewBox="0 0 24 24" style="display:none"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
-    <span id="fs-label">Vollbild</span>
-  </button>
 </div>
 <div class="toast" id="toast"></div>
 
@@ -1024,7 +1047,7 @@ body[data-theme="arctic"] body { background-image: none; }
       <button class="btn-fn" onclick="inputFn('sinh(')">sinh</button>
       <button class="btn-fn" onclick="inputFn('cosh(')">cosh</button>
       <button class="btn-fn" onclick="inputFn('tanh(')">tanh</button>
-      <button class="btn-fn" onclick="inputFn('**')">xʸ</button>
+      <button class="btn-fn" onclick="inputFn('pow(',',')">xʸ</button>
       <button class="btn-fn" onclick="inputFn('factorial(')">n!</button>
 
       <!-- Row 5: exp/log special -->
@@ -2282,7 +2305,7 @@ function updateFsBtn() {
   const isFs = !!document.fullscreenElement;
   document.getElementById('fs-icon-expand').style.display = isFs ? 'none' : '';
   document.getElementById('fs-icon-shrink').style.display = isFs ? '' : 'none';
-  document.getElementById('fs-label').textContent = isFs ? 'Verkleinern' : 'Vollbild';
+  /*document.getElementById('fs-label').textContent = isFs ? 'Verkleinern' : 'Vollbild';*/
   document.body.classList.toggle('is-fullscreen', isFs);
 }
 document.addEventListener('keydown', ev => {

@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Raumklima</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,600;1,9..40,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #eef3f8;
+    --bg2: #dce7f2;
+    --surface: rgba(255,255,255,0.75);
+    --surface2: rgba(255,255,255,0.55);
+    --border: rgba(180,205,230,0.6);
+    --text: #1a2535;
+    --text2: #4a6078;
+    --text3: #7a9ab5;
+    --accent: #1e6fb5;
+    --accent2: #2e90e8;
+    --good: #1aaa6e;
+    --warn: #e88c1a;
+    --bad: #e84040;
+    --good-bg: rgba(26,170,110,0.12);
+    --warn-bg: rgba(232,140,26,0.12);
+    --bad-bg: rgba(232,64,64,0.12);
+    --card-shadow: 0 4px 24px rgba(30,111,181,0.10), 0 1px 4px rgba(30,111,181,0.08);
+    --input-bg: rgba(255,255,255,0.85);
+    --dew-color: #5ba3d4;
+    --abs-color: #8b5cf6;
+    --mesh1: #c5dff7;
+    --mesh2: #d6eaf8;
+    --mesh3: #e8f4fb;
+    --toggle-bg: rgba(210,228,245,0.9);
+    --toggle-thumb: #fff;
+    --range-track: rgba(30,111,181,0.2);
+    --range-fill: #1e6fb5;
+  }
+
+  [data-theme="dark"] {
+    --bg: #0d1825;
+    --bg2: #0a1520;
+    --surface: rgba(20,36,58,0.85);
+    --surface2: rgba(15,28,46,0.7);
+    --border: rgba(40,80,130,0.5);
+    --text: #e2ecf5;
+    --text2: #8aaccc;
+    --text3: #4a6e90;
+    --accent: #4eaaff;
+    --accent2: #74c0fc;
+    --good: #2dd87e;
+    --warn: #f5b042;
+    --bad: #ff5757;
+    --good-bg: rgba(45,216,126,0.12);
+    --warn-bg: rgba(245,176,66,0.12);
+    --bad-bg: rgba(255,87,87,0.12);
+    --card-shadow: 0 4px 32px rgba(0,0,0,0.5), 0 1px 6px rgba(0,0,0,0.3);
+    --input-bg: rgba(15,30,55,0.9);
+    --dew-color: #74c0fc;
+    --abs-color: #b197fc;
+    --mesh1: #0d1f35;
+    --mesh2: #0f2540;
+    --mesh3: #112a48;
+    --toggle-bg: rgba(15,35,65,0.9);
+    --toggle-thumb: #4eaaff;
+    --range-track: rgba(78,170,255,0.2);
+    --range-fill: #4eaaff;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    min-height: 100dvh;
+    overflow-x: hidden;
+    transition: background-color 0.4s, color 0.4s;
+    position: relative;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 10%, var(--mesh1) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, var(--mesh2) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 60% at 50% 50%, var(--mesh3) 0%, transparent 70%);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  #app {
+    position: relative;
+    z-index: 1;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 0 0 40px;
+  }
+
+  /* ── Header ── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px 10px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: transparent;
+    backdrop-filter: blur(0);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+  .logo-icon {
+    width: 34px; height: 34px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    box-shadow: 0 2px 10px rgba(30,111,181,0.3);
+  }
+  .logo-text {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    line-height: 1.2;
+  }
+  .logo-sub {
+    font-size: 10px;
+    color: var(--text3);
+    font-weight: 300;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .header-btns {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .icon-btn {
+    width: 36px; height: 36px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: var(--text2);
+  }
+  .icon-btn:active { transform: scale(0.92); }
+
+  /* ── Cards ── */
+  .card {
+    margin: 12px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 20px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: var(--card-shadow);
+    transition: background 0.4s, border 0.4s, box-shadow 0.4s;
+  }
+
+  .card-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .card-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── Input Rows ── */
+  .input-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .input-row:last-child { margin-bottom: 0; }
+
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .input-group.full { grid-column: 1 / -1; }
+
+  .input-group label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text2);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    letter-spacing: 0.2px;
+  }
+
+  .input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .input-wrap input[type="number"] {
+    width: 100%;
+    height: 52px;
+    background: var(--input-bg);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 0 36px 0 14px;
+    font-family: 'Space Mono', monospace;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    appearance: textfield;
+    -moz-appearance: textfield;
+  }
+  .input-wrap input[type="number"]::-webkit-inner-spin-button,
+  .input-wrap input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+  .input-wrap input[type="number"]:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(78,170,255,0.15);
+  }
+
+  .input-unit {
+    position: absolute;
+    right: 11px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text3);
+    letter-spacing: 0.3px;
+    pointer-events: none;
+  }
+
+  /* Slider */
+  .slider-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .slider-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .slider-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 4px;
+    background: var(--range-track);
+    outline: none;
+    cursor: pointer;
+    margin: 6px 0;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px; height: 22px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(30,111,181,0.35);
+    transition: transform 0.15s;
+  }
+  input[type="range"]:active::-webkit-slider-thumb { transform: scale(1.2); }
+
+  /* ── Divider ── */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 4px 16px;
+    color: var(--text3);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── Calc Button ── */
+  .calc-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    width: calc(100% - 32px);
+    margin: 12px 16px;
+    height: 56px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+    border: none;
+    border-radius: 18px;
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.2px;
+    box-shadow: 0 4px 20px rgba(30,111,181,0.35);
+    transition: transform 0.15s, box-shadow 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .calc-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.18) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .calc-btn:active { transform: scale(0.97); box-shadow: 0 2px 10px rgba(30,111,181,0.25); }
+
+  /* ── Results ── */
+  #result-section {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    pointer-events: none;
+  }
+  #result-section.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .result-hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 0 16px;
+  }
+
+  .result-label-sm {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--text3);
+  }
+
+  .result-main-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 52px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -2px;
+    transition: color 0.4s;
+  }
+
+  .result-sub {
+    font-size: 13px;
+    color: var(--text2);
+    font-weight: 300;
+    font-style: italic;
+  }
+
+  /* Status Banner */
+  .status-banner {
+    margin: 0 0 16px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    transition: background 0.4s;
+  }
+  .status-banner.good { background: var(--good-bg); border: 1px solid rgba(26,170,110,0.25); }
+  .status-banner.warn { background: var(--warn-bg); border: 1px solid rgba(232,140,26,0.25); }
+  .status-banner.bad  { background: var(--bad-bg);  border: 1px solid rgba(232,64,64,0.25); }
+
+  .status-icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+  .status-text-wrap {}
+  .status-title {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .status-banner.good .status-title { color: var(--good); }
+  .status-banner.warn .status-title { color: var(--warn); }
+  .status-banner.bad  .status-title { color: var(--bad); }
+  .status-desc {
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.5;
+    font-weight: 300;
+  }
+
+  /* Grid metrics */
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 0;
+  }
+  .metric-cell {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .metric-icon { font-size: 16px; }
+  .metric-name {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-top: 2px;
+  }
+  .metric-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .metric-val.dew { color: var(--dew-color); }
+  .metric-val.abs { color: var(--abs-color); }
+
+  /* Comparison bar */
+  .compare-section { margin-top: 14px; }
+  .compare-row {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .compare-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text3);
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+  .bar-track {
+    height: 10px;
+    background: var(--range-track);
+    border-radius: 8px;
+    overflow: visible;
+    position: relative;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 8px;
+    transition: width 0.7s cubic-bezier(.4,0,.2,1), background 0.4s;
+    position: relative;
+  }
+  .bar-fill.outside { background: linear-gradient(90deg, #4eaaff, #74c0fc); }
+  .bar-fill.inside-result { background: linear-gradient(90deg, #f5b042, #ffd080); }
+  .bar-fill.inside-result.good { background: linear-gradient(90deg, #2dd87e, #70e8a8); }
+  .bar-fill.inside-result.bad  { background: linear-gradient(90deg, #ff5757, #ff9090); }
+
+  /* Comfort zones */
+  .comfort-note {
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font-size: 11px;
+    color: var(--text3);
+    line-height: 1.5;
+    text-align: center;
+  }
+  .comfort-note span { color: var(--accent); font-weight: 600; }
+
+  /* Dew point warning */
+  .dew-warning {
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: var(--bad-bg);
+    border: 1px solid rgba(232,64,64,0.3);
+    border-radius: 12px;
+    font-size: 11px;
+    color: var(--bad);
+    font-weight: 600;
+    display: none;
+    align-items: center;
+    gap: 6px;
+    line-height: 1.4;
+  }
+  .dew-warning.show { display: flex; }
+
+  /* Fullscreen overlay */
+  :fullscreen #app, :-webkit-full-screen #app {
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: 100dvh;
+    overflow-y: auto;
+    padding-bottom: 60px;
+  }
+  :fullscreen body, :-webkit-full-screen body {
+    overflow-y: auto;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  @media (max-height: 700px) {
+    .card { padding: 15px; }
+    header { padding: 12px 20px 6px; }
+  }
+
+  /* Pulse anim for calc btn */
+  @keyframes pulse-ring {
+    0% { box-shadow: 0 0 0 0 rgba(78,170,255,0.5); }
+    70% { box-shadow: 0 0 0 10px rgba(78,170,255,0); }
+    100% { box-shadow: 0 0 0 0 rgba(78,170,255,0); }
+  }
+  .calc-btn.pulse { animation: pulse-ring 0.5s ease; }
+
+  /* Humidity gauge */
+  .gauge-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 6px;
+  }
+  .gauge-svg text { font-family: 'Space Mono', monospace; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="logo">
+      <div class="logo-icon">🌬️</div>
+      <div>
+        <div class="logo-text">Raumklima</div>
+        <div class="logo-sub">Lüftungs-Rechner</div>
+      </div>
+    </div>
+    <div class="header-btns">
+      <button class="icon-btn" id="theme-btn" title="Modus wechseln">☀️</button>
+      <button class="icon-btn" id="fs-btn" title="Vollbild">⛶</button>
+    </div>
+  </header>
+
+  <!-- AUSSEN -->
+  <div class="card">
+    <div class="card-label">🌿 Außenluft</div>
+    <div class="input-row">
+      <div class="input-group">
+        <label>🌡️ Temperatur</label>
+        <div class="input-wrap">
+          <input type="number" id="t-out" value="8" min="-30" max="50" step="0.5">
+          <span class="input-unit">°C</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>💧 Feuchte</label>
+        <div class="input-wrap">
+          <input type="number" id="h-out" value="63" min="0" max="100" step="1">
+          <span class="input-unit">%</span>
+        </div>
+      </div>
+    </div>
+    <div class="slider-group">
+      <div class="slider-header">
+        <label style="font-size:11px;font-weight:600;color:var(--text2);">💧 Feuchte anpassen</label>
+        <span class="slider-val" id="h-out-disp">63%</span>
+      </div>
+      <input type="range" id="h-out-slider" min="0" max="100" value="63">
+    </div>
+  </div>
+
+  <div class="divider">nach innen</div>
+
+  <!-- INNEN -->
+  <div class="card">
+    <div class="card-label">🏠 Innenluft (aktuell)</div>
+    <div class="input-row">
+      <div class="input-group">
+        <label>🌡️ Temperatur</label>
+        <div class="input-wrap">
+          <input type="number" id="t-in" value="18" min="0" max="40" step="0.5">
+          <span class="input-unit">°C</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>💧 Feuchte</label>
+        <div class="input-wrap">
+          <input type="number" id="h-in" value="50" min="0" max="100" step="1">
+          <span class="input-unit">%</span>
+        </div>
+      </div>
+    </div>
+    <div class="slider-group">
+      <div class="slider-header">
+        <label style="font-size:11px;font-weight:600;color:var(--text2);">💧 Feuchte anpassen</label>
+        <span class="slider-val" id="h-in-disp">50%</span>
+      </div>
+      <input type="range" id="h-in-slider" min="0" max="100" value="50">
+    </div>
+  </div>
+
+  <!-- BUTTON -->
+  <button class="calc-btn" id="calc-btn">
+    <span>🔄</span> Lüftung berechnen
+  </button>
+
+  <!-- RESULTS -->
+  <div id="result-section">
+    <div class="card">
+      <div class="card-label">📊 Ergebnis nach dem Lüften</div>
+
+      <!-- Status Banner -->
+      <div class="status-banner" id="status-banner">
+        <div class="status-icon" id="status-icon"></div>
+        <div class="status-text-wrap">
+          <div class="status-title" id="status-title"></div>
+          <div class="status-desc" id="status-desc"></div>
+        </div>
+      </div>
+
+      <!-- Hero: Neue Innenfeuchte -->
+      <div class="result-hero">
+        <div class="result-label-sm">Neue Luftfeuchtigkeit innen</div>
+        <div class="gauge-wrap">
+          <svg id="gauge-svg" width="180" height="100" viewBox="0 0 180 100">
+            <defs>
+              <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#4eaaff"/>
+                <stop offset="50%" stop-color="#2dd87e"/>
+                <stop offset="100%" stop-color="#ff5757"/>
+              </linearGradient>
+              <clipPath id="gaugeClip">
+                <rect x="0" y="0" width="180" height="100"/>
+              </clipPath>
+            </defs>
+            <!-- Background arc -->
+            <path id="gauge-bg" d="M 20 90 A 70 70 0 0 1 160 90" fill="none" stroke-width="12" stroke-linecap="round"/>
+            <!-- Value arc -->
+            <path id="gauge-arc" d="M 20 90 A 70 70 0 0 1 160 90" fill="none" stroke="url(#gaugeGrad)" stroke-width="12" stroke-linecap="round" stroke-dasharray="220" stroke-dashoffset="220"/>
+            <!-- Needle -->
+            <line id="gauge-needle" x1="90" y1="90" x2="90" y2="30" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" transform="rotate(0, 90, 90)" opacity="0.7"/>
+            <circle cx="90" cy="90" r="5" fill="var(--text)" opacity="0.7"/>
+            <!-- Labels -->
+            <text x="16" y="100" font-size="9" fill="var(--text3)" text-anchor="middle">0</text>
+            <text x="90" y="18" font-size="9" fill="var(--text3)" text-anchor="middle">50%</text>
+            <text x="164" y="100" font-size="9" fill="var(--text3)" text-anchor="middle">100</text>
+            <!-- Value text -->
+            <text id="gauge-val" x="90" y="78" font-size="26" font-weight="700" text-anchor="middle" fill="var(--text)">—</text>
+            <text x="90" y="92" font-size="9" fill="var(--text3)" text-anchor="middle">rel. Feuchte</text>
+          </svg>
+        </div>
+        <div class="result-sub" id="result-change-text"></div>
+      </div>
+
+      <!-- Comparison bars -->
+      <div class="compare-section">
+        <div style="font-size:11px;font-weight:600;color:var(--text3);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;">Vergleich</div>
+        <div class="compare-row" style="margin-bottom:10px;">
+          <div class="compare-header">
+            <span>Außen (erwärmt)</span>
+            <span id="bar-outside-val">—</span>
+          </div>
+          <div class="bar-track" style="height:8px;">
+            <div class="bar-fill outside" id="bar-outside" style="width:0%;height:100%;"></div>
+          </div>
+        </div>
+        <div class="compare-row" style="margin-bottom:10px;">
+          <div class="compare-header">
+            <span>Innen vorher</span>
+            <span id="bar-before-val">—</span>
+          </div>
+          <div class="bar-track" style="height:8px;">
+            <div class="bar-fill outside" id="bar-before" style="width:0%;height:100%;background:linear-gradient(90deg,#8b5cf6,#b197fc)"></div>
+          </div>
+        </div>
+        <div class="compare-row">
+          <div class="compare-header">
+            <span>Innen <b>nach</b> Lüften</span>
+            <span id="bar-result-val">—</span>
+          </div>
+          <div class="bar-track" style="height:8px;">
+            <div class="bar-fill inside-result" id="bar-result" style="width:0%;height:100%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dew point warning -->
+      <div class="dew-warning" id="dew-warn">
+        ⚠️ <span id="dew-warn-text"></span>
+      </div>
+
+      <!-- Comfort note -->
+      <div class="comfort-note">
+        Wohlfühlbereich: <span>40–60 %</span> relative Feuchte · Taupunkt &gt; 3°C empfohlen
+      </div>
+    </div>
+
+    <!-- Metrics -->
+    <div class="card">
+      <div class="card-label">🔬 Physikalische Kennwerte</div>
+      <div class="metrics-grid">
+        <div class="metric-cell">
+          <div class="metric-icon">💨</div>
+          <div class="metric-name">Abs. Feuchte außen</div>
+          <div class="metric-val abs" id="m-abs-out">—</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-icon">🌡️</div>
+          <div class="metric-name">Taupunkt außen</div>
+          <div class="metric-val dew" id="m-dew-out">—</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-icon">🏠</div>
+          <div class="metric-name">Abs. Feuchte innen</div>
+          <div class="metric-val abs" id="m-abs-in">—</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-icon">❄️</div>
+          <div class="metric-name">Taupunkt innen</div>
+          <div class="metric-val dew" id="m-dew-in">—</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-icon">💧</div>
+          <div class="metric-name">Neue Abs. Feuchte</div>
+          <div class="metric-val abs" id="m-abs-res">—</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-icon">🌡️</div>
+          <div class="metric-name">Neuer Taupunkt</div>
+          <div class="metric-val dew" id="m-dew-res">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<script>
+// ── Physics ──────────────────────────────────────────────────
+function satPressure(T) {
+  // Magnus-Formel (hPa)
+  return 6.112 * Math.exp(17.67 * T / (T + 243.5));
+}
+
+function absHumidity(T, RH) {
+  // g/m³
+  const es = satPressure(T);
+  return 216.7 * (es * RH / 100) / (T + 273.15);
+}
+
+function relHumidity(T, AH) {
+  // % from abs humidity and temp
+  const es = satPressure(T);
+  const ahSat = 216.7 * es / (T + 273.15);
+  return Math.min((AH / ahSat) * 100, 100);
+}
+
+function dewPoint(T, RH) {
+  const es = satPressure(T);
+  const e  = es * RH / 100;
+  return 243.5 * Math.log(e / 6.112) / (17.67 - Math.log(e / 6.112));
+}
+
+function calculate() {
+  const Tout = parseFloat(document.getElementById('t-out').value);
+  const RHout = parseFloat(document.getElementById('h-out').value);
+  const Tin  = parseFloat(document.getElementById('t-in').value);
+  const RHin  = parseFloat(document.getElementById('h-in').value);
+
+  if (isNaN(Tout) || isNaN(RHout) || isNaN(Tin) || isNaN(RHin)) return;
+  if (RHout < 0 || RHout > 100 || RHin < 0 || RHin > 100) return;
+
+  const ahOut  = absHumidity(Tout, RHout);
+  const ahIn   = absHumidity(Tin, RHin);
+  const dpOut  = dewPoint(Tout, RHout);
+  const dpIn   = dewPoint(Tin, RHin);
+
+  // After ventilation: outside air fills the room, heated to Tin
+  const rhResult = relHumidity(Tin, ahOut);
+  const dpResult = dewPoint(Tin, rhResult);
+  const ahResult = absHumidity(Tin, rhResult);
+
+  const diff = rhResult - RHin;
+
+  // ── Update Gauge ──
+  updateGauge(rhResult);
+  document.getElementById('gauge-val').textContent = Math.round(rhResult) + '%';
+
+  // Change text
+  const changeText = diff > 0
+    ? `▲ ${Math.abs(diff).toFixed(1)} % mehr als vorher (${RHin}%)`
+    : diff < 0
+    ? `▼ ${Math.abs(diff).toFixed(1)} % weniger als vorher (${RHin}%)`
+    : `Keine Änderung (${RHin}%)`;
+  document.getElementById('result-change-text').textContent = changeText;
+
+  // ── Status ──
+  const banner = document.getElementById('status-banner');
+  const icon = document.getElementById('status-icon');
+  const title = document.getElementById('status-title');
+  const desc = document.getElementById('status-desc');
+
+  banner.className = 'status-banner';
+
+  if (rhResult < RHin && rhResult <= 60) {
+    banner.classList.add('good');
+    icon.textContent = '✅';
+    title.textContent = 'Lüften empfohlen';
+    desc.textContent = `Die Außenluft hat weniger absolute Feuchte. Nach dem Lüften sinkt die rel. Feuchte innen von ${RHin}% auf ~${Math.round(rhResult)}% – ideal!`;
+  } else if (rhResult > RHin || rhResult > 65) {
+    banner.classList.add('bad');
+    icon.textContent = '❌';
+    title.textContent = 'Lüften nicht empfohlen';
+    desc.textContent = `Draußen ist mehr absolute Feuchte vorhanden. Lüften würde die Feuchte innen von ${RHin}% auf ~${Math.round(rhResult)}% erhöhen.`;
+  } else {
+    banner.classList.add('warn');
+    icon.textContent = '⚠️';
+    title.textContent = 'Lüften bedingt sinnvoll';
+    desc.textContent = `Die Feuchteänderung ist gering (${RHin}% → ~${Math.round(rhResult)}%). Kurzes Stoßlüften kann dennoch die Luftqualität verbessern.`;
+  }
+
+  // ── Bars ──
+  const pct = v => Math.min(Math.max(v, 0), 100);
+  const barOut = document.getElementById('bar-outside');
+  barOut.style.width = pct(rhResult) + '%';
+  document.getElementById('bar-outside-val').textContent = Math.round(rhResult) + '%';
+
+  document.getElementById('bar-before').style.width = pct(RHin) + '%';
+  document.getElementById('bar-before-val').textContent = RHin + '%';
+
+  const barRes = document.getElementById('bar-result');
+  barRes.style.width = pct(rhResult) + '%';
+  barRes.className = 'bar-fill inside-result' + (diff < 0 && rhResult <= 60 ? ' good' : diff > 5 ? ' bad' : '');
+  document.getElementById('bar-result-val').textContent = Math.round(rhResult) + '%';
+
+  // ── Dew point warning ──
+  const dewWarn = document.getElementById('dew-warn');
+  const dewText = document.getElementById('dew-warn-text');
+  if (dpResult < 0) {
+    dewWarn.classList.add('show');
+    dewText.textContent = `Taupunkt nach Lüften: ${dpResult.toFixed(1)}°C – Kondensation an kalten Wänden möglich!`;
+  } else if (dpOut > Tin - 2) {
+    dewWarn.classList.add('show');
+    dewText.textContent = `Außen-Taupunkt (${dpOut.toFixed(1)}°C) nahe Innentemperatur – Kondensation möglich!`;
+  } else {
+    dewWarn.classList.remove('show');
+  }
+
+  // ── Metrics ──
+  document.getElementById('m-abs-out').textContent = ahOut.toFixed(2) + ' g/m³';
+  document.getElementById('m-abs-in').textContent  = ahIn.toFixed(2)  + ' g/m³';
+  document.getElementById('m-abs-res').textContent = ahResult.toFixed(2) + ' g/m³';
+  document.getElementById('m-dew-out').textContent = dpOut.toFixed(1) + ' °C';
+  document.getElementById('m-dew-in').textContent  = dpIn.toFixed(1)  + ' °C';
+  document.getElementById('m-dew-res').textContent = dpResult.toFixed(1) + ' °C';
+
+  // ── Show ──
+  const sec = document.getElementById('result-section');
+  sec.classList.add('visible');
+  setTimeout(() => sec.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+}
+
+// ── Gauge ────────────────────────────────────────────────────
+function updateGauge(value) {
+  const pct = Math.min(Math.max(value, 0), 100) / 100;
+  const totalArc = 220;
+  const offset = totalArc - pct * totalArc;
+  document.getElementById('gauge-arc').setAttribute('stroke-dashoffset', offset);
+
+  // Needle: -90° (0%) to +90° (100%), pivot at 90,90
+  const angle = -90 + pct * 180;
+  document.getElementById('gauge-needle').setAttribute('transform', `rotate(${angle}, 90, 90)`);
+
+  // Color bg arc
+  document.getElementById('gauge-bg').setAttribute('stroke', 'var(--range-track)');
+
+  // Update text color
+  const val = document.getElementById('gauge-val');
+  if (value < 40)       val.setAttribute('fill', 'var(--warn)');
+  else if (value <= 60) val.setAttribute('fill', 'var(--good)');
+  else                  val.setAttribute('fill', 'var(--bad)');
+}
+
+// ── Slider sync ──────────────────────────────────────────────
+function syncSlider(inputId, sliderId, dispId) {
+  const inp = document.getElementById(inputId);
+  const sl  = document.getElementById(sliderId);
+  const dp  = document.getElementById(dispId);
+
+  inp.addEventListener('input', () => {
+    const v = parseFloat(inp.value);
+    if (!isNaN(v) && v >= 0 && v <= 100) { sl.value = v; dp.textContent = v + '%'; }
+  });
+  sl.addEventListener('input', () => {
+    inp.value = sl.value;
+    dp.textContent = sl.value + '%';
+  });
+}
+syncSlider('h-out', 'h-out-slider', 'h-out-disp');
+syncSlider('h-in',  'h-in-slider',  'h-in-disp');
+
+// Auto-calculate on input change
+['t-out','h-out','t-in','h-in','h-out-slider','h-in-slider'].forEach(id => {
+  document.getElementById(id).addEventListener('change', () => {
+    if (document.getElementById('result-section').classList.contains('visible')) calculate();
+  });
+});
+
+// ── Calc button ──────────────────────────────────────────────
+document.getElementById('calc-btn').addEventListener('click', () => {
+  const btn = document.getElementById('calc-btn');
+  btn.classList.remove('pulse');
+  void btn.offsetWidth;
+  btn.classList.add('pulse');
+  calculate();
+});
+
+// ── Theme ────────────────────────────────────────────────────
+let dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  document.getElementById('theme-btn').textContent = dark ? '☀️' : '🌙';
+}
+applyTheme();
+document.getElementById('theme-btn').addEventListener('click', () => {
+  dark = !dark; applyTheme();
+});
+
+// ── Fullscreen ───────────────────────────────────────────────
+const fsBtn = document.getElementById('fs-btn');
+fsBtn.addEventListener('click', () => {
+  if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+    (document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen).call(document.documentElement);
+    fsBtn.textContent = '⛶';
+  } else {
+    (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+  }
+});
+document.addEventListener('fullscreenchange', () => {
+  fsBtn.textContent = document.fullscreenElement ? '⊡' : '⛶';
+});
+
+// ── Initial calc on load ──────────────────────────────────────
+window.addEventListener('load', () => { calculate(); });
+</script>
+</body>
+</html>

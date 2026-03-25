@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Raumklima</title>
+<title>Lüftungsrechner</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,600;1,9..40,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -518,6 +518,167 @@
   }
   .dew-warning.show { display: flex; }
 
+  /* ── Room type selector ── */
+  .room-type-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .room-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 10px 6px;
+    background: var(--input-bg);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .room-btn.active {
+    border-color: var(--accent);
+    background: rgba(78,170,255,0.1);
+    box-shadow: 0 0 0 2px rgba(78,170,255,0.18);
+  }
+  .room-btn:active { transform: scale(0.95); }
+  .room-btn-icon { font-size: 20px; }
+  .room-btn-name {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text2);
+    letter-spacing: 0.2px;
+    text-align: center;
+  }
+  .room-btn.active .room-btn-name { color: var(--accent); }
+  .room-btn-tau {
+    font-size: 9px;
+    color: var(--text3);
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* ── 30-min result card ── */
+  .temp30-hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .temp30-cell {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    text-align: center;
+  }
+  .temp30-cell.highlight {
+    border-color: var(--accent);
+    background: rgba(78,170,255,0.08);
+  }
+  .temp30-cell.highlight-warm {
+    border-color: var(--warn);
+    background: rgba(232,140,26,0.08);
+  }
+  .temp30-icon { font-size: 20px; }
+  .temp30-label {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-top: 2px;
+  }
+  .temp30-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.1;
+  }
+  .temp30-val.cool { color: var(--dew-color); }
+  .temp30-val.humid { color: var(--abs-color); }
+  .temp30-delta {
+    font-size: 10px;
+    color: var(--text3);
+    font-weight: 400;
+  }
+
+  /* Timeline strip */
+  .timeline {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 10px 0 14px;
+  }
+  .tl-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    flex: 1;
+  }
+  .tl-dot {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    border: 2px solid var(--border);
+    background: var(--surface2);
+    flex-shrink: 0;
+  }
+  .tl-dot.start { border-color: var(--abs-color); background: rgba(139,92,246,0.1); }
+  .tl-dot.end   { border-color: var(--accent);    background: rgba(78,170,255,0.1); }
+  .tl-label {
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--text3);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    text-align: center;
+  }
+  .tl-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text2);
+    text-align: center;
+  }
+  .tl-line {
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(90deg, var(--abs-color), var(--accent));
+    opacity: 0.4;
+    margin: 0 4px;
+    margin-top: -22px;
+    align-self: center;
+    position: relative;
+    top: -11px;
+  }
+  .tl-mid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    flex: 0 0 auto;
+    margin-top: -11px;
+  }
+  .tl-mid-label {
+    font-size: 9px;
+    color: var(--accent);
+    font-weight: 700;
+    background: var(--surface);
+    padding: 1px 5px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
   /* Fullscreen overlay */
   :fullscreen #app, :-webkit-full-screen #app {
     max-width: 480px;
@@ -563,8 +724,8 @@
     <div class="logo">
       <div class="logo-icon">🌬️</div>
       <div>
-        <div class="logo-text">Raumklima</div>
-        <div class="logo-sub">Lüftungs-Rechner</div>
+        <div class="logo-text">LuftCheck</div>
+        <div class="logo-sub">Lüftungsrechner</div>
       </div>
     </div>
     <div class="header-btns">
@@ -628,6 +789,28 @@
         <span class="slider-val" id="h-in-disp">50%</span>
       </div>
       <input type="range" id="h-in-slider" min="0" max="100" value="50">
+    </div>
+  </div>
+
+  <!-- RAUMTYP -->
+  <div class="card">
+    <div class="card-label">🏗️ Raumtyp (Wärmeverlust)</div>
+    <div class="room-type-row">
+      <button class="room-btn" data-tau="180" onclick="selectRoom(this)">
+        <span class="room-btn-icon">🧱</span>
+        <span class="room-btn-name">Gut isoliert</span>
+        <span class="room-btn-tau">τ = 3 h</span>
+      </button>
+      <button class="room-btn active" data-tau="90" onclick="selectRoom(this)">
+        <span class="room-btn-icon">🏠</span>
+        <span class="room-btn-name">Normal</span>
+        <span class="room-btn-tau">τ = 1.5 h</span>
+      </button>
+      <button class="room-btn" data-tau="45" onclick="selectRoom(this)">
+        <span class="room-btn-icon">🪟</span>
+        <span class="room-btn-name">Schlecht isoliert</span>
+        <span class="room-btn-tau">τ = 45 min</span>
+      </button>
     </div>
   </div>
 
@@ -727,6 +910,81 @@
       </div>
     </div>
 
+    <!-- 30-min temperature card -->
+    <div class="card">
+      <div class="card-label">⏱️ Nach dem Lüften</div>
+      <!-- Time selector -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:14px;">
+        <button class="room-btn" data-min="10" onclick="selectTime(this)">
+          <span class="room-btn-icon">⚡</span>
+          <span class="room-btn-name">10 min</span>
+        </button>
+        <button class="room-btn active" data-min="20" onclick="selectTime(this)">
+          <span class="room-btn-icon">🕐</span>
+          <span class="room-btn-name">20 min</span>
+        </button>
+        <button class="room-btn" data-min="30" onclick="selectTime(this)">
+          <span class="room-btn-icon">🕧</span>
+          <span class="room-btn-name">30 min</span>
+        </button>
+        <button class="room-btn" data-min="40" onclick="selectTime(this)">
+          <span class="room-btn-icon">🕑</span>
+          <span class="room-btn-name">40 min</span>
+        </button>
+      </div>
+
+      <!-- Timeline -->
+      <div class="timeline">
+        <div class="tl-node">
+          <div class="tl-dot start">🌡️</div>
+          <div class="tl-label">Jetzt</div>
+          <div class="tl-val" id="tl-start">—</div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;margin-top:-22px;">
+          <div class="tl-mid-label" id="tl-mid-label">20 min</div>
+          <div style="width:100%;height:2px;background:linear-gradient(90deg,var(--abs-color),var(--accent));opacity:0.4;margin-top:4px;"></div>
+        </div>
+        <div class="tl-node">
+          <div class="tl-dot end">❄️</div>
+          <div class="tl-label">Danach</div>
+          <div class="tl-val" id="tl-end">—</div>
+        </div>
+      </div>
+
+      <!-- 4 key values -->
+      <div class="temp30-hero">
+        <div class="temp30-cell highlight">
+          <div class="temp30-icon">🌡️</div>
+          <div class="temp30-label">Neue Temperatur</div>
+          <div class="temp30-val cool" id="t30-temp">—</div>
+          <div class="temp30-delta" id="t30-temp-delta"></div>
+        </div>
+        <div class="temp30-cell highlight">
+          <div class="temp30-icon">💧</div>
+          <div class="temp30-label">Neue Feuchte</div>
+          <div class="temp30-val humid" id="t30-rh">—</div>
+          <div class="temp30-delta" id="t30-rh-delta"></div>
+        </div>
+        <div class="temp30-cell">
+          <div class="temp30-icon">🌡️</div>
+          <div class="temp30-label">Taupunkt</div>
+          <div class="temp30-val" id="t30-dew">—</div>
+          <div class="temp30-delta" style="color:var(--text3);font-size:9px;">bei neuer Temp.</div>
+        </div>
+        <div class="temp30-cell">
+          <div class="temp30-icon">💨</div>
+          <div class="temp30-label">Abs. Feuchte</div>
+          <div class="temp30-val" id="t30-abs">—</div>
+          <div class="temp30-delta" style="color:var(--text3);font-size:9px;">unverändert</div>
+        </div>
+      </div>
+
+      <!-- Info note -->
+      <div class="comfort-note" id="t30-note" style="text-align:left;line-height:1.6;">
+        —
+      </div>
+    </div>
+
     <!-- Metrics -->
     <div class="card">
       <div class="card-label">🔬 Physikalische Kennwerte</div>
@@ -768,6 +1026,23 @@
 </div><!-- /app -->
 
 <script>
+let ventTime = 20; // minutes
+function selectTime(btn) {
+  document.querySelectorAll('[data-min]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  ventTime = parseInt(btn.dataset.min);
+  if (document.getElementById('result-section').classList.contains('visible')) calculate();
+}
+
+// ── Room type ─────────────────────────────────────────────────
+let roomTau = 90; // minutes (default: normal)
+function selectRoom(btn) {
+  document.querySelectorAll('.room-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  roomTau = parseInt(btn.dataset.tau);
+  if (document.getElementById('result-section').classList.contains('visible')) calculate();
+}
+
 // ── Physics ──────────────────────────────────────────────────
 function satPressure(T) {
   // Magnus-Formel (hPa)
@@ -885,6 +1160,46 @@ function calculate() {
   document.getElementById('m-dew-out').textContent = dpOut.toFixed(1) + ' °C';
   document.getElementById('m-dew-in').textContent  = dpIn.toFixed(1)  + ' °C';
   document.getElementById('m-dew-res').textContent = dpResult.toFixed(1) + ' °C';
+
+  // ── 30-min temperature & humidity ──
+  // Newton cooling: T(t) = T_out + (T_in - T_out) * e^(-t/τ)
+  const t30 = ventTime; // minutes
+  const T30  = Tout + (Tin - Tout) * Math.exp(-t30 / roomTau);
+  // Absolute humidity after ventilation = ahOut (stays constant in room after exchange)
+  const RH30 = relHumidity(T30, ahOut);
+  const dp30 = dewPoint(T30, RH30);
+  const ah30 = ahOut; // unchanged
+
+  const dT   = T30  - Tin;
+  const dRH  = RH30 - RHin;
+
+  document.getElementById('tl-start').textContent = Tin.toFixed(1) + '°C';
+  document.getElementById('tl-end').textContent   = T30.toFixed(1) + '°C';
+
+  document.getElementById('t30-temp').textContent       = T30.toFixed(1) + '°C';
+  document.getElementById('tl-mid-label').textContent = ventTime + ' min';
+  document.getElementById('t30-temp-delta').textContent = (dT < 0 ? '▼ ' : '▲ ') + Math.abs(dT).toFixed(1) + '°C gegenüber vorher';
+
+  document.getElementById('t30-rh').textContent         = Math.round(RH30) + '%';
+  document.getElementById('t30-rh-delta').textContent   = (dRH < 0 ? '▼ ' : '▲ ') + Math.abs(dRH).toFixed(1) + '% gegenüber vorher';
+
+  document.getElementById('t30-dew').textContent  = dp30.toFixed(1) + '°C';
+  document.getElementById('t30-abs').textContent  = ah30.toFixed(2) + ' g/m³';
+
+  // Color temperature value
+  const t30el = document.getElementById('t30-temp');
+  t30el.style.color = T30 < Tin - 2 ? 'var(--dew-color)' : T30 < Tin ? 'var(--warn)' : 'var(--good)';
+
+  // Color humidity value
+  const rh30el = document.getElementById('t30-rh');
+  rh30el.style.color = RH30 <= 60 ? 'var(--good)' : RH30 <= 70 ? 'var(--warn)' : 'var(--bad)';
+
+  // Info note
+  const roomLabel = roomTau === 180 ? 'gut isolierter' : roomTau === 90 ? 'normaler' : 'schlecht isolierter';
+  const condWarn  = dp30 > T30 - 1 ? ' ⚠️ Kondensationsgefahr an Oberflächen!' : '';
+  document.getElementById('t30-note').innerHTML =
+    `In einem <span>${roomLabel} Raum</span> (τ = ${roomTau} min) sinkt die Temperatur nach ${ventTime} Min. Lüften von <span>${Tin}°C → ${T30.toFixed(1)}°C</span>. ` +
+    `Die rel. Feuchte verändert sich auf <span>${Math.round(RH30)}%</span> (Taupunkt ${dp30.toFixed(1)}°C).${condWarn}`;
 
   // ── Show ──
   const sec = document.getElementById('result-section');

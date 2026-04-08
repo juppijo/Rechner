@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LaTeX Editor</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" />
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Space+Grotesk:wght@400;500;600&family=Lora:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,400;0,700;1,400&family=Fira+Code:wght@400;500&display=swap" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="theme-dark font-ibm-plex pf-crimson">
+
+  <header class="app-header">
+    <div class="header-brand">
+      <span class="brand-icon">∑</span>
+      <span class="brand-name">LaTeX<em>Editor</em></span>
+    </div>
+
+    <div class="header-tools">
+
+      <div class="tool-group">
+        <label class="tool-label">Modus</label>
+        <div class="mode-switch">
+          <button class="mode-btn mode-active" id="modeDoc"     data-mode="doc">📄 Dokument</button>
+          <button class="mode-btn"              id="modeFormula" data-mode="formula">∑ Formel</button>
+        </div>
+      </div>
+
+      <div class="tool-group" id="groupFormat">
+        <label class="tool-label">Format</label>
+        <select id="formatSelect" class="tool-select">
+          <option value="inline">Inline  $…$</option>
+          <option value="display" selected>Display  $$…$$</option>
+          <option value="equation">\begin{equation}</option>
+          <option value="align">\begin{align}</option>
+          <option value="gather">\begin{gather}</option>
+          <option value="matrix">\begin{matrix}</option>
+          <option value="cases">\begin{cases}</option>
+        </select>
+      </div>
+
+      <div class="tool-group">
+        <label class="tool-label">Editor-Schrift</label>
+        <select id="fontSelect" class="tool-select">
+          <option value="font-ibm-plex" selected>IBM Plex Mono</option>
+          <option value="font-jetbrains">JetBrains Mono</option>
+          <option value="font-fira">Fira Code</option>
+          <option value="font-playfair">Playfair Display</option>
+          <option value="font-crimson">Crimson Pro</option>
+          <option value="font-lora">Lora</option>
+          <option value="font-merriweather">Merriweather</option>
+          <option value="font-space">Space Grotesk</option>
+        </select>
+      </div>
+
+      <div class="tool-group">
+        <label class="tool-label">Vorschau-Schrift</label>
+        <select id="previewFontSelect" class="tool-select">
+          <option value="pf-crimson"       selected>Crimson Pro</option>
+          <option value="pf-lora">Lora</option>
+          <option value="pf-merriweather">Merriweather</option>
+          <option value="pf-playfair">Playfair Display</option>
+          <option value="pf-space">Space Grotesk</option>
+          <option value="pf-ibm">IBM Plex Mono</option>
+        </select>
+      </div>
+
+      <div class="tool-divider"></div>
+
+      <div class="tool-group" id="groupPages">
+        <label class="tool-label">Seiten</label>
+        <div class="page-controls">
+          <button class="tool-btn icon-only" id="btnPagePrev" title="Vorherige Seite">‹</button>
+          <span class="page-indicator" id="pageIndicator">1 / 1</span>
+          <button class="tool-btn icon-only" id="btnPageNext" title="Nächste Seite">›</button>
+          <button class="tool-btn" id="btnPageAdd">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            <span>Seite</span>
+          </button>
+          <button class="tool-btn" id="btnPageDel">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+            <span>Löschen</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="tool-divider"></div>
+
+      <button id="btnLoad"   class="tool-btn" title="Laden (Ctrl+O)">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V6h5.17l2 2H20v10z"/></svg>
+        <span>Laden</span>
+      </button>
+      <input type="file" id="fileInput" accept=".tex,.txt,.latex,.json" style="display:none" />
+
+      <button id="btnSave"   class="tool-btn" title="Speichern (Ctrl+S)">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm2 16H5V5h11.17L19 7.83V19zm-7-7c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3zM6 6h9v4H6z"/></svg>
+        <span>Speichern</span>
+      </button>
+
+      <button id="btnExport" class="tool-btn" title="HTML Export (Ctrl+E)">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+        <span>HTML</span>
+      </button>
+
+      <button id="btnPrint"  class="tool-btn" title="Drucken (Ctrl+P)">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
+        <span>Drucken</span>
+      </button>
+
+      <div class="tool-divider"></div>
+
+      <button id="btnA4" class="tool-btn toggle-btn" title="A4-Modus">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 2h12a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 2v16h12V4H6zm2 3h8v2H8V7zm0 4h8v2H8v-2zm0 4h5v2H8v-2z"/></svg>
+        <span>A4</span>
+      </button>
+
+      <button id="btnTheme" class="tool-btn icon-only" title="Hell/Dunkel (Ctrl+D)">
+        <svg class="icon-dark"  viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>
+        <svg class="icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+
+      <button id="btnFullscreen" class="tool-btn icon-only" title="Vollbild (F11)">
+        <svg class="icon-enter" viewBox="0 0 24 24" fill="currentColor"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+        <svg class="icon-exit"  viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
+      </button>
+
+    </div>
+  </header>
+
+  <!-- ===== SNIPPET BAR ===== -->
+  <div class="snippet-bar">
+    <div class="snip-group" id="docSnipGroup">
+      <span class="snippet-label">Absatz:</span>
+      <button class="snip snip-text" data-prefix="# ">H1</button>
+      <button class="snip snip-text" data-prefix="## ">H2</button>
+      <button class="snip snip-text" data-prefix="### ">H3</button>
+      <button class="snip snip-text" data-inline="**" data-inline-end="**">Fett</button>
+      <button class="snip snip-text" data-inline="*" data-inline-end="*">Kursiv</button>
+      <button class="snip snip-text" data-prefix="> ">Zitat</button>
+      <span class="snip-sep"></span>
+    </div>
+    <span class="snippet-label">Formel:</span>
+    <button class="snip" data-tex="\frac{a}{b}">a/b</button>
+    <button class="snip" data-tex="\sqrt{x}">√x</button>
+    <button class="snip" data-tex="\sum_{i=0}^{n}">Σ</button>
+    <button class="snip" data-tex="\int_{a}^{b}">∫</button>
+    <button class="snip" data-tex="\lim_{x \to \infty}">lim</button>
+    <button class="snip" data-tex="\vec{v}">v⃗</button>
+    <button class="snip" data-tex="\partial">∂</button>
+    <button class="snip" data-tex="\nabla">∇</button>
+    <button class="snip" data-tex="\infty">∞</button>
+    <button class="snip" data-tex="\alpha">α</button>
+    <button class="snip" data-tex="\beta">β</button>
+    <button class="snip" data-tex="\gamma">γ</button>
+    <button class="snip" data-tex="\lambda">λ</button>
+    <button class="snip" data-tex="\pi">π</button>
+    <button class="snip" data-tex="\theta">θ</button>
+    <button class="snip" data-tex="\omega">ω</button>
+    <button class="snip" data-tex="\hbar">ℏ</button>
+    <button class="snip" data-tex="\Delta">Δ</button>
+    <button class="snip" data-tex="\Psi">Ψ</button>
+    <button class="snip" data-tex="\sigma">σ</button>
+    <button class="snip" data-tex="\pm">±</button>
+    <button class="snip" data-tex="\begin{pmatrix} a & b \\ c & d \end{pmatrix}">Matrix</button>
+    <button class="snip" data-tex="e^{i\pi}+1=0">Euler</button>
+    <button class="snip" data-tex="E = mc^2">E=mc²</button>
+    <span class="snip-sep" id="docMathSep"></span>
+    <button class="snip snip-accent" id="btnInsertDisplay">$$ Formel $$</button>
+    <button class="snip snip-accent" id="btnInsertInline">$ inline $</button>
+    <button class="snip snip-accent" id="btnInsertAlign">\align</button>
+    <button class="snip snip-accent" id="btnPageBreak">⏎ Neue Seite</button>
+  </div>
+
+  <!-- ===== MAIN ===== -->
+  <main class="editor-main" id="editorMain">
+
+    <section class="pane pane-source">
+      <div class="pane-header">
+        <span class="pane-title">
+          <span id="editorModeLabel">Dokument</span> —
+          Seite <span id="currentPageLabel">1</span> / <span id="totalPageLabel">1</span>
+        </span>
+        <div class="pane-actions">
+          <button id="btnClearEditor" class="pane-btn">✕ Leeren</button>
+          <button id="btnPaste"       class="pane-btn">⌘ Einfügen</button>
+          <button id="btnCopyLatex"   class="pane-btn">⌘ Kopieren</button>
+        </div>
+      </div>
+      <div class="editor-wrapper">
+        <div class="line-numbers" id="lineNumbers"></div>
+        <textarea
+          id="latexInput"
+          class="latex-editor"
+          spellcheck="false"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          placeholder="Text und LaTeX gemischt eingeben…&#10;&#10;Beispiel:&#10;Die Amplitude einer Welle ist:&#10;$$ E = A \sin(kr - \omega t) $$&#10;&#10;Inline: Die Energie $E = mc^2$ zeigt…&#10;&#10;Verwende === NEUE SEITE === für Seitenumbrüche."
+        ></textarea>
+      </div>
+      <div class="pane-footer">
+        <span id="charCount">0 Z · 0 Zeilen</span>
+        <span id="renderStatus" class="status-ok">● Bereit</span>
+      </div>
+    </section>
+
+    <div class="pane-divider" id="paneDivider"></div>
+
+    <section class="pane pane-preview">
+      <div class="pane-header">
+        <span class="pane-title">Vorschau</span>
+        <div class="pane-actions">
+          <button id="btnShowAll"  class="pane-btn pane-btn-active" title="Alle Seiten anzeigen">Alle Seiten</button>
+          <button id="btnCopyHTML" class="pane-btn">⌘ HTML</button>
+          <button id="btnZoomOut"  class="pane-btn icon-btn" title="Verkleinern">−</button>
+          <span   id="zoomLabel"   class="zoom-label">100%</span>
+          <button id="btnZoomIn"   class="pane-btn icon-btn" title="Vergrößern">+</button>
+          <button id="btnZoomReset" class="pane-btn icon-btn" title="Zoom zurücksetzen">⌂</button>
+        </div>
+      </div>
+      <div class="preview-scroll" id="previewScroll">
+        <div class="preview-inner" id="previewInner">
+          <!-- Pages rendered by JS -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="toast" id="toast"></div>
+  <script src="script.js"></script>
+</body>
+</html>

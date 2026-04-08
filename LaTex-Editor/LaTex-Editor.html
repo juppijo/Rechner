@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WRZT - Ultimate Manifest Editor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400&family=Playfair+Display:wght@700&family=Roboto:wght@300;400;700&family=Fira+Code&display=swap" rel="stylesheet">
+    
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #f0f2f5;
+            --panel-bg: #ffffff;
+            --text-color: #1a1a1a;
+            --accent-color: #2563eb;
+            --border-color: #d1d5db;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #111827;
+            --panel-bg: #1f2937;
+            --text-color: #f9fafb;
+            --accent-color: #3b82f6;
+            --border-color: #444;
+        }
+
+        body, html {
+            margin: 0; padding: 0; height: 100%;
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden;
+        }
+
+        /* Toolbar & Controls */
+        .toolbar {
+            display: flex; gap: 10px; padding: 10px 15px;
+            background: var(--panel-bg);
+            border-bottom: 1px solid var(--border-color);
+            align-items: center; flex-wrap: wrap;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .control-group { display: flex; align-items: center; gap: 5px; border-right: 1px solid var(--border-color); padding-right: 10px; }
+
+        .btn, select, input[type="color"] {
+            padding: 5px 10px; border: 1px solid var(--border-color);
+            border-radius: 4px; background: var(--panel-bg);
+            color: var(--text-color); cursor: pointer; font-size: 13px;
+        }
+
+        .btn:hover { background: var(--accent-color); color: white; }
+
+        /* Main Layout */
+        .main-container { display: flex; height: calc(100vh - 70px); }
+
+        .editor-side { flex: 1; display: flex; flex-direction: column; padding: 15px; }
+        
+        textarea {
+            flex: 1; width: 100%; padding: 15px;
+            font-family: 'Fira Code', monospace;
+            font-size: 14px; border: 1px solid var(--border-color);
+            border-radius: 8px; background: var(--panel-bg);
+            color: var(--text-color); resize: none; outline: none;
+        }
+
+        .preview-side { flex: 1; padding: 20px; overflow-y: auto; background: #4b5563; }
+
+        #output-container { width: 210mm; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+
+        .preview-page {
+            background: white; color: black;
+            width: 210mm; min-height: 297mm;
+            padding: 25mm; box-sizing: border-box;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: all 0.2s;
+        }
+
+        .fullscreen .editor-side { display: none; }
+        .fullscreen .preview-side { flex: 100%; }
+
+        @media print {
+            .toolbar, .editor-side { display: none !important; }
+            .preview-side { padding: 0 !important; background: white !important; }
+            .preview-page { box-shadow: none !important; margin: 0 !important; page-break-after: always !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="toolbar">
+    <div class="control-group">
+        <button class="btn" onclick="toggleTheme()">🌓</button>
+        <button class="btn" onclick="toggleFullscreen()">📺 Vollbild</button>
+    </div>
+
+    <div class="control-group">
+        <label>Schrift:</label>
+        <select id="fontSelect" onchange="updateStyle()">
+            <option value="'Lora', serif">Lora (Klassisch)</option>
+            <option value="'Playfair Display', serif">Playfair (Titel)</option>
+            <option value="'Roboto', sans-serif">Roboto (Modern)</option>
+            <option value="monospace">Monospace</option>
+        </select>
+    </div>
+
+    <div class="control-group">
+        <label>Größe:</label>
+        <select id="sizeSelect" onchange="updateStyle()">
+            <option value="12pt">12pt</option>
+            <option value="14pt" selected>14pt</option>
+            <option value="16pt">16pt</option>
+            <option value="18pt">18pt</option>
+            <option value="22pt">22pt</option>
+        </select>
+    </div>
+
+    <div class="control-group">
+        <label>Farbe:</label>
+        <input type="color" id="colorPicker" value="#1a1a1a" onchange="updateStyle()">
+    </div>
+
+    <button class="btn" style="background: #10b981; color: white; border:none;" onclick="exportHTML()">🌐 HTML Export</button>
+    <button class="btn" onclick="window.print()">🖨️ PDF</button>
+    <button class="btn" onclick="saveToBrowser()">💾 Save</button>
+    <button class="btn" onclick="loadFromBrowser()">📂 Load</button>
+</div>
+
+<div class="main-container" id="container">
+    <div class="editor-side">
+        <textarea id="latexInput" oninput="renderMath()">
+# WRZT - Das Einheits-Manifest
+
+### Die Ur-Konstanten der Wellenraumzeit
+
+In der Lora-Schrift wirkt die Theorie besonders edel. 
+Hier ist die zentrale Formel für die Ur-Spannung:
+
+$$\Xi = \frac{m_e^2 \cdot c}{4 \cdot \hbar}$$
+
+Mit dem Wert:
+$$\Xi \approx 5,897427 \times 10^{-19} \text{ kg/m}$$
+
+[PAGE]
+
+## Kapitel 2: Neue Horizonte
+Nutze die Farbauswahl oben, um Akzente zu setzen. 
+Jede Seite wird individuell gerendert.
+        </textarea>
+    </div>
+    
+    <div class="preview-side">
+        <div id="output-container"></div>
+    </div>
+</div>
+
+<script>
+    const input = document.getElementById('latexInput');
+    const container = document.getElementById('output-container');
+
+    function renderMath() {
+        const pages = input.value.split('[PAGE]');
+        container.innerHTML = ''; 
+
+        pages.forEach(content => {
+            const pageDiv = document.createElement('div');
+            pageDiv.className = 'preview-page';
+            pageDiv.innerHTML = content.trim().split('\n').join('<br>');
+            container.appendChild(pageDiv);
+        });
+
+        updateStyle(); // Wende aktuelle Stile an
+
+        if (window.MathJax) {
+            MathJax.typesetPromise([container]);
+        }
+    }
+
+    function updateStyle() {
+        const font = document.getElementById('fontSelect').value;
+        const size = document.getElementById('sizeSelect').value;
+        const color = document.getElementById('colorPicker').value;
+
+        document.querySelectorAll('.preview-page').forEach(page => {
+            page.style.fontFamily = font;
+            page.style.fontSize = size;
+            page.style.color = color;
+        });
+    }
+
+    function exportHTML() {
+        const pagesHTML = container.innerHTML;
+        const font = document.getElementById('fontSelect').value;
+        const size = document.getElementById('sizeSelect').value;
+        const color = document.getElementById('colorPicker').value;
+
+        const template = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400&family=Playfair+Display:wght@700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"><\/script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"><\/script>
+    <style>
+        body { background: #f0f2f5; margin: 0; padding: 20px; }
+        .preview-page { 
+            background: white; width: 210mm; min-height: 297mm; 
+            margin: 0 auto 20px auto; padding: 25mm; box-sizing: border-box;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1); page-break-after: always;
+            font-family: ${font}; font-size: ${size}; color: ${color};
+        }
+        @media print { .preview-page { box-shadow: none; margin: 0; width: 100%; } }
+    </style>
+</head>
+<body>${pagesHTML}</body>
+</html>`;
+
+        const blob = new Blob([template], { type: 'text/html' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'WRZT_Manifest_Styled.html';
+        a.click();
+    }
+
+    function saveToBrowser() { localStorage.setItem('wrzt_v4', input.value); alert('Gespeichert!'); }
+    function loadFromBrowser() { 
+        const saved = localStorage.getItem('wrzt_v4');
+        if (saved) { input.value = saved; renderMath(); }
+    }
+    function toggleTheme() { document.body.hasAttribute('data-theme') ? document.body.removeAttribute('data-theme') : document.body.setAttribute('data-theme', 'dark'); }
+    function toggleFullscreen() { document.getElementById('container').classList.toggle('fullscreen'); }
+
+    window.onload = renderMath;
+</script>
+
+</body>
+</html>

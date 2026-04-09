@@ -4,40 +4,37 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>LaTeX Editor</title>
-
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" />
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
-
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Space+Grotesk:wght@400;500;600&family=Lora:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,400;0,700;1,400&family=Fira+Code:wght@400;500&display=swap" />
-
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Space+Grotesk:wght@400;500;600&family=Lora:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,400;0,700;1,400&family=Fira+Code:wght@400;500&family=EB+Garamond:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:ital,wght@0,400;0,700;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Josefin+Sans:wght@300;400;600&family=Raleway:wght@300;400;600&family=Nunito:wght@300;400;700&family=PT+Serif:ital,wght@0,400;0,700;1,400&family=Roboto+Slab:wght@300;400;700&display=swap" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body class="theme-dark font-ibm-plex pf-crimson">
 
+  <!-- ===== HEADER ===== -->
   <header class="app-header">
     <div class="header-brand">
       <span class="brand-icon">∑</span>
       <span class="brand-name">LaTeX<em>Editor</em></span>
     </div>
-
     <div class="header-tools">
 
       <div class="tool-group">
         <label class="tool-label">Modus</label>
         <div class="mode-switch">
           <button class="mode-btn mode-active" id="modeDoc"     data-mode="doc">📄 Dokument</button>
-          <button class="mode-btn"              id="modeFormula" data-mode="formula">∑ Formel</button>
+          <button class="mode-btn"             id="modeFormula" data-mode="formula">∑ Formel</button>
         </div>
       </div>
 
       <div class="tool-group" id="groupFormat">
         <label class="tool-label">Format</label>
         <select id="formatSelect" class="tool-select">
-          <option value="inline">Inline  $…$</option>
-          <option value="display" selected>Display  $$…$$</option>
+          <option value="inline">Inline $…$</option>
+          <option value="display" selected>Display $$…$$</option>
           <option value="equation">\begin{equation}</option>
           <option value="align">\begin{align}</option>
           <option value="gather">\begin{gather}</option>
@@ -57,18 +54,6 @@
           <option value="font-lora">Lora</option>
           <option value="font-merriweather">Merriweather</option>
           <option value="font-space">Space Grotesk</option>
-        </select>
-      </div>
-
-      <div class="tool-group">
-        <label class="tool-label">Vorschau-Schrift</label>
-        <select id="previewFontSelect" class="tool-select">
-          <option value="pf-crimson"       selected>Crimson Pro</option>
-          <option value="pf-lora">Lora</option>
-          <option value="pf-merriweather">Merriweather</option>
-          <option value="pf-playfair">Playfair Display</option>
-          <option value="pf-space">Space Grotesk</option>
-          <option value="pf-ibm">IBM Plex Mono</option>
         </select>
       </div>
 
@@ -93,13 +78,13 @@
 
       <div class="tool-divider"></div>
 
-      <button id="btnLoad"   class="tool-btn" title="Laden (Ctrl+O)">
+      <button id="btnLoad" class="tool-btn" title="Laden (Ctrl+O)">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V6h5.17l2 2H20v10z"/></svg>
         <span>Laden</span>
       </button>
       <input type="file" id="fileInput" accept=".tex,.txt,.latex,.json" style="display:none" />
 
-      <button id="btnSave"   class="tool-btn" title="Speichern (Ctrl+S)">
+      <button id="btnSave" class="tool-btn" title="Speichern (Ctrl+S)">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm2 16H5V5h11.17L19 7.83V19zm-7-7c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3zM6 6h9v4H6z"/></svg>
         <span>Speichern</span>
       </button>
@@ -109,7 +94,7 @@
         <span>HTML</span>
       </button>
 
-      <button id="btnPrint"  class="tool-btn" title="Drucken (Ctrl+P)">
+      <button id="btnPrint" class="tool-btn" title="Drucken (Ctrl+P)">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
         <span>Drucken</span>
       </button>
@@ -181,6 +166,7 @@
   <!-- ===== MAIN ===== -->
   <main class="editor-main" id="editorMain">
 
+    <!-- LEFT: Editor -->
     <section class="pane pane-source">
       <div class="pane-header">
         <span class="pane-title">
@@ -195,15 +181,8 @@
       </div>
       <div class="editor-wrapper">
         <div class="line-numbers" id="lineNumbers"></div>
-        <textarea
-          id="latexInput"
-          class="latex-editor"
-          spellcheck="false"
-          autocomplete="off"
-          autocorrect="off"
-          autocapitalize="off"
-          placeholder="Text und LaTeX gemischt eingeben…&#10;&#10;Beispiel:&#10;Die Amplitude einer Welle ist:&#10;$$ E = A \sin(kr - \omega t) $$&#10;&#10;Inline: Die Energie $E = mc^2$ zeigt…&#10;&#10;Verwende === NEUE SEITE === für Seitenumbrüche."
-        ></textarea>
+        <textarea id="latexInput" class="latex-editor" spellcheck="false" autocomplete="off"
+          placeholder="Text und LaTeX gemischt…&#10;&#10;$$ E_1 = A_1 \sin(k r_1 - \omega t) $$&#10;&#10;Inline: Die Energie $E = mc^2$ zeigt…"></textarea>
       </div>
       <div class="pane-footer">
         <span id="charCount">0 Z · 0 Zeilen</span>
@@ -213,22 +192,235 @@
 
     <div class="pane-divider" id="paneDivider"></div>
 
+    <!-- RIGHT: Preview + Style Panel -->
     <section class="pane pane-preview">
       <div class="pane-header">
         <span class="pane-title">Vorschau</span>
         <div class="pane-actions">
-          <button id="btnShowAll"  class="pane-btn pane-btn-active" title="Alle Seiten anzeigen">Alle Seiten</button>
-          <button id="btnCopyHTML" class="pane-btn">⌘ HTML</button>
-          <button id="btnZoomOut"  class="pane-btn icon-btn" title="Verkleinern">−</button>
-          <span   id="zoomLabel"   class="zoom-label">100%</span>
-          <button id="btnZoomIn"   class="pane-btn icon-btn" title="Vergrößern">+</button>
-          <button id="btnZoomReset" class="pane-btn icon-btn" title="Zoom zurücksetzen">⌂</button>
+          <button id="btnShowAll"   class="pane-btn pane-btn-active">Alle Seiten</button>
+          <button id="btnStylePanel" class="pane-btn pane-btn-accent" title="Stil-Panel öffnen">🎨 Stil</button>
+          <button id="btnCopyHTML"  class="pane-btn">⌘ HTML</button>
+          <button id="btnZoomOut"   class="pane-btn icon-btn" title="Verkleinern">−</button>
+          <span   id="zoomLabel"    class="zoom-label">100%</span>
+          <button id="btnZoomIn"    class="pane-btn icon-btn" title="Vergrößern">+</button>
+          <button id="btnZoomReset" class="pane-btn icon-btn" title="Zurücksetzen">⌂</button>
         </div>
       </div>
-      <div class="preview-scroll" id="previewScroll">
-        <div class="preview-inner" id="previewInner">
-          <!-- Pages rendered by JS -->
+
+      <!-- STYLE PANEL (collapsible) -->
+      <div class="style-panel" id="stylePanel">
+
+        <!-- Row 1: Schrift -->
+        <div class="sp-row">
+          <div class="sp-group">
+            <label class="sp-label">Schriftart</label>
+            <select id="spFont" class="sp-select sp-select-wide">
+              <option value="'Crimson Pro',Georgia,serif" selected>Crimson Pro</option>
+              <option value="'Lora',serif">Lora</option>
+              <option value="'EB Garamond',serif">EB Garamond</option>
+              <option value="'Source Serif 4',serif">Source Serif 4</option>
+              <option value="'Libre Baskerville',serif">Libre Baskerville</option>
+              <option value="'PT Serif',serif">PT Serif</option>
+              <option value="'Merriweather',serif">Merriweather</option>
+              <option value="'Playfair Display',serif">Playfair Display</option>
+              <option value="'Roboto Slab',serif">Roboto Slab</option>
+              <option value="'Space Grotesk',sans-serif">Space Grotesk</option>
+              <option value="'Josefin Sans',sans-serif">Josefin Sans</option>
+              <option value="'Raleway',sans-serif">Raleway</option>
+              <option value="'Nunito',sans-serif">Nunito</option>
+              <option value="'IBM Plex Mono',monospace">IBM Plex Mono</option>
+              <option value="'Fira Code',monospace">Fira Code</option>
+              <option value="'JetBrains Mono',monospace">JetBrains Mono</option>
+            </select>
+          </div>
+
+          <div class="sp-group">
+            <label class="sp-label">Schriftgröße</label>
+            <div class="sp-stepper">
+              <button class="sp-step-btn" id="spFontSizeDown">−</button>
+              <input  class="sp-num-input" id="spFontSize" type="number" value="17" min="8" max="48" step="1" />
+              <span   class="sp-unit">px</span>
+              <button class="sp-step-btn" id="spFontSizeUp">+</button>
+            </div>
+          </div>
+
+          <div class="sp-group">
+            <label class="sp-label">Zeilenabstand</label>
+            <div class="sp-stepper">
+              <button class="sp-step-btn" id="spLineHDown">−</button>
+              <input  class="sp-num-input" id="spLineH" type="number" value="1.75" min="1.0" max="3.5" step="0.05" />
+              <button class="sp-step-btn" id="spLineHUp">+</button>
+            </div>
+          </div>
+
+          <div class="sp-group">
+            <label class="sp-label">Buchstabenabstand</label>
+            <div class="sp-stepper">
+              <button class="sp-step-btn" id="spLetterDown">−</button>
+              <input  class="sp-num-input" id="spLetterSpacing" type="number" value="0" min="-2" max="10" step="0.5" />
+              <span   class="sp-unit">px</span>
+              <button class="sp-step-btn" id="spLetterUp">+</button>
+            </div>
+          </div>
+
+          <div class="sp-group">
+            <label class="sp-label">Absatzabstand</label>
+            <div class="sp-stepper">
+              <button class="sp-step-btn" id="spParaDown">−</button>
+              <input  class="sp-num-input" id="spParaSpacing" type="number" value="0.5" min="0" max="4" step="0.25" />
+              <span   class="sp-unit">rem</span>
+              <button class="sp-step-btn" id="spParaUp">+</button>
+            </div>
+          </div>
         </div>
+
+        <!-- Row 2: Farben + Seite -->
+        <div class="sp-row">
+          <div class="sp-group">
+            <label class="sp-label">Textfarbe</label>
+            <div class="sp-color-row">
+              <input type="color" class="sp-color" id="spTextColor" value="#dde1f5" title="Textfarbe wählen" />
+              <input type="text"  class="sp-color-hex" id="spTextColorHex" value="#dde1f5" maxlength="7" />
+            </div>
+          </div>
+
+          <div class="sp-group">
+            <label class="sp-label">Seitenhintergrund</label>
+            <div class="sp-color-row">
+              <input type="color" class="sp-color" id="spBgColor" value="#13172a" title="Hintergrundfarbe" />
+              <input type="text"  class="sp-color-hex" id="spBgColorHex" value="#13172a" maxlength="7" />
+            </div>
+          </div>
+
+          <div class="sp-group">
+            <label class="sp-label">Vorschau-BG</label>
+            <div class="sp-color-row">
+              <input type="color" class="sp-color" id="spCanvasColor" value="#0e1019" title="Vorschau-Hintergrund" />
+              <input type="text"  class="sp-color-hex" id="spCanvasColorHex" value="#0e1019" maxlength="7" />
+            </div>
+          </div>
+
+          <div class="sp-group">
+            <label class="sp-label">Überschrift-Farbe</label>
+            <div class="sp-color-row">
+              <input type="color" class="sp-color" id="spHeadColor" value="#8fa0ff" />
+              <input type="text"  class="sp-color-hex" id="spHeadColorHex" value="#8fa0ff" maxlength="7" />
+            </div>
+          </div>
+
+          <div class="sp-group">
+            <label class="sp-label">Akzentfarbe</label>
+            <div class="sp-color-row">
+              <input type="color" class="sp-color" id="spAccentColor" value="#6c7ef5" />
+              <input type="text"  class="sp-color-hex" id="spAccentColorHex" value="#6c7ef5" maxlength="7" />
+            </div>
+          </div>
+
+          <div class="sp-group">
+            <label class="sp-label">Formel-Farbe</label>
+            <div class="sp-color-row">
+              <input type="color" class="sp-color" id="spMathColor" value="#a8d8f0" />
+              <input type="text"  class="sp-color-hex" id="spMathColorHex" value="#a8d8f0" maxlength="7" />
+            </div>
+          </div>
+
+          <!-- Page width + padding -->
+          <div class="sp-group">
+            <label class="sp-label">Seitenbreite</label>
+            <div class="sp-stepper">
+              <button class="sp-step-btn" id="spWidthDown">−</button>
+              <input  class="sp-num-input" id="spPageWidth" type="number" value="210" min="100" max="400" step="10" />
+              <span   class="sp-unit">mm</span>
+              <button class="sp-step-btn" id="spWidthUp">+</button>
+            </div>
+          </div>
+
+          <div class="sp-group">
+            <label class="sp-label">Innenabstand</label>
+            <div class="sp-stepper">
+              <button class="sp-step-btn" id="spPadDown">−</button>
+              <input  class="sp-num-input" id="spPagePad" type="number" value="20" min="5" max="60" step="5" />
+              <span   class="sp-unit">mm</span>
+              <button class="sp-step-btn" id="spPadUp">+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 3: Ausrichtung + Dekoration + Presets -->
+        <div class="sp-row">
+
+          <div class="sp-group">
+            <label class="sp-label">Textausrichtung</label>
+            <div class="sp-toggle-row">
+              <button class="sp-toggle" id="spAlignLeft"    data-align="left"    title="Links">&#8676;</button>
+              <button class="sp-toggle sp-toggle-active" id="spAlignJustify" data-align="justify" title="Blocksatz">&#8643;</button>
+              <button class="sp-toggle" id="spAlignCenter" data-align="center"  title="Zentriert">&#8596;</button>
+              <button class="sp-toggle" id="spAlignRight"  data-align="right"   title="Rechts">&#8677;</button>
+            </div>
+          </div>
+
+          <div class="sp-group">
+            <label class="sp-label">Rand-Linie</label>
+            <div class="sp-toggle-row">
+              <button class="sp-toggle" id="spBorderNone"  data-border="none"   title="Kein Rand">○</button>
+              <button class="sp-toggle sp-toggle-active" id="spBorderThin"  data-border="thin"   title="Dünner Rand">▭</button>
+              <button class="sp-toggle" id="spBorderThick" data-border="thick"  title="Dicker Rand">▬</button>
+              <button class="sp-toggle" id="spBorderLeft"  data-border="left"   title="Linke Linie">▏</button>
+            </div>
+          </div>
+
+          <div class="sp-group">
+            <label class="sp-label">Schatten</label>
+            <div class="sp-toggle-row">
+              <button class="sp-toggle" id="spShadowNone" data-shadow="none"   title="Kein Schatten">○</button>
+              <button class="sp-toggle sp-toggle-active" id="spShadowSoft" data-shadow="soft"   title="Weicher Schatten">◻</button>
+              <button class="sp-toggle" id="spShadowHard" data-shadow="hard"   title="Harter Schatten">◼</button>
+              <button class="sp-toggle" id="spShadowGlow" data-shadow="glow"   title="Leuchteffekt">✦</button>
+            </div>
+          </div>
+
+          <div class="sp-group">
+            <label class="sp-label">Absatz einrücken</label>
+            <label class="sp-checkbox-label">
+              <input type="checkbox" id="spIndent" />
+              <span class="sp-checkbox-custom"></span>
+              <span>1. Zeile</span>
+            </label>
+          </div>
+
+          <div class="sp-group">
+            <label class="sp-label">Trennzeile nach H1</label>
+            <label class="sp-checkbox-label">
+              <input type="checkbox" id="spH1Rule" checked />
+              <span class="sp-checkbox-custom"></span>
+              <span>Anzeigen</span>
+            </label>
+          </div>
+
+          <!-- Presets -->
+          <div class="sp-group sp-group-presets">
+            <label class="sp-label">Schnell-Stil</label>
+            <div class="sp-preset-row">
+              <button class="sp-preset" data-preset="dark-elegant"    title="Dunkel Elegant">🌙</button>
+              <button class="sp-preset" data-preset="light-classic"   title="Hell Klassisch">☀️</button>
+              <button class="sp-preset" data-preset="sepia"           title="Sepia">📜</button>
+              <button class="sp-preset" data-preset="midnight-blue"   title="Mitternachtsblau">🔵</button>
+              <button class="sp-preset" data-preset="forest"          title="Waldgrün">🌿</button>
+              <button class="sp-preset" data-preset="rose"            title="Roséton">🌸</button>
+              <button class="sp-preset" data-preset="print"           title="Druck-optimiert">🖨️</button>
+              <button class="sp-preset" data-preset="neon"            title="Neon">⚡</button>
+            </div>
+          </div>
+
+          <div class="sp-group">
+            <button class="sp-reset-btn" id="spReset" title="Stil zurücksetzen">↺ Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PREVIEW SCROLL -->
+      <div class="preview-scroll" id="previewScroll">
+        <div class="preview-inner" id="previewInner"></div>
       </div>
     </section>
 

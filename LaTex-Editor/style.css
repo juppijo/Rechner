@@ -472,6 +472,152 @@ body {
 .error-msg { color: var(--error-color); font-family: 'IBM Plex Mono', monospace; font-size: .77rem; padding: .55rem .75rem; border: 1px solid var(--error-color); border-radius: 4px; background: rgba(248,113,113,.05); display: block; white-space: pre-wrap; }
 .empty-hint { color: var(--empty-color); font-style: italic; font-size: .84rem; }
 
+/* ═══════════════════════════════════════════════════
+   FIND & REPLACE BAR
+   ═══════════════════════════════════════════════════ */
+.find-bar {
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-soft);
+  flex-shrink: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height .22s cubic-bezier(.4,0,.2,1);
+}
+.find-bar.fb-open {
+  max-height: 120px;
+}
+
+.find-row {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .38rem .75rem;
+  border-bottom: 1px solid var(--border-soft);
+}
+.find-row:last-child { border-bottom: none; }
+
+.find-input-wrap {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: .18rem .4rem;
+  gap: .3rem;
+  min-width: 0;
+  transition: border-color .15s;
+}
+.find-input-wrap:focus-within { border-color: var(--accent); }
+
+.find-icon {
+  font-size: .8rem;
+  flex-shrink: 0;
+  opacity: .5;
+}
+
+.find-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-editor);
+  font-family: var(--editor-font);
+  font-size: .82rem;
+  min-width: 0;
+  caret-color: var(--accent);
+}
+.find-input::placeholder { color: var(--empty-color); opacity: .6; }
+
+.find-match-count {
+  font-size: .66rem;
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: 60px;
+  text-align: right;
+}
+
+.find-nav-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: .88rem;
+  line-height: 1;
+  padding: .1rem .3rem;
+  border-radius: 3px;
+  transition: all .12s;
+}
+.find-nav-btn:hover { background: var(--accent-glow); color: var(--accent); }
+
+.find-opt {
+  display: flex;
+  align-items: center;
+  gap: .18rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.find-opt input[type="checkbox"] { display: none; }
+.find-opt span {
+  font-size: .7rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: .18rem .38rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: var(--bg-input);
+  cursor: pointer;
+  transition: all .12s;
+  user-select: none;
+}
+.find-opt input:checked + span {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-glow);
+}
+.find-opt span:hover { border-color: var(--accent); color: var(--accent); }
+
+.find-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: .8rem;
+  padding: .15rem .3rem;
+  border-radius: 3px;
+  transition: all .12s;
+  flex-shrink: 0;
+}
+.find-close-btn:hover { color: var(--status-err); background: rgba(248,113,113,.08); }
+
+.find-action-btn {
+  background: var(--bg-input);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: .2rem .55rem;
+  font-size: .72rem;
+  font-family: var(--editor-font);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .12s;
+  flex-shrink: 0;
+}
+.find-action-btn:hover { background: var(--accent-glow); color: var(--accent); border-color: var(--accent); }
+.find-action-btn-accent { color: var(--snip-accent); border-color: transparent; }
+.find-action-btn-accent:hover { border-color: var(--snip-accent); color: var(--snip-accent); background: rgba(144,96,224,.1); }
+
+.find-replace-status {
+  font-size: .7rem;
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--status-ok);
+  flex-shrink: 0;
+  min-width: 80px;
+}
+
 /* ── Toast ──────────────────────────────────────────── */
 .toast {
   position: fixed; bottom: 1.1rem; left: 50%;

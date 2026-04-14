@@ -177,8 +177,45 @@
           <button id="btnClearEditor" class="pane-btn">✕ Leeren</button>
           <button id="btnPaste"       class="pane-btn">⌘ Einfügen</button>
           <button id="btnCopyLatex"   class="pane-btn">⌘ Kopieren</button>
+          <button id="btnToggleSearch" class="pane-btn" title="Suchen & Ersetzen (Ctrl+F)">🔍 Suchen</button>
         </div>
       </div>
+
+      <!-- ── Find & Replace Bar ── -->
+      <div class="find-bar" id="findBar">
+        <div class="find-row">
+          <div class="find-input-wrap">
+            <span class="find-icon">🔍</span>
+            <input  id="findInput"       class="find-input" type="text" placeholder="Suchen…" spellcheck="false" />
+            <span   id="findMatchCount"  class="find-match-count">–</span>
+            <button id="btnFindPrev"     class="find-nav-btn" title="Vorheriges (Shift+Enter)">↑</button>
+            <button id="btnFindNext"     class="find-nav-btn" title="Nächstes (Enter)">↓</button>
+          </div>
+          <label class="find-opt" title="Groß-/Kleinschreibung beachten">
+            <input type="checkbox" id="findCaseSensitive" />
+            <span>Aa</span>
+          </label>
+          <label class="find-opt" title="Ganzes Wort">
+            <input type="checkbox" id="findWholeWord" />
+            <span>W</span>
+          </label>
+          <label class="find-opt" title="Regulärer Ausdruck">
+            <input type="checkbox" id="findRegex" />
+            <span>.*</span>
+          </label>
+          <button id="btnFindClose" class="find-close-btn" title="Schließen (Esc)">✕</button>
+        </div>
+        <div class="find-row">
+          <div class="find-input-wrap">
+            <span class="find-icon">↺</span>
+            <input  id="replaceInput"    class="find-input" type="text" placeholder="Ersetzen…" spellcheck="false" />
+          </div>
+          <button id="btnReplaceOne"  class="find-action-btn">Ersetzen</button>
+          <button id="btnReplaceAll"  class="find-action-btn find-action-btn-accent">Alle ersetzen</button>
+          <span   id="replaceStatus"  class="find-replace-status"></span>
+        </div>
+      </div>
+
       <div class="editor-wrapper">
         <div class="line-numbers" id="lineNumbers"></div>
         <textarea id="latexInput" class="latex-editor" spellcheck="false" autocomplete="off"

@@ -786,6 +786,173 @@ $('btnInsertInline').addEventListener('click',  () => insertAtCursor('$  $', 2))
 $('btnInsertAlign').addEventListener('click',   () => insertAtCursor('\n\\begin{align}\n\n\\end{align}\n', 13));
 $('btnPageBreak').addEventListener('click', () => { insertAtCursor(`\n\n${PAGE_SEP}\n\n`); showToast('⏎ Seitenumbruch eingefügt'); });
 
+/* ══ Find & Replace ═════════════════════════════════ */
+const findState = {
+  open: false,
+  matches: [],   // [{start, end}]
+  current: -1,
+};
+
+function buildFindRegex() {
+  const raw      = $('findInput').value;
+  const caseSens = $('findCaseSensitive').checked;
+  const whole    = $('findWholeWord').checked;
+  const isRegex  = $('findRegex').checked;
+  if (!raw) return null;
+  try {
+    const pattern = isRegex ? raw : raw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const wrapped = whole ? `\\b${pattern}\\b` : pattern;
+    return new RegExp(wrapped, caseSens ? 'g' : 'gi');
+  } catch(e) {
+    return null;
+  }
+}
+
+function findAll() {
+  const rx = buildFindRegex();
+  const el = $('findMatchCount');
+  if (!rx) { findState.matches = []; findState.current = -1; el.textContent = '–'; clearFindHighlight(); return; }
+  const text = latexInput.value;
+  const matches = [];
+  let m;
+  while ((m = rx.exec(text)) !== null) {
+    matches.push({ start: m.index, end: m.index + m[0].length });
+    if (matches.length > 9999) break; // safety
+  }
+  findState.matches  = matches;
+  findState.current  = matches.length > 0 ? 0 : -1;
+  el.textContent     = matches.length > 0 ? `1 / ${matches.length}` : '0 Treffer';
+  el.style.color     = matches.length > 0 ? 'var(--status-ok)' : 'var(--status-err)';
+  if (matches.length > 0) scrollToMatch(0);
+  highlightMatches();
+}
+
+function scrollToMatch(idx) {
+  if (idx < 0 || idx >= findState.matches.length) return;
+  const { start, end } = findState.matches[idx];
+  // Set selection so the textarea scrolls to that position
+  latexInput.focus();
+  latexInput.setSelectionRange(start, end);
+  // Scroll textarea to the match
+  const linesBefore = latexInput.value.slice(0, start).split('\n').length - 1;
+  const lineH = parseFloat(getComputedStyle(latexInput).lineHeight) || 22;
+  latexInput.scrollTop = Math.max(0, linesBefore * lineH - latexInput.clientHeight / 2);
+  findState.current = idx;
+  updateMatchCounter();
+}
+
+function updateMatchCounter() {
+  const el = $('findMatchCount');
+  const { matches, current } = findState;
+  if (matches.length === 0) { el.textContent = '0 Treffer'; el.style.color = 'var(--status-err)'; return; }
+  el.textContent = `${current + 1} / ${matches.length}`;
+  el.style.color = 'var(--status-ok)';
+}
+
+function findNext() {
+  const n = findState.matches.length;
+  if (n === 0) return;
+  const next = (findState.current + 1) % n;
+  scrollToMatch(next);
+}
+function findPrev() {
+  const n = findState.matches.length;
+  if (n === 0) return;
+  const prev = (findState.current - 1 + n) % n;
+  scrollToMatch(prev);
+}
+
+/* Highlight overlay using a positioned canvas-like div */
+function highlightMatches() {
+  // We use the textarea's native selection only for the current match.
+  // For all matches, show count. Full multi-highlight in a textarea
+  // requires a mirror div — skip for simplicity, show selection on current.
+  if (findState.current >= 0) {
+    const { start, end } = findState.matches[findState.current];
+    latexInput.setSelectionRange(start, end);
+  }
+}
+function clearFindHighlight() {
+  // Clear selection
+  const pos = latexInput.selectionStart;
+  latexInput.setSelectionRange(pos, pos);
+}
+
+function replaceOne() {
+  const rx = buildFindRegex();
+  if (!rx || findState.matches.length === 0) return;
+  const repl = $('replaceInput').value;
+  const idx  = findState.current >= 0 ? findState.current : 0;
+  const { start, end } = findState.matches[idx];
+  const val = latexInput.value;
+  const matched = val.slice(start, end);
+  let replacement = repl;
+  // Support regex back-references if regex mode
+  if ($('findRegex').checked) {
+    try { replacement = matched.replace(buildFindRegex(), repl); } catch(_) {}
+  }
+  latexInput.value = val.slice(0, start) + replacement + val.slice(end);
+  scheduleRender();
+  findAll(); // recalculate
+  $('replaceStatus').textContent = '1 ersetzt';
+  setTimeout(() => { $('replaceStatus').textContent = ''; }, 1500);
+}
+
+function replaceAll() {
+  const rx = buildFindRegex();
+  if (!rx) return;
+  const repl  = $('replaceInput').value;
+  const before = latexInput.value;
+  let count = 0;
+  const after = before.replace(rx, match => { count++; return repl; });
+  if (count === 0) { $('replaceStatus').textContent = 'Kein Treffer'; return; }
+  latexInput.value = after;
+  scheduleRender();
+  findState.matches = []; findState.current = -1;
+  $('findMatchCount').textContent = '–';
+  $('replaceStatus').textContent = `${count} ersetzt ✓`;
+  $('replaceStatus').style.color = 'var(--status-ok)';
+  setTimeout(() => { $('replaceStatus').textContent = ''; }, 2000);
+}
+
+function openFindBar() {
+  findState.open = true;
+  $('findBar').classList.add('fb-open');
+  $('btnToggleSearch').classList.add('pane-btn-active');
+  $('findInput').focus();
+  $('findInput').select();
+}
+function closeFindBar() {
+  findState.open = false;
+  $('findBar').classList.remove('fb-open');
+  $('btnToggleSearch').classList.remove('pane-btn-active');
+  clearFindHighlight();
+  latexInput.focus();
+}
+function toggleFindBar() { findState.open ? closeFindBar() : openFindBar(); }
+
+/* Bindings */
+$('btnToggleSearch').addEventListener('click', toggleFindBar);
+$('btnFindClose').addEventListener('click', closeFindBar);
+$('btnFindNext').addEventListener('click', findNext);
+$('btnFindPrev').addEventListener('click', findPrev);
+$('btnReplaceOne').addEventListener('click', replaceOne);
+$('btnReplaceAll').addEventListener('click', replaceAll);
+
+$('findInput').addEventListener('input', findAll);
+$('findCaseSensitive').addEventListener('change', findAll);
+$('findWholeWord').addEventListener('change', findAll);
+$('findRegex').addEventListener('change', findAll);
+
+$('findInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.shiftKey ? findPrev() : findNext(); e.preventDefault(); }
+  if (e.key === 'Escape') closeFindBar();
+});
+$('replaceInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { replaceOne(); e.preventDefault(); }
+  if (e.key === 'Escape') closeFindBar();
+});
+
 document.addEventListener('keydown', e => {
   if (e.ctrlKey || e.metaKey) {
     if (e.key==='s'){e.preventDefault();saveFile();}
@@ -793,8 +960,11 @@ document.addEventListener('keydown', e => {
     if (e.key==='e'){e.preventDefault();exportHTML();}
     if (e.key==='d'){e.preventDefault();toggleTheme();}
     if (e.key==='p'){e.preventDefault();window.print();}
+    if (e.key==='f'){e.preventDefault();openFindBar();}
+    if (e.key==='h'){e.preventDefault();openFindBar(); $('replaceInput').focus();}
   }
   if (e.key==='F11'){e.preventDefault();toggleFullscreen();}
+  if (e.key==='Escape' && findState.open) closeFindBar();
 });
 
 /* ══ Init ═══════════════════════════════════════════ */

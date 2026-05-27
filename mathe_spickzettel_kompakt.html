@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kompakt-Ansicht — Mathe Spickzettel</title>
+    <style>
+        :root {
+            --bg-color: #eef5f5;
+            --text-color: #1e293b;
+            --primary: #008080;
+            --primary-dark: #005a5a;
+            --accent: #00ced1;
+            --card-bg: #ffffff;
+            --border: #cbd5e1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 10px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .dashboard-header {
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .dashboard-header h1 { font-size: 18px; font-weight: 700; }
+        .dashboard-header p { font-size: 11px; opacity: 0.9; }
+
+        /* Fullscreen Action Button */
+        .fullscreen-btn {
+            position: fixed;
+            bottom: 15px;
+            right: 15px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        /* Container for the compact matrix grid layout */
+        .matrix-grid {
+            display: block;
+        }
+
+        .compact-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .card-title {
+            background-color: #f1f5f9;
+            border-left: 4px solid var(--primary);
+            padding: 3px 8px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary-dark);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .card-title span.fr { font-size: 10px; font-weight: 400; color: #64748b; font-style: italic; }
+
+        /* Ultra dense math formulas alignment */
+        .compact-row {
+            display: table;
+            width: 100%;
+            margin: 4px 0;
+            font-size: 13px;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 4px;
+        }
+        
+        .compact-row:last-child { border-bottom: none; }
+
+        .label-cell {
+            display: table-cell;
+            width: 35%;
+            font-weight: 600;
+            color: #475569;
+            font-size: 11px;
+            vertical-align: middle;
+        }
+
+        .math-cell {
+            display: table-cell;
+            width: 65%;
+            font-family: "Times New Roman", Times, serif;
+            font-style: italic;
+            font-size: 15px;
+            text-align: right;
+            vertical-align: middle;
+            color: #0f172a;
+        }
+
+        /* Pure CSS Fractions */
+        .frac {
+            display: inline-flex;
+            flex-direction: column;
+            vertical-align: middle;
+            text-align: center;
+            padding: 0 3px;
+            font-size: 13px;
+        }
+        .num { border-bottom: 1px solid #000; padding-bottom: 1px; }
+        .den { padding-top: 1px; }
+
+        .warn-text {
+            color: #b45309;
+            background-color: #fffbeb;
+            padding: 4px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 4px;
+            text-align: center;
+            border: 1px solid #fef3c7;
+        }
+
+        .gaga-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            text-align: center;
+            font-size: 11px;
+            padding: 6px;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+
+        /* Two column layout for larger phone screens / desktop */
+        @media (min-width: 650px) {
+            .matrix-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+            .compact-card { margin-bottom: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-header">
+        <h1>MATHE SPICKZETTEL — DASHBOARD</h1>
+        <p>Kompakt-Ansicht für die Hosentasche (Juni 2026)</p>
+    </div>
+
+    <div class="matrix-grid">
+
+        <!-- CARD 1: BRÜCHE -->
+        <div class="compact-card">
+            <div class="card-title">I. Bruchrechnen <span class="fr">Les fractions</span></div>
+            <div class="compact-row">
+                <div class="label-cell">Mal (•):</div>
+                <div class="math-cell">
+                    <div class="frac"><div class="num">a</div><div class="den">b</div></div> • <div class="frac"><div class="num">c</div><div class="den">d</div></div> = <div class="frac"><div class="num">a•c</div><div class="den">b•d</div></div>
+                </div>
+            </div>
+            <div class="compact-row">
+                <div class="label-cell">Geteilt (÷):</div>
+                <div class="math-cell">
+                    <div class="frac"><div class="num">a</div><div class="den">b</div></div> ÷ <div class="frac"><div class="num">c</div><div class="den">d</div></div> = <div class="frac"><div class="num">a•d</div><div class="den">b•c</div></div>
+                </div>
+            </div>
+            <div class="compact-row">
+                <div class="label-cell">Plus/Minus:</div>
+                <div class="math-cell">
+                    <div class="frac"><div class="num">a</div><div class="den">b</div></div> ± <div class="frac"><div class="num">c</div><div class="den">d</div></div> = <div class="frac"><div class="num">a•d ± c•b</div><div class="den">b•d</div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 2: POTENZEN & WURZELN -->
+        <div class="compact-card">
+            <div class="card-title">I. Potenzen &amp; Wurzeln <span class="fr">Puissances</span></div>
+            <div class="compact-row">
+                <div class="label-cell">Multiplikation:</div>
+                <div class="math-cell">a<sup>m</sup> • a<sup>n</sup> = a<sup>m+n</sup></div>
+            </div>
+            <div class="compact-row">
+                <div class="label-cell">Division:</div>
+                <div class="math-cell"><div class="frac"><div class="num">a<sup>m</sup></div><div class="den">a<sup>n</sup></div></div> = a<sup>m-n</sup></div>
+            </div>
+            <div class="compact-row">
+                <div class="label-cell">Negativ-Exp:</div>
+                <div class="math-cell">a<sup>-n</sup> = <div class="frac"><div class="num">1</div><div class="den">a<sup>n</sup></div></div></div>
+            </div>
+            <div class="compact-row">
+                <div class="label-cell">Wurzel-Mal:</div>
+                <div class="math-cell">&radic;<span style="border-top:1px solid #000;">a</span> • &radic;<span style="border-top:1px solid #000;">b</span> = &radic;<span style="border-top:1px solid #000;">a•b</span></div>
+            </div>
+            <div class="warn-text">&radic;<span style="border-top:1px solid #000;">a</span> + &radic;<span style="border-top:1px solid #000;">b</span> &ne; &radic;<span style="border-top:1px solid #000;">a+b</span></div>
+        </div>
+
+        <!-- CARD 3: BINOMISCHE FORMELN -->
+        <div class="compact-card">
+            <div class="card-title">I. Binome <span class="fr">Formules binômes</span></div>
+            <div class="compact-row">
+                <div class="label-cell">1. Formel (+):</div>
+                <div class="math-cell">(a+b)<sup>2</sup> = a<sup>2</sup> + 2ab + b<sup>2</sup></div>
+            </div>
+            <div class="compact-row">
+                <div class="label-cell">2. Formel (-):</div>
+                <div class="math-cell">(a-b)<sup>2</sup> = a<sup>2</sup> - 2ab + b<sup>2</sup></div>
+            </div>
+            <div class="compact-row">
+                <div class="label-cell">3. Formel (&plusmn;):</div>
+                <div class="math-cell">(a+b)(a-b) = a<sup>2</sup> - b<sup>2</sup></div>
+            </div>
+        </div>
+
+        <!-- CARD 4: UNGLEICHUNGEN (VI) -->
+        <div class="compact-card">
+            <div class="card-title">VI. Ungleichungen <span class="fr">Inéquations</span></div>
+            <div class="compact-row">
+                <div class="label-cell">Klammern weg:</div>
+                <div class="math-cell">a•(b+c) = a•b + a•c</div>
+            </div>
+            <div class="compact-row">
+                <div class="label-cell">Typ 1 (Eindeutig):</div>
+                <div class="math-cell">x &le; -2 &rarr; x &in; ]-&infin;; -2]</div>
+            </div>
+            <div class="compact-row">
+                <div class="label-cell">Typ 2 (Immer):</div>
+                <div class="math-cell">-1 &le; 5 &rarr; Lösung: &Ropf;</div>
+            </div>
+            <div class="compact-row">
+                <div class="label-cell">Typ 3 (Nie):</div>
+                <div class="math-cell">0 &le; -2 &rarr; Lösung: &empty;</div>
+            </div>
+            <div class="warn-text">⚠️ Bei Multiplikation/Division mit MINUS (&bull; / &divide; negative Zahl) &rarr; Zeichen umdrehen!</div>
+        </div>
+
+        <!-- CARD 5: GERADEN & SYSTEME -->
+        <div class="compact-card">
+            <div class="card-title">Geraden &amp; Systeme <span class="fr">Fonctions / Systèmes</span></div>
+            <div class="compact-row">
+                <div class="label-cell">Normalform:</div>
+                <div class="math-cell">y = m • x + n</div>
+            </div>
+            <div class="compact-row">
+                <div class="label-cell">Steigung m:</div>
+                <div class="math-cell">m = <div class="frac"><div class="num">y<sub>2</sub> - y<sub>1</sub></div><div class="den">x<sub>2</sub> - x<sub>1</sub></div></div></div>
+            </div>
+            <div class="compact-row">
+                <div class="label-cell">Schnittpunkt:</div>
+                <div class="math-cell">1 Lösung (Schnitt), 0 (Parallel), &infin; (Identisch)</div>
+            </div>
+        </div>
+
+        <!-- CARD 6: TRIGONOMETRIE (XI) -->
+        <div class="compact-card">
+            <div class="card-title">XI. Trigonometrie <span class="fr">Trigonométrie</span></div>
+            <div class="compact-row">
+                <div class="label-cell">Sinus (sin &theta;):</div>
+                <div class="math-cell"><div class="frac"><div class="num">Gegenkathete</div><div class="den">Hypotenuse</div></div></div>
+            </div>
+            <div class="compact-row">
+                <div class="label-cell">Cosinus (cos &theta;):</div>
+                <div class="math-cell"><div class="frac"><div class="num">Ankathete</div><div class="den">Hypotenuse</div></div></div>
+            </div>
+            <div class="compact-row">
+                <div class="label-cell">Tangens (tan &theta;):</div>
+                <div class="math-cell"><div class="frac"><div class="num">Gegenkathete</div><div class="den">Ankathete</div></div></div>
+            </div>
+            <div class="gaga-box">
+                <strong>GAGA / HHA-Hummel</strong> &rarr; <div class="frac"><div class="num">G</div><div class="den">H</div></div> (sin) | <div class="frac"><div class="num">A</div><div class="den">H</div></div> (cos) | <div class="frac"><div class="num">G</div><div class="den">A</div></div> (tan)
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Floating Trigger -->
+    <button class="fullscreen-btn" id="fsBtn" title="Vollbild">⛶</button>
+
+    <script>
+        const fsBtn = document.getElementById('fsBtn');
+        fsBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log(err);
+                });
+                fsBtn.innerHTML = "&times;";
+            } else {
+                document.exitFullscreen();
+                fsBtn.innerHTML = "⛶";
+            }
+        });
+    </script>
+</body>
+</html>

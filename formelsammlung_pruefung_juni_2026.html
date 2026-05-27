@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formelsammlung & Kompakt-Erklärungen — Mathematik</title>
+    <style>
+        :root {
+            --bg-color: #f0f6f6;
+            --text-color: #2c3e50;
+            --primary-color: #008080; /* Blau-Türkis / Professional Teal */
+            --primary-dark: #006666;
+            --primary-light: #e6f2f2;
+            --accent-color: #00ced1; /* Dark Turquoise */
+            --card-bg: #ffffff;
+            --border-color: #ccdfdf;
+            --shadow-sm: 0 2px 5px rgba(0, 128, 128, 0.05);
+            --shadow-md: 0 4px 15px rgba(0, 128, 128, 0.08);
+            --radius: 10px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 15px 10px;
+            max-width: 750px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding: 22px 15px;
+            background: linear-gradient(135deg, var(--primary-light), #ffffff);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            border-top: 5px solid var(--primary-color);
+            box-shadow: var(--shadow-sm);
+        }
+
+        header h1 {
+            font-size: 22px;
+            color: var(--primary-dark);
+            font-weight: 700;
+            margin-bottom: 5px;
+            letter-spacing: -0.5px;
+        }
+
+        header p {
+            font-size: 13px;
+            color: #5a738e;
+            font-weight: 500;
+        }
+
+        /* Fixed Fullscreen Action Button */
+        .fullscreen-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 55px;
+            height: 55px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 128, 128, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: transform 0.1s, opacity 0.2s;
+        }
+
+        .fullscreen-btn:active {
+            transform: scale(0.92);
+        }
+
+        /* Main Chapter Card Container */
+        .chapter-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            margin-bottom: 25px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+
+        /* Elegant Chapter Header Badge */
+        .chapter-header {
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 12px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--accent-color);
+        }
+
+        .chapter-header .lang-fr {
+            font-size: 11px;
+            font-weight: 400;
+            opacity: 0.85;
+            background: rgba(25px, 25px, 25px, 0.15);
+            padding: 2px 8px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .chapter-content {
+            padding: 16px;
+        }
+
+        /* Beautiful Sub-section Titles */
+        h3 {
+            font-size: 13.5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--primary-dark);
+            margin: 20px 0 10px 0;
+            padding-bottom: 4px;
+            border-bottom: 2px solid var(--primary-light);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        h3:first-of-type {
+            margin-top: 5px;
+        }
+
+        /* Clean List Structure */
+        .topic-item {
+            border-bottom: 1px dashed #e2ecec;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+
+        .topic-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-bottom: 0;
+        }
+
+        .topic-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .explanation {
+            font-size: 13px;
+            color: #475569;
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        /* Highly Styled Pure HTML Math Formulas Box */
+        .formula-box {
+            background-color: #fdfefe;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid var(--primary-color);
+            padding: 14px;
+            margin: 8px 0;
+            border-radius: 6px;
+            overflow-x: auto;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        /* Beautiful Math Alignment Elements */
+        .math-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 10px 0;
+            font-family: "Times New Roman", Times, serif;
+            font-style: italic;
+            font-size: 17px;
+            color: #111827;
+        }
+        
+        .math-label {
+            font-family: -apple-system, sans-serif;
+            font-size: 12px;
+            font-style: normal;
+            color: #64748b;
+            font-weight: 600;
+            width: 140px;
+            text-align: left;
+        }
+        
+        .math-expr {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+        }
+
+        /* Advanced CSS Fraction Renderer */
+        .fraction {
+            display: inline-flex;
+            flex-direction: column;
+            vertical-align: middle;
+            text-align: center;
+            padding: 0 6px;
+        }
+
+        .numerator {
+            border-bottom: 1px solid #2c3e50;
+            padding-bottom: 1px;
+            padding-top: 1px;
+        }
+
+        .denominator {
+            padding-top: 2px;
+            padding-bottom: 1px;
+        }
+
+        /* Info & Alert Badges */
+        .badge {
+            background-color: var(--primary-light);
+            color: var(--primary-dark);
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            display: inline-block;
+            border: 1px solid var(--border-color);
+        }
+        
+        .badge-danger {
+            background-color: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fee2e2;
+        }
+
+        /* Notice Boxes */
+        .rule-card {
+            background: #fffbeb;
+            border-left: 4px solid #d97706;
+            border-top: 1px solid #fef3c7;
+            border-right: 1px solid #fef3c7;
+            border-bottom: 1px solid #fef3c7;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 12px 0;
+            font-size: 12.5px;
+            color: #78350f;
+        }
+
+        /* Grid for modern list structures */
+        .grid-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .grid-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        /* Responsive Layout Overrides */
+        @media (max-width: 600px) {
+            body { padding: 5px; }
+            .chapter-content { padding: 12px; }
+            .math-row { flex-direction: column; align-items: center; gap: 4px; padding: 6px 0; border-bottom: 1px dotted #edf2f7; }
+            .math-row:last-child { border-bottom: none; }
+            .math-label { width: 100%; text-align: center; margin-bottom: 2px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Mathematik-Grundkurs</h1>
+        <p>Strukturierte Formelsammlung &amp; Kompakt-Erklärungen (Juni 2026)</p>
+    </header>
+
+    <!-- KAPITEL I -->
+    <div class="chapter-card">
+        <div class="chapter-header">
+            <div>Kapitel I: Die reellen Zahlen</div>
+            <div class="lang-fr">Les nombres réels</div>
+        </div>
+        <div class="chapter-content">
+            <div class="topic-item">
+                <div class="topic-title">1. Grundrechenarten mit Brüchen</div>
+                <div class="explanation">Übersichtliche Formeln für die bruchrechnerischen Operationen:</div>
+                <div class="formula-box">
+                    <div class="math-row">
+                        <div class="math-label">Multiplikation:</div>
+                        <div class="math-expr">
+                            <div class="fraction"><div class="numerator">a</div><div class="denominator">b</div></div> 
+                            • 
+                            <div class="fraction"><div class="numerator">c</div><div class="denominator">d</div></div> 
+                            = 
+                            <div class="fraction"><div class="numerator">a • c</div><div class="denominator">b • d</div></div>
+                        </div>
+                    </div>
+                    <div class="math-row">
+                        <div class="math-label">Division (Kehrwert):</div>
+                        <div class="math-expr">
+                            <div class="fraction"><div class="numerator">a</div><div class="denominator">b</div></div> 
+                            ÷ 
+                            <div class="fraction"><div class="numerator">c</div><div class="denominator">d</div></div> 
+                            = 
+                            <div class="fraction"><div class="numerator">a</div><div class="denominator">b</div></div> 
+                            • 
+                            <div class="fraction"><div class="numerator">d</div><div class="denominator">c</div></div> 
+                            = 
+                            <div class="fraction"><div class="numerator">a • d</div><div class="denominator">b • c</div></div>
+                        </div>
+                    </div>
+                    <div class="math-row">
+                        <div class="math-label">Addition / Subtraktion:</div>
+                        <div class="math-expr">
+                            <div class="fraction"><div class="numerator">a</div><div class="denominator">b</div></div> 
+                            ± 
+                            <div class="fraction"><div class="numerator">c</div><div class="denominator">d</div></div> 
+                            = 
+                            <div class="fraction"><div class="numerator">a • d ± c • b</div><div class="denominator">b • d</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="topic-item">
+                <div class="topic-title">2. Potenzgesetze &amp; negative Exponenten</div>
+                <div class="explanation">Wichtige Rechenregeln für die Umformung von Exponenten:</div>
+                <div class="formula-box">
+                    <div class="math-row"><div class="math-label">Gleiche Basis (Mult.):</div><div class="math-expr">a<sup>m</sup> • a<sup>n</sup> = a<sup>m + n</sup></div></div>
+                    <div class="math-row">
+                        <div class="math-label">Gleiche Basis (Div.):</div>
+                        <div class="math-expr">
+                            <div class="fraction"><div class="numerator">a<sup>m</sup></div><div class="denominator">a<sup>n</sup></div></div> = a<sup>m - n</sup>
+                        </div>
+                    </div>
+                    <div class="math-row">
+                        <div class="math-label">Negativer Exponent:</div>
+                        <div class="math-expr">
+                            a<sup>-n</sup> = <div class="fraction"><div class="numerator">1</div><div class="denominator">a<sup>n</sup></div></div>
+                            &nbsp;&nbsp;|&nbsp;&nbsp;
+                            (<div class="fraction"><div class="numerator">a</div><div class="denominator">b</div></div>)<sup>-n</sup> = (<div class="fraction"><div class="numerator">b</div><div class="denominator">a</div></div>)<sup>n</sup>
+                        </div>
+                    </div>
+                    <div class="math-row"><div class="math-label">Potenz potenzieren:</div><div class="math-expr">(a<sup>m</sup>)<sup>n</sup> = a<sup>m • n</sup></div></div>
+                </div>
+            </div>
+
+            <div class="topic-item">
+                <div class="topic-title">3. Die drei Binomischen Formeln</div>
+                <div class="formula-box">
+                    <div class="math-row"><div class="math-label">1. Formel (Plus):</div><div class="math-expr">(a + b)<sup>2</sup> = a<sup>2</sup> + 2ab + b<sup>2</sup></div></div>
+                    <div class="math-row"><div class="math-label">2. Formel (Minus):</div><div class="math-expr">(a - b)<sup>2</sup> = a<sup>2</sup> - 2ab + b<sup>2</sup></div></div>
+                    <div class="math-row"><div class="math-label">3. Formel (Mix):</div><div class="math-expr">(a + b)(a - b) = a<sup>2</sup> - b<sup>2</sup></div></div>
+                </div>
+            </div>
+
+            <div class="topic-item">
+                <div class="topic-title">4. Rechnen mit Quadratwurzeln</div>
+                <div class="formula-box">
+                    <div class="math-row"><div class="math-label">Multiplikation:</div><div class="math-expr">&radic;<span style="border-top:1px solid #000;">a</span> • &radic;<span style="border-top:1px solid #000;">b</span> = &radic;<span style="border-top:1px solid #000;">a • b</span></div></div>
+                    <div class="math-row">
+                        <div class="math-label">Division:</div>
+                        <div class="math-expr">
+                            <div class="fraction"><div class="numerator">&radic;<span style="border-top:1px solid #000;">a</span></div><div class="denominator">&radic;<span style="border-top:1px solid #000;">b</span></div></div> 
+                            = &radic;<span style="border-top:1px solid #000;"><div class="fraction"><div class="numerator">a</div><div class="denominator">b</div></div></span>
+                        </div>
+                    </div>
+                    <div class="math-row"><div class="math-label text-danger">Warnung / Fehlerquelle:</div><div class="math-expr" style="color: #c53030;">&radic;<span style="border-top:1px solid #000;">a</span> + &radic;<span style="border-top:1px solid #000;">b</span> &ne; &radic;<span style="border-top:1px solid #000;">a + b</span></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- KAPITEL VI -->
+    <div class="chapter-card">
+        <div class="chapter-header">
+            <div>Kapitel VI: Ungleichungen ersten Grades</div>
+            <div class="lang-fr">Inéquation du premier degré</div>
+        </div>
+        <div class="chapter-content">
+            <div class="explanation">
+                Beim Bestimmen der Lösungsmenge ermittelt man ein <strong>Lösungsintervall</strong>, welches grafisch auf einer Achse (Zahlengerade) markiert wird.
+            </div>
+
+            <div class="rule-card">
+                <strong>KLAPPS-Regel einhalten:</strong> Klammer vor Potenz vor Punkt vor Strich.<br>
+                <strong>⚠️ ACHTUNG PRÜFUNGSFALLE:</strong> Wenn du eine Ungleichung mit einer <strong>negativen Zahl multiplizierst oder dividierst</strong>, musst du das Relationszeichen umdrehen! (Aus &lt; wird &gt;, aus &le; wird &ge;).
+            </div>
+
+            <h3>Die 3 Lösungsstrukturen</h3>
+            <div class="grid-list">
+                <div class="grid-item">
+                    <span class="badge">1. Eindeutige Lösung</span><br>
+                    <div class="explanation" style="margin-top:4px;">Beispiel: x &le; -2 &rarr; Schreibweise als Intervall: <strong>x &in; ]-&infin;; -2]</strong></div>
+                </div>
+                <div class="grid-item">
+                    <span class="badge">2. Unbestimmte Lösung</span><br>
+                    <div class="explanation" style="margin-top:4px;">Beispiel: -1 &le; 5. Die Aussage ist immer wahr. Lösungsmenge: Alle reellen Zahlen (<strong>&Ropf;</strong>).</div>
+                </div>
+                <div class="grid-item">
+                    <span class="badge badge-danger">3. Nicht lösbar</span><br>
+                    <div class="explanation" style="margin-top:4px;">Beispiel: 0 &le; -2. Das ist ein logischer Widerspruch. Lösungsmenge: Leere Menge (<strong>&empty;</strong>).</div>
+                </div>
+            </div>
+
+            <h3>Termumformung (Distributivgesetz)</h3>
+            <div class="formula-box">
+                <div class="math-row"><div class="math-label">Klammern auflösen:</div><div class="math-expr">a • (b + c) = a • b + a • c</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- KAPITEL VII -->
+    <div class="chapter-card">
+        <div class="chapter-header">
+            <div>Kapitel VII: Kongruenz und Ähnlichkeit</div>
+            <div class="lang-fr">Isométrie et similitude</div>
+        </div>
+        <div class="chapter-content">
+            <h3>Geometrischer Satz des Thales</h3>
+            <div class="explanation">
+                Konstruiert man ein Dreieck <em>ABC</em> aus den Endpunkten des Durchmessers eines Halbkreises (Strecke <em>AB</em>) und einem beliebigen Punkt <em>C</em> auf diesem Kreisrand, besitzt das Dreieck am Punkt <em>C</em> immer einen exakten <strong>90&deg;-Winkel (Rechter Winkel)</strong>.
+            </div>
+        </div>
+    </div>
+
+    <!-- LINEARE FUNKTIONEN -->
+    <div class="chapter-card">
+        <div class="chapter-header">
+            <div>Lineare Funktionen &amp; Geradengleichungen</div>
+            <div class="lang-fr">Fonctions linéaires</div>
+        </div>
+        <div class="chapter-content">
+            <div class="topic-title">Mathematische Normalform</div>
+            <div class="formula-box">
+                <div class="math-row"><div class="math-label">Geradengleichung:</div><div class="math-expr">y = m • x + n</div></div>
+                <div style="font-size: 12.5px; color: #475569; padding-left: 5px;">
+                     • <strong>m</strong> = Steigungsfaktor (Coefficient angulaire)<br>
+                     • <strong>n</strong> = y-Achsenabschnitt / Startwert (Ordonnée à l'origine)
+                </div>
+            </div>
+
+            <div class="topic-title" style="margin-top:15px;">Berechnung der Steigung (Zwei-Punkte-Formel)</div>
+            <div class="explanation">Aus den Punkten P<sub>1</sub>(x<sub>1</sub>|y<sub>1</sub>) und P<sub>2</sub>(x<sub>2</sub>|y<sub>2</sub>) berechnet man m:</div>
+            <div class="formula-box">
+                <div class="math-row">
+                    <div class="math-label">Steigungsformel:</div>
+                    <div class="math-expr">
+                        m = <div class="fraction"><div class="numerator">y<sub>2</sub> - y<sub>1</sub></div><div class="denominator">x<sub>2</sub> - x<sub>1</sub></div></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="topic-title" style="margin-top:15px;">Rechnerischer Nachweis (Punktprobe)</div>
+            <div class="explanation">
+                Um zu bestimmen, ob ein gegebener Punkt auf der Geraden liegt, setzt man seinen x-Wert in die Funktion ein und vergleicht das Resultat mit dem vorgegebenen y-Wert.
+            </div>
+        </div>
+    </div>
+
+    <!-- KAPITEL X -->
+    <div class="chapter-card">
+        <div class="chapter-header">
+            <div>Kapitel X: Lineare Gleichungssysteme</div>
+            <div class="lang-fr">Système d'équations</div>
+        </div>
+        <div class="chapter-content">
+            <div class="explanation">
+                Systeme aus zwei Gleichungen lassen sich entweder <strong>grafisch</strong> (durch Zeichnen zweier Geraden und Ablesen des Schnittpunkts) oder <strong>algebraisch</strong> (Einsetzungs-, Gleichsetzungs- oder Additionsverfahren) auflösen.
+            </div>
+
+            <h3>Die 3 geometrischen Lösungsfälle</h3>
+            <div class="grid-list">
+                <div class="grid-item">
+                    <strong>1. Eindeutige Lösung:</strong> Die Geraden besitzen unterschiedliche Steigungen und kreuzen sich in exakt einem <strong>Schnittpunkt S(x|y)</strong>.
+                </div>
+                <div class="grid-item">
+                    <strong>2. Unlösbar:</strong> Die Geraden haben dieselbe Steigung, aber verschiedene Achsenabschnitte. Sie verlaufen absolut parallel zueinander.
+                </div>
+                <div class="grid-item">
+                    <strong>3. Unendlich viele Lösungen:</strong> Beide mathematischen Terme beschreiben identische Geraden, sie liegen deckungsgleich aufeinander.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- KAPITEL XI -->
+    <div class="chapter-card">
+        <div class="chapter-header">
+            <div>Kapitel XI: Trigonometrie am rechtwinkligen Dreieck</div>
+            <div class="lang-fr">Trigonométrie dans le triangle rectangle</div>
+        </div>
+        <div class="chapter-content">
+            <div class="explanation">
+                Verhältnismäßigkeiten der Dreiecksseiten in Abhängigkeit des Winkels &theta; (Theta):
+            </div>
+            <div class="formula-box">
+                <div class="math-row">
+                    <div class="math-label">Sinus:</div>
+                    <div class="math-expr">
+                        sin(&theta;) = <div class="fraction"><div class="numerator">Gegenkathete</div><div class="denominator">Hypotenuse</div></div>
+                    </div>
+                </div>
+                <div class="math-row">
+                    <div class="math-label">Cosinus:</div>
+                    <div class="math-expr">
+                        cos(&theta;) = <div class="fraction"><div class="numerator">Ankathete</div><div class="denominator">Hypotenuse</div></div>
+                    </div>
+                </div>
+                <div class="math-row">
+                    <div class="math-label">Tangens:</div>
+                    <div class="math-expr">
+                        tan(&theta;) = <div class="fraction"><div class="numerator">Gegenkathete</div><div class="denominator">Ankathete</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="rule-card">
+                <strong>Klassische Eselsbrücke (Die GAGA-Tabelle):</strong><br>
+                Reihe oben: <strong>G</strong>egenkathete | <strong>A</strong>nkathete | <strong>G</strong>egenkathete | <strong>A</strong>nkathete<br>
+                Reihe unten: <strong>H</strong>ypotenuse | <strong>H</strong>ypotenuse | <strong>A</strong>nkathete | <strong>H</strong>ypotenuse<br>
+                Daraus folgt von links nach rechts gelesen direkt: <strong>Sinus</strong> (G/H), <strong>Cosinus</strong> (A/H) und <strong>Tangens</strong> (G/A).
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Action Button for Fullscreen Mode -->
+    <button class="fullscreen-btn" id="fsBtn" title="Vollbildmodus aktivieren">⛶</button>
+
+    <script>
+        const fsBtn = document.getElementById('fsBtn');
+        fsBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log("Fehler beim Aktivieren des Vollbildmodus: ", err);
+                });
+                fsBtn.innerHTML = "&times;"; // Changes icon to an 'X' close symbol
+            } else {
+                document.exitFullscreen();
+                fsBtn.innerHTML = "&#9642;"; // Reset to icon or fullscreen symbol
+            }
+        });
+    </script>
+</body>
+</html>

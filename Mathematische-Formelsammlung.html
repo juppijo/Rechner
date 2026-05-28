@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathematische Formelsammlung</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #2980b9;
+            border-bottom: 1px solid #ecf0f1;
+            padding-bottom: 5px;
+            margin-top: 25px;
+        }
+        .formula-card {
+            background: #f8f9fa;
+            border-left: 5px solid #3498db;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .formula {
+            font-size: 1.15em;
+            font-weight: bold;
+            color: #c0392b;
+            font-family: "Courier New", Courier, monospace;
+            margin: 10px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            border: 1px solid #bdc3c7;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #ecf0f1;
+        }
+        ol {
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+        .note {
+            font-style: italic;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Mathematische Formelsammlung</h1>
+
+    <h2>1. Bemerkenswerte Produkte (Binomische Formeln)</h2>
+    
+    <div class="formula-card">
+        <strong>Quadrat eines Binoms (1. & 2. Binomische Formel):</strong>
+        <div class="formula">(A ± B)² = A² ± 2AB + B²</div>
+    </div>
+
+    <div class="formula-card">
+        <strong>Differenz zweier Quadrate (3. Binomische Formel):</strong>
+        <div class="formula">(A + B) · (A - B) = A² - B²</div>
+    </div>
+
+    <div class="formula-card">
+        <strong>Kubus eines Binoms:</strong>
+        <div class="formula">(A ± B)³ = A³ ± 3A²B + 3AB² ± B³</div>
+    </div>
+
+    <div class="formula-card">
+        <strong>Summe/Differenz von Kuben:</strong>
+        <div class="formula">A³ ± B³ = (A ± B) · (A² ∓ AB + B²)</div>
+    </div>
+
+    <div class="formula-card">
+        <strong>Quadrat eines Trinoms:</strong>
+        <div class="formula">(A + B + C)² = A² + B² + C² + 2AB + 2AC + 2BC</div>
+        <p class="note">Hinweis: Bei negativen Vorzeichen in der Ausgangsklammer müssen die Vorzeichen der Mischterme entsprechend angepasst werden.</p>
+    </div>
+
+
+    <h2>2. Gleichungen</h2>
+
+    <h3>Linear (1. Grades)</h3>
+    <div class="formula-card">
+        <div class="formula">a·x + b = 0 &nbsp;&nbsp;⇒&nbsp;&nbsp; x = -b / a</div>
+    </div>
+
+    <h3>Quadratisch (2. Grades)</h3>
+    <div class="formula-card">
+        <div class="formula">a·x² + b·x + c = 0</div>
+        <p><strong>Diskriminante:</strong></p>
+        <div class="formula">Δ = b² - 4·a·c</div>
+        <p><strong>Lösungen:</strong></p>
+        <ul>
+            <li>Wenn <strong>Δ &gt; 0</strong>: Zwei reelle Lösungen: <span class="formula">x₁‚₂ = (-b ± √Δ) / (2·a)</span></li>
+            <li>Wenn <strong>Δ = 0</strong>: Eine reelle Lösung: <span class="formula">x = -b / (2·a)</span></li>
+            <li>Wenn <strong>Δ &lt; 0</strong>: Keine reelle Lösung.</li>
+        </ul>
+    </div>
+
+    <h3>Biquadratische Gleichungen</h3>
+    <div class="formula-card">
+        <div class="formula">a·x⁴ + b·x² + c = 0</div>
+        <p><strong>Substitution:</strong> Setze <span class="formula">t = x²</span> (woraus folgt <span class="formula">t² = x⁴</span>), um die Gleichung in eine quadratische Form zu bringen:</p>
+        <div class="formula">a·t² + b·t + c = 0</div>
+        <p>Nachdem <span class="formula">t₁‚₂</span> berechnet wurde, erfolgt die Rücksubstitution:</p>
+        <div class="formula">x = ±√t</div>
+    </div>
+
+
+    <h2>3. Determinanten</h2>
+
+    <h3>2x2 Determinante (Kreuzverfahren)</h3>
+    <div class="formula-card">
+        <div class="formula">|A| = | a &nbsp; b |<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| c &nbsp; d | = a·d - b·c</div>
+    </div>
+
+    <h3>3x3 Determinante (Regel von Sarrus)</h3>
+    <div class="formula-card">
+        <p>Berechnung durch das wiederholte Aufschreiben der ersten zwei Spalten und das Aufsummieren der Hauptdiagonalen minus der Nebendiagonalen.</p>
+    </div>
+
+    <h3>4x4 Determinante (Entwicklungssatz / Minoren)</h3>
+    <div class="formula-card">
+        <p>Entwicklung nach der 1. Zeile:</p>
+        <div class="formula">D = a₁₁·A₁₁ + a₁₂·A₁₂ + a₁₃·A₁₃ + a₁₄·A₁₄</div>
+        <p>Wobei der Minor bzw. Kofaktor bestimmt wird durch:</p>
+        <div class="formula">Aᵢⱼ = (-1)ⁱ⁺ʲ · |Unterdeterminante|</div>
+    </div>
+
+
+    <h2>4. Eigenschaften und Regeln für Determinanten</h2>
+    <ol>
+        <li><strong>Identische Zeilen/Spalten:</strong> Wenn in einer Determinante zwei Zeilen (oder Spalten) identisch sind, ist der Wert der Determinante gleich Null (<span class="formula">D = 0</span>).</li>
+        <li><strong>Proportionale Zeilen/Spalten:</strong> Wenn zwei Zeilen (oder Spalten) proportional zueinander sind, ist die Determinante ebenfalls Null (<span class="formula">D = 0</span>).</li>
+        <li><strong>Faktoren ausklammern:</strong> Man kann einen gemeinsamen Faktor aus einer <em>einzelnen</em> Zeile oder Spalte vor die Determinante ziehen.</li>
+        <li><strong>Nullzeile:</strong> Wenn alle Elemente einer Zeile oder Spalte Null sind, ist die Determinante Null (<span class="formula">D = 0</span>).</li>
+        <li><strong>Erzeugen von Nullen ("Ziros"):</strong> Durch Linearkombinationen von Zeilen oder Spalten (z. B. <span class="formula">L₂ = L₂ - k·L₁</span>) kann man Nullen erzeugen, um die Berechnung zu vereinfachen, ohne den Wert der Determinante zu verändern.</li>
+        <li><strong>Transponierung:</strong> Ein Determinantenwert ändert sich nicht, wenn man Zeilen und Spalten miteinander vertauscht (Spiegelung an Hauptdiagonale).</li>
+        <li><strong>Zeilentausch:</strong> Vertauscht man zwei Zeilen oder zwei Spalten miteinander, ändert sich das Vorzeichen der Determinante.</li>
+        <li><strong>Linearität / Addition:</strong> Eine Determinante lässt sich aufspalten, wenn eine Zeile oder Spalte als Summe dargestellt ist (siehe Beispiel):
+            <div class="formula" style="margin-top:10px;">
+                | a' + a" &nbsp; b | &nbsp;=&nbsp; | a' &nbsp; b | &nbsp;+&nbsp; | a" &nbsp; b |<br>
+                | c' + c" &nbsp; d | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | c' &nbsp; d | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | c" &nbsp; d |
+            </div>
+        </li>
+    </ol>
+
+</div>
+
+</body>
+</html>

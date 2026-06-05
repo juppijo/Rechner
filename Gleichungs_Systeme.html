@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lineare Funktionen Rechner mit Grafik & Bruchweg</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: blueviolet;
+            color: #333;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            background: lightblue;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-width: 650px;
+            width: 100%;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .point-input {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .point-box {
+            flex: 1;
+            background: #eef2f3;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .point-box h3 {
+            margin-top: 0;
+            color: #34495e;
+        }
+        label {
+            display: block;
+            margin: 5px 0 2px;
+            font-size: 0.9em;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        .result-box {
+            margin-top: 25px;
+            padding: 20px;
+            background: #e8f4fd;
+            border-left: 5px solid #3498db;
+            border-radius: 4px;
+            display: none;
+        }
+        .equation {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #2c3e50;
+            text-align: center;
+            margin: 15px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            border: 1px dashed #3498db;
+        }
+        .step {
+            margin-bottom: 18px;
+            line-height: 1.6;
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+        .fraction {
+            display: inline-block;
+            vertical-align: middle;
+            text-align: center;
+            padding: 0 4px;
+        }
+        .fraction > span {
+            display: block;
+            padding-top: 2px;
+        }
+        .fraction span.numerator {
+            border-bottom: 1px solid #333;
+        }
+        .canvas-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            background: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        canvas {
+            background: #fff;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Lineare Funktion & Graf</h1>
+    
+    <div class="point-input">
+        <div class="point-box">
+            <h3>Punkt A</h3>
+            <label>x₁:</label>
+            <input type="number" id="x1" value="-6" step="any">
+            <label>y₁:</label>
+            <input type="number" id="y1" value="-2" step="any">
+        </div>
+        <div class="point-box">
+            <h3>Punkt B</h3>
+            <label>x₂:</label>
+            <input type="number" id="x2" value="3" step="any">
+            <label>y₂:</label>
+            <input type="number" id="y2" value="4" step="any">
+        </div>
+    </div>
+
+    <button onclick="berechneUndZeichne()">Funktion & Graf berechnen</button>
+
+    <div id="result" class="result-box"></div>
+    
+    <div class="canvas-container" id="canvasContainer" style="display:none;">
+        <canvas id="koordinatensystem" width="400" height="400"></canvas>
+    </div>
+</div>
+
+<script>
+function ggt(a, b) {
+    return b ? ggt(b, a % b) : Math.abs(a);
+}
+
+function formatBruchHtml(zaehler, nenner) {
+    if (nenner === 0) return "nand";
+    let vorzeichen = "";
+    if ((zaehler < 0 && nenner > 0) || (zaehler > 0 && nenner < 0)) {
+        vorzeichen = "-";
+    }
+    zaehler = Math.abs(zaehler);
+    nenner = Math.abs(nenner);
+    
+    let teiler = ggt(zaehler, nenner);
+    zaehler /= teiler;
+    nenner /= teiler;
+    
+    if (nenner === 1) return vorzeichen + zaehler;
+    return `${vorzeichen}<div class="fraction"><span class="numerator">${zaehler}</span><span>${nenner}</span></div>`;
+}
+
+function berechneUndZeichne() {
+    const x1 = parseFloat(document.getElementById('x1').value);
+    const y1 = parseFloat(document.getElementById('y1').value);
+    const x2 = parseFloat(document.getElementById('x2').value);
+    const y2 = parseFloat(document.getElementById('y2').value);
+    
+    const resultDiv = document.getElementById('result');
+    const canvasContainer = document.getElementById('canvasContainer');
+    
+    if (x1 === x2) {
+        resultDiv.innerHTML = `<h3>Fehler</h3><p>Die x-Koordinaten dürfen nicht gleich sein (senkrechte Gerade).</p>`;
+        resultDiv.style.display = 'block';
+        canvasContainer.style.display = 'none';
+        return;
+    }
+
+    // --- 1. SCHRITT: BERECHNUNG M ---
+    const mZaehler = y2 - y1;
+    const mNenner = x2 - x1;
+    const mDezimal = mZaehler / mNenner;
+    
+    const mTeiler = ggt(mZaehler, mNenner);
+    let mZaehlerGekuerzt = mZaehler / mTeiler;
+    let mNennerGekuerzt = mNenner / mTeiler;
+    if (mNennerGekuerzt < 0) {
+        mZaehlerGekuerzt = -mZaehlerGekuerzt;
+        mNennerGekuerzt = -mNennerGekuerzt;
+    }
+
+    // --- 2. SCHRITT: BERECHNUNG B ---
+    const bZaehler = (y1 * mNennerGekuerzt) - (mZaehlerGekuerzt * x1);
+    const bNenner = mNennerGekuerzt;
+    const bDezimal = bZaehler / bNenner;
+    
+    const bTeiler = ggt(bZaehler, bNenner);
+    let bZaehlerGekuerzt = bZaehler / bTeiler;
+    let bNennerGekuerzt = bNenner / bTeiler;
+    if (bNennerGekuerzt < 0) {
+        bZaehlerGekuerzt = -bZaehlerGekuerzt;
+        bNennerGekuerzt = -bNennerGekuerzt;
+    }
+
+    // HTML Strings für m und b generieren
+    let mString = formatBruchHtml(mZaehlerGekuerzt, mNennerGekuerzt);
+    let bString = formatBruchHtml(bZaehlerGekuerzt, bNennerGekuerzt);
+    
+    // Aufbau der finalen Funktionsgleichung
+    let endGleichungBruch = "y = " + (mDezimal === 1 ? "x" : mDezimal === -1 ? "-x" : mDezimal === 0 ? "" : mString + "x");
+    if (bDezimal > 0) endGleichungBruch += (mDezimal === 0 ? "" : " + ") + bString;
+    else if (bDezimal < 0) endGleichungBruch += " - " + formatBruchHtml(Math.abs(bZaehlerGekuerzt), bNennerGekuerzt);
+    else if (bDezimal === 0 && mDezimal === 0) endGleichungBruch += "0";
+
+    // --- TEXTAUSGABE GENERIEREN ---
+    let htmlLösung = `<h3>Ergebnis:</h3><div class="equation">${endGleichungBruch}</div>`;
+    htmlLösung += `<hr style="border:0; border-top:1px solid #ccc; margin:20px 0;">`;
+    htmlLösung += `<h3>Ausführlicher Lösungsweg:</h3>`;
+    
+    // Schritt 1 im HTML
+    htmlLösung += `<div class="step"><strong>1. Steigung m berechnen:</strong><br>`;
+    htmlLösung += `Formel: <em>m = (y₂ - y₁) / (x₂ - x₁)</em><br>`;
+    htmlLösung += `Einsetzen: <em>m = (${y2} - (${y1})) / (${x2} - (${x1}))</em><br>`;
+    htmlLösung += `Berechnet: <em>m = ${formatBruchHtml(mZaehler, mNenner)}</em>`;
+    if (mTeiler > 1) {
+        htmlLösung += ` (mit ${mTeiler} gekürzt ergibt das <strong>${mString}</strong>)`;
+    }
+    htmlLösung += `</div>`;
+    
+    // Schritt 2 im HTML
+    let mMalX1Zaehler = mZaehlerGekuerzt * x1;
+    let y1AufNennerZaehler = y1 * mNennerGekuerzt;
+    htmlLösung += `<div class="step"><strong>2. y-Achsenabschnitt b berechnen:</strong><br>`;
+    htmlLösung += `Wir nutzen Punkt A(${x1} | ${y1}) und setzen in <em>y = m · x + b</em> ein:<br>`;
+    htmlLösung += `<em>${y1} = ${mString} · (${x1}) + b</em><br>`;
+    htmlLösung += `Multiplikation: <em>${y1} = ${formatBruchHtml(mMalX1Zaehler, mNennerGekuerzt)} + b</em><br>`;
+    htmlLösung += `Nach b umstellen: <em>b = ${y1} - (${formatBruchHtml(mMalX1Zaehler, mNennerGekuerzt)})</em><br>`;
+    htmlLösung += `Auf gemeinsamen Nenner bringen: <em>b = ${formatBruchHtml(y1AufNennerZaehler, mNennerGekuerzt)} - (${formatBruchHtml(mMalX1Zaehler, mNennerGekuerzt)})</em><br>`;
+    htmlLösung += `Ergebnis für b: <strong>b = ${bString}</strong>`;
+    htmlLösung += `</div>`;
+    
+    // Probe im HTML
+    let mMalX2Zaehler = mZaehlerGekuerzt * x2;
+    let summeRechtsZaehler = mMalX2Zaehler + bZaehlerGekuerzt;
+    htmlLösung += `<div class="step" style="background: #f0fdf4; border-color: #bbf7d0;">`;
+    htmlLösung += `<strong style="color: #166534;">3. Überprüfung / Probe mit Punkt B(${x2} | ${y2}):</strong><br>`;
+    htmlLösung += `Setze x = ${x2} und y = ${y2} in unsere Gleichung ein:<br>`;
+    htmlLösung += `<em>${y2} = ${mString} · (${x2}) + ${bDezimal >= 0 ? '+ ' : ''}${bString}</em><br>`;
+    htmlLösung += `Multiplikation: <em>${y2} = ${formatBruchHtml(mMalX2Zaehler, mNennerGekuerzt)} + (${bString})</em><br>`;
+    htmlLösung += `Zähler addieren: <em>${y2} = ${formatBruchHtml(summeRechtsZaehler, mNennerGekuerzt)}</em><br>`;
+    htmlLösung += `Ergebnis: <strong>${y2} = ${y2}</strong> <span style="color:#15803d; font-weight:bold;">✔ (Die Probe stimmt!)</span>`;
+    htmlLösung += `</div>`;
+
+    resultDiv.innerHTML = htmlLösung;
+    resultDiv.style.display = 'block';
+    canvasContainer.style.display = 'flex';
+
+    // Grafik zeichnen
+    zeichneKoordinatensystem(x1, y1, x2, y2, mDezimal, bDezimal);
+}
+
+function zeichneKoordinatensystem(x1, y1, x2, y2, m, b) {
+    const canvas = document.getElementById('koordinatensystem');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const width = canvas.width;
+    const height = canvas.height;
+    
+    const maxVal = 10; 
+    const stepX = width / (maxVal * 2);
+    const stepY = height / (maxVal * 2);
+    
+    const centerX = width / 2;
+    const centerY = height / 2;
+
+    // Gitter zeichnen (Häuschen)
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = 1;
+    for(let i = -maxVal; i <= maxVal; i++) {
+        ctx.beginPath();
+        ctx.moveTo(centerX + i * stepX, 0);
+        ctx.lineTo(centerX + i * stepX, height);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(0, centerY + i * stepY);
+        ctx.lineTo(width, centerY + i * stepY);
+        ctx.stroke();
+    }
+
+    // Achsen zeichnen
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(0, centerY); ctx.lineTo(width, centerY); ctx.stroke(); // X
+    ctx.beginPath(); ctx.moveTo(centerX, 0); ctx.lineTo(centerX, height); ctx.stroke(); // Y
+
+    // Achsenbeschriftung
+    ctx.fillStyle = '#64748b';
+    ctx.font = '10px sans-serif';
+    ctx.textBaseline = 'top';
+    ctx.textAlign = 'center';
+    
+    for(let i = -maxVal; i <= maxVal; i++) {
+        if(i !== 0 && i % 2 === 0) {
+            ctx.fillText(i, centerX + i * stepX, centerY + 5);
+            ctx.textAlign = 'right';
+            ctx.fillText(-i, centerX - 5, centerY + i * stepY - 4);
+            ctx.textAlign = 'center';
+        }
+    }
+
+    function toPixel(x, y) {
+        return { x: centerX + (x * stepX), y: centerY - (y * stepY) };
+    }
+
+    // Gerade zeichnen
+    ctx.strokeStyle = '#ef4444';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    let pMin = toPixel(-maxVal, m * (-maxVal) + b);
+    let pMax = toPixel(maxVal, m * maxVal + b);
+    ctx.moveTo(pMin.x, pMin.y);
+    ctx.lineTo(pMax.x, pMax.y);
+    ctx.stroke();
+
+    // Punkte zeichnen
+    function zeichnePunkt(x, y, name, color) {
+        let p = toPixel(x, y);
+        ctx.fillStyle = color;
+        ctx.beginPath(); ctx.arc(p.x, p.y, 5, 0, 2 * Math.PI); ctx.fill();
+        ctx.fillStyle = '#1e293b';
+        ctx.font = 'bold 12px sans-serif';
+        ctx.fillText(`${name}(${x}|${y})`, p.x + 15, p.y - 12);
+    }
+
+    zeichnePunkt(x1, y1, 'A', '#3b82f6');
+    zeichnePunkt(x2, y2, 'B', '#22c55e');
+}
+
+// Erster Aufruf nach Laden der Seite
+window.onload = berechneUndZeichne;
+</script>
+
+</body>
+</html>

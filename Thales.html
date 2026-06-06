@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universeller Rechner für Allgemeine Ähnliche Dreiecke</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --bg-color: #f4f6f7;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --success-color: #27ae60;
+            --third-side-color: #e74c3c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 26px;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        p.description {
+            color: #666;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 700px) {
+            .grid-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .triangle-card {
+            background: #fdfefe;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .triangle-card.small-t { border-top: 4px solid #e67e22; }
+        .triangle-card.large-t { border-top: 4px solid var(--accent-color); }
+
+        h2 {
+            font-size: 18px;
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .input-group {
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 15px;
+            box-sizing: border-box;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--accent-color);
+            outline: none;
+            background: #f8fafc;
+        }
+
+        input.calculated {
+            background-color: #e8f8f5;
+            border-color: var(--success-color);
+            color: #117a65;
+            font-weight: bold;
+        }
+
+        .button-group {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+            transition: background 0.2s;
+        }
+
+        .btn-calc {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-calc:hover { background-color: #219653; }
+
+        .btn-reset {
+            background-color: #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-reset:hover { background-color: #cbd5e1; }
+
+        .visualization-box {
+            margin-top: 30px;
+            text-align: center;
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px dashed #cbd5e1;
+        }
+
+        svg {
+            max-width: 100%;
+            height: auto;
+            background: #fff;
+            border-radius: 4px;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Allgemeiner Ähnlichkeits-Rechner</h1>
+    <p class="description">Gilt für alle Dreiecke mit parallelen Linien (Strahlensatz). Gib 3 beliebige Werte ein, um den Rest zu berechnen.</p>
+
+    <div class="grid-layout">
+        <div class="triangle-card small-t">
+            <h2>Kleines Dreieck</h2>
+            <div class="input-group">
+                <label for="a">Seite a (Erster Schenkel)</label>
+                <input type="number" id="a" step="any" placeholder="Frei lassen für Berechnung">
+            </div>
+            <div class="input-group">
+                <label for="b">Seite b (Parallele Basis)</label>
+                <input type="number" id="b" step="any" placeholder="Frei lassen für Berechnung">
+            </div>
+            <div class="input-group">
+                <label for="c">Seite c (Zweiter Schenkel)</label>
+                <input type="number" id="c" step="any" placeholder="Frei lassen für Berechnung">
+            </div>
+        </div>
+
+        <div class="triangle-card large-t">
+            <h2>Großes Dreieck</h2>
+            <div class="input-group">
+                <label for="A_side">Seite A (Erster Schenkel)</label>
+                <input type="number" id="A_side" step="any" placeholder="Frei lassen für Berechnung">
+            </div>
+            <div class="input-group">
+                <label for="B_side">Seite B (Parallele Basis)</label>
+                <input type="number" id="B_side" step="any" placeholder="Frei lassen für Berechnung">
+            </div>
+            <div class="input-group">
+                <label for="C_side">Seite C (Zweiter Schenkel)</label>
+                <input type="number" id="C_side" step="any" placeholder="Frei lassen für Berechnung">
+            </div>
+        </div>
+    </div>
+
+    <div class="button-group">
+        <button class="btn-reset" onclick="resetForm()">Zurücksetzen</button>
+        <button class="btn-calc" onclick="calculateEverything()">Berechnen & Zeichnen</button>
+    </div>
+
+    <div class="visualization-box">
+        <h2 style="font-size: 16px; margin-bottom: 10px;">Geometrische Visualisierung (Strahlensatz-Verschachtelung)</h2>
+        <svg id="triangleSvg" width="600" height="320" viewBox="0 0 600 320">
+            <text x="300" y="160" text-anchor="middle" fill="#94a3b8">Gib Werte ein und klicke auf Berechnen</text>
+        </svg>
+    </div>
+</div>
+
+<script>
+    function calculateEverything() {
+        const ids = ['a', 'b', 'c', 'A_side', 'B_side', 'C_side'];
+        let vals = {};
+        
+        ids.forEach(id => {
+            const el = document.getElementById(id);
+            el.classList.remove('calculated');
+            vals[id] = parseFloat(el.value);
+        });
+
+        let factor = null;
+
+        // 1. Skalierungsfaktor ermitteln über ein bekanntes Paar
+        if (!isNaN(vals.a) && !isNaN(vals.A_side) && vals.a > 0) factor = vals.A_side / vals.a;
+        else if (!isNaN(vals.b) && !isNaN(vals.B_side) && vals.b > 0) factor = vals.B_side / vals.b;
+        else if (!isNaN(vals.c) && !isNaN(vals.C_side) && vals.c > 0) factor = vals.C_side / vals.c;
+
+        // Da es sich um nicht-rechtwinklige Dreiecke handelt, können wir Pythagoras nicht 
+        // ohne Winkel anwenden. Die Ähnlichkeit (Verhältnisrechnung) reicht bei 3 gegebenen Werten aber völlig aus!
+        if (factor !== null && factor > 0) {
+            if (isNaN(vals.A_side) && !isNaN(vals.a)) vals.A_side = vals.a * factor;
+            if (isNaN(vals.B_side) && !isNaN(vals.b)) vals.B_side = vals.b * factor;
+            if (isNaN(vals.C_side) && !isNaN(vals.c)) vals.C_side = vals.c * factor;
+
+            if (isNaN(vals.a) && !isNaN(vals.A_side)) vals.a = vals.A_side / factor;
+            if (isNaN(vals.b) && !isNaN(vals.B_side)) vals.b = vals.B_side / factor;
+            if (isNaN(vals.c) && !isNaN(vals.C_side)) vals.c = vals.C_side / factor;
+        }
+
+        let validFields = 0;
+        ids.forEach(id => {
+            const inputEl = document.getElementById(id);
+            if (!isNaN(vals[id])) {
+                if (inputEl.value === "") {
+                    inputEl.value = vals[id].toFixed(2);
+                    inputEl.classList.add('calculated');
+                }
+                validFields++;
+            }
+        });
+
+        // Es müssen alle 6 Felder ausgefüllt sein, um zeichnen zu können
+        if (validFields < 6) {
+            alert("Nicht genügend Angaben. Bitte gib mindestens 3 Werte ein (z.B. a, b und B), damit ein Verhältnis berechnet werden kann.");
+            return;
+        }
+
+        drawGeneralTriangles(vals.a, vals.b, vals.c, vals.A_side, vals.B_side, vals.C_side);
+    }
+
+    function drawGeneralTriangles(a, b, c, A, B, C) {
+        const svg = document.getElementById('triangleSvg');
+        svg.innerHTML = '';
+
+        // Skalierung basierend auf der längsten Seite des großen Dreiecks
+        const maxVal = Math.max(A, B, C);
+        const scale = 240 / maxVal; 
+
+        // Die Spitze (Zentrum des Strahlensatzes) ist oben mittig platziert
+        const topX = 300;
+        const topY = 40;
+
+        // Um ein schickes, nicht-rechtwinkliges (spitzwinkliges) Dreieck zu simulieren,
+        // lassen wir den linken Schenkel in einem festen Winkel nach links unten laufen,
+        // und den rechten Schenkel nach rechts unten.
+        const leftAngle = 110 * (Math.PI / 180); // 110 Grad im Bogenmaß
+        const rightAngle = 70 * (Math.PI / 180); // 70 Grad im Bogenmaß
+
+        // Koordinaten berechnen (V-Form / Strahlensatz-Struktur)
+        // Großes Dreieck
+        const lLeftX = topX + Math.cos(leftAngle) * (A * scale);
+        const lLeftY = topY + Math.sin(leftAngle) * (A * scale);
+        
+        const lRightX = topX + Math.cos(rightAngle) * (C * scale);
+        const lRightY = lLeftY; // Da B parallel zur x-Achse ist, teilen sie sich die Y-Koordinate
+
+        // Kleines Dreieck (liegt proportional auf den gleichen Schenkeln)
+        const sLeftX = topX + Math.cos(leftAngle) * (a * scale);
+        const sLeftY = topY + Math.sin(leftAngle) * (a * scale);
+        
+        const sRightX = topX + Math.cos(rightAngle) * (c * scale);
+        const sRightY = sLeftY;
+
+        let svgContent = `
+            <polygon points="${topX},${topY} ${lLeftX},${lLeftY} ${lRightX},${lRightY}" fill="rgba(52, 152, 219, 0.08)" stroke="#3498db" stroke-width="2" />
+            <line x1="${lLeftX}" y1="${lLeftY}" x2="${lRightX}" y2="${lRightY}" stroke="#2980b9" stroke-width="3.5" />
+
+            <polygon points="${topX},${topY} ${sLeftX},${sLeftY} ${sRightX},${sRightY}" fill="rgba(230, 126, 34, 0.15)" stroke="#e67e22" stroke-width="2" />
+            <line x1="${sLeftX}" y1="${sLeftY}" x2="${sRightX}" y2="${sRightY}" stroke="#d35400" stroke-width="3.5" />
+
+            <text x="${(topX + sLeftX)/2 - 20}" y="${(topY + sLeftY)/2}" fill="#e67e22" font-size="12" font-weight="bold">a = ${a.toFixed(1)}</text>
+            <text x="${sLeftX - 25}" y="${sLeftY + (lLeftY - sLeftY)/2}" fill="#3498db" font-size="12" font-weight="bold">A = ${A.toFixed(1)}</text>
+
+            <text x="${(topX + sRightX)/2 + 10}" y="${(topY + sRightY)/2}" fill="#e67e22" font-size="12" font-weight="bold">c = ${c.toFixed(1)}</text>
+            <text x="${sRightX + 10}" y="${sRightY + (lRightY - sRightY)/2}" fill="#3498db" font-size="12" font-weight="bold">C = ${C.toFixed(1)}</text>
+
+            <text x="${(sLeftX + sRightX)/2}" y="${sLeftY - 8}" fill="#d35400" font-size="12" font-weight="bold" text-anchor="middle">b = ${b.toFixed(1)}</text>
+            <text x="${(lLeftX + lRightX)/2}" y="${lLeftY + 20}" fill="#2980b9" font-size="12" font-weight="bold" text-anchor="middle">B = ${B.toFixed(1)}</text>
+            
+            <circle cx="${topX}" cy="${topY}" r="4" fill="#2c3e50" />
+            <text x="${topX}" y="${topY - 10}" fill="#2c3e50" font-size="12" font-weight="bold" text-anchor="middle">Gemeinsame Spitze</text>
+        `;
+
+        svg.innerHTML = svgContent;
+    }
+
+    function resetForm() {
+        const ids = ['a', 'b', 'c', 'A_side', 'B_side', 'C_side'];
+        ids.forEach(id => {
+            const el = document.getElementById(id);
+            el.value = '';
+            el.classList.remove('calculated');
+        });
+        document.getElementById('triangleSvg').innerHTML = '<text x="300" y="160" text-anchor="middle" fill="#94a3b8">Gib Werte ein und klicke auf Berechnen</text>';
+    }
+</script>
+
+</body>
+</html>

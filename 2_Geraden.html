@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LGS-Rechner & Geometrische Analyse</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-1: #e74c3c; /* Gerade 1 */
+            --accent-2: #3498db; /* Gerade 2 */
+            --bg-color: #f4f6f7;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            max-width: 750px;
+            width: 100%;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 24px;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        p.description {
+            color: #666;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .system-box {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .equation-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .equation-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .g1-label { color: var(--accent-1); }
+        .g2-label { color: var(--accent-2); }
+
+        input[type="number"] {
+            width: 70px;
+            padding: 8px;
+            border: 2px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 15px;
+            text-align: center;
+            transition: border-color 0.2s;
+        }
+
+        input[type="number"]:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+            transition: background 0.2s;
+        }
+
+        .btn-calc {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .btn-calc:hover { background-color: #1a252f; }
+
+        .btn-reset {
+            background-color: #e2e8f0;
+            color: #475569;
+        }
+        .btn-reset:hover { background-color: #cbd5e1; }
+
+        .result-card {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            border-left: 5px solid transparent;
+        }
+
+        .case-1 { background-color: #e8f8f5; border-color: var(--success-color); color: #117a65; }
+        .case-2 { background-color: #fdf2e9; border-color: var(--accent-1); color: #a04000; }
+        .case-3 { background-color: #fef9e7; border-color: var(--warning-color); color: #7d6608; }
+
+        .result-card h3 { margin: 0 0 5px 0; font-size: 16px; }
+        .result-card p { margin: 0; font-size: 18px; font-weight: bold; }
+
+        .visualization-box {
+            text-align: center;
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px dashed #cbd5e1;
+        }
+
+        svg {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Lineare Gleichungssysteme (LGS)</h1>
+    <p class="description">Form: ax + by = c. Das Skript berechnet den exakten Schnittpunkt und analysiert den geometrischen Fall.</p>
+
+    <div class="system-box">
+        <div class="equation-row">
+            <span class="g1-label">I.</span>
+            <input type="number" id="a1" value="1" step="any"> <span>x</span>
+            <span>+</span>
+            <input type="number" id="b1" value="1" step="any"> <span>y</span>
+            <span>=</span>
+            <input type="number" id="c1" value="5" step="any">
+        </div>
+        <div class="equation-row">
+            <span class="g2-label">II.</span>
+            <input type="number" id="a2" value="1" step="any"> <span>x</span>
+            <span>+</span>
+            <input type="number" id="b2" value="-1" step="any"> <span>y</span>
+            <span>=</span>
+            <input type="number" id="c2" value="1" step="any">
+        </div>
+    </div>
+
+    <div class="button-group">
+        <button class="btn-reset" onclick="resetForm()">Zurücksetzen</button>
+        <button class="btn-calc" onclick="solveLGS()">System auflösen</button>
+    </div>
+
+    <div id="resultBox" class="result-card">
+        <h3 id="resultTitle">Geometrischer Fall</h3>
+        <p id="resultText">Lösungsweg</p>
+    </div>
+
+    <div class="visualization-box">
+        <svg id="coordSvg" width="500" height="400" viewBox="0 0 500 400">
+            <line x1="20" y1="200" x2="480" y2="200" stroke="#94a3b8" stroke-width="1.5" /> <line x1="250" y1="20" x2="250" y2="380" stroke="#94a3b8" stroke-width="1.5" /> <text x="250" y="215" text-anchor="middle" fill="#94a3b8">Klicke auf Berechnen</text>
+        </svg>
+    </div>
+</div>
+
+<script>
+    function solveLGS() {
+        // Koeffizienten einlesen
+        const a1 = parseFloat(document.getElementById('a1').value);
+        const b1 = parseFloat(document.getElementById('b1').value);
+        const c1 = parseFloat(document.getElementById('c1').value);
+
+        const a2 = parseFloat(document.getElementById('a2').value);
+        const b2 = parseFloat(document.getElementById('b2').value);
+        const c2 = parseFloat(document.getElementById('c2').value);
+
+        if (isNaN(a1) || isNaN(b1) || isNaN(c1) || isNaN(a2) || isNaN(b2) || isNaN(c2)) {
+            alert("Bitte alle Koeffizienten korrekt ausfüllen.");
+            return;
+        }
+
+        const resultBox = document.getElementById('resultBox');
+        const resultTitle = document.getElementById('resultTitle');
+        const resultText = document.getElementById('resultText');
+
+        // Determinanten-Methode (Cramersche Regel) zur Fallunterscheidung
+        // Hauptdeterminante D = a1*b2 - b1*a2
+        const D = a1 * b2 - b1 * a2;
+        const Dx = c1 * b2 - b1 * c2;
+        const Dy = a1 * c2 - c1 * a2;
+
+        let solutionCase = 0; 
+        let x = 0, y = 0;
+
+        // Zurücksetzen der CSS-Klassen
+        resultBox.className = "result-card";
+
+        if (D !== 0) {
+            // Fall 1: Eindeutige Lösung
+            solutionCase = 1;
+            x = Dx / D;
+            y = Dy / D;
+            
+            resultBox.classList.add('case-1');
+            resultTitle.innerText = "1. Eindeutige Lösung (Geraden kreuzen sich)";
+            resultText.innerText = `Schnittpunkt S (${x.toFixed(2)} | ${y.toFixed(2)})`;
+        } else {
+            // Wenn D == 0, gibt es zwei Möglichkeiten
+            if (Dx === 0 && Dy === 0) {
+                // Fall 3: Unendlich viele Lösungen
+                solutionCase = 3;
+                resultBox.classList.add('case-3');
+                resultTitle.innerText = "3. Unendlich viele Lösungen (Identische Geraden)";
+                resultText.innerText = "Die Geraden liegen deckungsgleich aufeinander.";
+            } else {
+                // Fall 2: Unlösbar
+                solutionCase = 2;
+                resultBox.classList.add('case-2');
+                resultTitle.innerText = "2. Unlösbar (Echte Parallele)";
+                resultText.innerText = "Die Geraden verlaufen absolut parallel zueinander.";
+            }
+        }
+
+        resultBox.style.display = "block";
+        drawSystem(a1, b1, c1, a2, b2, c2, solutionCase, x, y);
+    }
+
+    function drawSystem(a1, b1, c1, a2, b2, c2, solutionCase, solX, solY) {
+        const svg = document.getElementById('coordSvg');
+        svg.innerHTML = ''; // Vorherige Zeichnung leeren
+
+        const width = 500;
+        const height = 400;
+        const centerX = width / 2; // Pixel-Koordinate des Ursprungs (x=0)
+        const centerY = height / 2; // Pixel-Koordinate des Ursprungs (y=0)
+        const scale = 25; // 1 Einheit = 25 Pixel
+
+        // 1. Hintergrundgitter zeichnen
+        let grid = '';
+        for (let i = -10; i <= 10; i++) {
+            let xPos = centerX + i * scale;
+            let yPos = centerY + i * scale;
+            grid += `<line x1="${xPos}" y1="0" x2="${xPos}" y2="${height}" stroke="#f1f5f9" stroke-width="1" />`;
+            grid += `<line x1="0" y1="${yPos}" x2="${width}" y2="${yPos}" stroke="#f1f5f9" stroke-width="1" />`;
+        }
+
+        // Hauptachsen
+        grid += `<line x1="10" y1="${centerY}" x2="${width - 10}" y2="${centerY}" stroke="#94a3b8" stroke-width="1.5" />`;
+        grid += `<line x1="${centerX}" y1="10" x2="${centerX}" y2="${height - 10}" stroke="#94a3b8" stroke-width="1.5" />`;
+        
+        // Achsenbeschriftung Pfeile
+        grid += `<polygon points="${width-10},${centerY-4} ${width},${centerY} ${width-10},${centerY+4}" fill="#94a3b8" />`;
+        grid += `<polygon points="${centerX-4},10 ${centerX},0 ${centerX+4},10" fill="#94a3b8" />`;
+        grid += `<text x="${width-15}" y="${centerY+15}" fill="#64748b" font-size="12">x</text>`;
+        grid += `<text x="${centerX-15}" y="15" fill="#64748b" font-size="12">y</text>`;
+
+        // 2. Geraden berechnen und zeichnen (y = (c - ax) / b)
+        // Funktion zur Punktegenerierung am Bildschirmrand
+        function getLinePoints(a, b, c) {
+            let points = [];
+            if (b !== 0) {
+                // Berechne Y für x = -10 und x = 10
+                let x1 = -15, x2 = 15;
+                let y1 = (c - a * x1) / b;
+                let y2 = (c - a * x2) / b;
+                return {
+                    x1: centerX + x1 * scale, y1: centerY - y1 * scale,
+                    x2: centerX + x2 * scale, y2: centerY - y2 * scale
+                };
+            } else if (a !== 0) {
+                // Senkrechte Gerade (b = 0), x = c/a
+                let xVal = c / a;
+                return {
+                    x1: centerX + xVal * scale, y1: 0,
+                    x2: centerX + xVal * scale, y2: height
+                };
+            }
+            return null;
+        }
+
+        let p1 = getLinePoints(a1, b1, c1);
+        let p2 = getLinePoints(a2, b2, c2);
+
+        let lines = '';
+        if (p1) {
+            lines += `<line x1="${p1.x1}" y1="${p1.y1}" x2="${p1.x2}" y2="${p1.y2}" stroke="var(--accent-1)" stroke-width="2.5" />`;
+        }
+        if (p2) {
+            // Wenn identisch, zeichnen wir die zweite leicht gestrichelt, damit man beide sieht
+            let strokeStyle = (solutionCase === 3) ? 'stroke-dasharray="5,5"' : '';
+            lines += `<line x1="${p2.x1}" y1="${p2.y1}" x2="${p2.x2}" y2="${p2.y2}" stroke="var(--accent-2)" stroke-width="2.5" ${strokeStyle} />`;
+        }
+
+        // 3. Schnittpunkt markieren (falls existent)
+        let dot = '';
+        if (solutionCase === 1) {
+            let pX = centerX + solX * scale;
+            let pY = centerY - solY * scale;
+            // Nur zeichnen, wenn es im sichtbaren Feld liegt
+            if (pX >= 0 && pX <= width && pY >= 0 && pY <= height) {
+                dot += `<circle cx="${pX}" cy="${pY}" r="6" fill="var(--success-color)" stroke="white" stroke-width="2" />`;
+                dot += `<text x="${pX + 10}" y="${pY - 10}" fill="var(--success-color)" font-size="12" font-weight="bold">S (${solX.toFixed(1)}|${solY.toFixed(1)})</text>`;
+            }
+        }
+
+        svg.innerHTML = grid + lines + dot;
+    }
+
+    function resetForm() {
+        document.getElementById('a1').value = 1; document.getElementById('b1').value = 1; document.getElementById('c1').value = 5;
+        document.getElementById('a2').value = 1; document.getElementById('b2').value = -1; document.getElementById('c2').value = 1;
+        document.getElementById('resultBox').style.display = "none";
+        document.getElementById('coordSvg').innerHTML = `
+            <line x1="20" y1="200" x2="480" y2="200" stroke="#94a3b8" stroke-width="1.5" />
+            <line x1="250" y1="20" x2="250" y2="380" stroke="#94a3b8" stroke-width="1.5" />
+            <text x="300" y="215" text-anchor="middle" fill="#94a3b8">Klicke auf Berechnen</text>
+        `;
+    }
+</script>
+
+</body>
+</html>

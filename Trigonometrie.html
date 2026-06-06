@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pythagoras & Trigonometrie Rechner (Erweitert)</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --bg-color: #f4f6f7;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --success-color: #27ae60;
+            
+            /* Farben für die Dreiecksseiten */
+            --ankathete-color: #2980b9;  /* Blau */
+            --gegenkathete-color: #e67e22; /* Orange */
+            --hypotenuse-color: #9b59b6;   /* Lila */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            max-width: 850px;
+            width: 100%;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 26px;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        p.description {
+            color: #666;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        @media (max-width: 750px) {
+            .grid-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .input-card {
+            background: #fdfefe;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            border-top: 4px solid var(--primary-color);
+        }
+
+        h2 {
+            font-size: 18px;
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .angle-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .label-ak { color: var(--ankathete-color); }
+        .label-gk { color: var(--gegenkathete-color); }
+        .label-hyp { color: var(--hypotenuse-color); }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 15px;
+            box-sizing: border-box;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            background: #f8fafc;
+        }
+
+        input.calculated {
+            background-color: #e8f8f5;
+            border-color: var(--success-color);
+            color: #117a65;
+            font-weight: bold;
+        }
+
+        .button-group {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+            transition: background 0.2s;
+        }
+
+        .btn-calc { background-color: var(--success-color); color: white; }
+        .btn-calc:hover { background-color: #219653; }
+        .btn-reset { background-color: #e2e8f0; color: #475569; }
+        .btn-reset:hover { background-color: #cbd5e1; }
+
+        .gaga-box {
+            margin-top: 20px;
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .gaga-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        .gaga-table th, .gaga-table td {
+            border: 1px solid #cbd5e1;
+            padding: 8px;
+        }
+
+        .gaga-table th {
+            background: #e2e8f0;
+            color: var(--primary-color);
+        }
+
+        .highlight-gaga {
+            background-color: #e8f8f5;
+            font-weight: bold;
+            color: var(--success-color);
+        }
+
+        .visualization-box {
+            text-align: center;
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px dashed #cbd5e1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        svg {
+            max-width: 100%;
+            height: auto;
+            background: #fff;
+            border-radius: 4px;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Pythagoras & Trigonometrie-Rechner</h1>
+    <p class="description">Berechnet alle Seiten, die GAGA-Tabelle sowie beide spitzen Winkel (&theta; und &beta;) im rechtwinkligen Dreieck.</p>
+
+    <div class="grid-layout">
+        <div class="input-card">
+            <h2>Dreieckswerte</h2>
+            
+            <div class="input-group">
+                <label for="ak" class="label-ak">Ankathete (zu &theta;)</label>
+                <input type="number" id="ak" step="any" placeholder="Frei lassen für Berechnung">
+            </div>
+
+            <div class="input-group">
+                <label for="gk" class="label-gk">Gegenkathete (zu &theta;)</label>
+                <input type="number" id="gk" step="any" placeholder="Frei lassen für Berechnung">
+            </div>
+
+            <div class="input-group">
+                <label for="hyp" class="label-hyp">Hypotenuse (längste Seite)</label>
+                <input type="number" id="hyp" step="any" placeholder="Frei lassen für Berechnung">
+            </div>
+
+            <div class="angle-group">
+                <div>
+                    <label for="theta" style="color: #2c3e50; font-weight: bold;">Winkel &theta; (°)</label>
+                    <input type="number" id="theta" step="any" min="0.1" max="89.9" placeholder="unten links">
+                </div>
+                <div>
+                    <label for="beta" style="color: #7f8c8d; font-weight: bold;">Winkel &beta; (°)</label>
+                    <input type="number" id="beta" step="any" min="0.1" max="89.9" placeholder="oben rechts">
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-reset" onclick="resetForm()">Zurücksetzen</button>
+                <button class="btn-calc" onclick="calculateTrig()">Berechnen</button>
+            </div>
+        </div>
+
+        <div class="visualization-box">
+            <h2 style="font-size: 16px; margin-bottom: 10px;">Dynamische Grafik</h2>
+            <svg id="trigSvg" width="380" height="280" viewBox="0 0 380 280">
+                <text x="190" y="140" text-anchor="middle" fill="#94a3b8">Gib Werte ein und klicke auf Berechnen</text>
+            </svg>
+
+            <div class="gaga-box" style="width: 100%; box-sizing: border-box;">
+                <strong style="font-size: 14px; color: var(--primary-color);">Korrigierte Eselsbrücke: GAGA-Tabelle</strong>
+                <table class="gaga-table">
+                    <tr>
+                        <th>Winkel-Fkt.</th>
+                        <td id="gaga-sin-th">Sinus (sin)</td>
+                        <td id="gaga-cos-th">Cosinus (cos)</td>
+                        <td id="gaga-tan-th">Tangens (tan)</td>
+                        <td id="gaga-cot-th">Cotangens (cot)</td>
+                    </tr>
+                    <tr style="font-weight: bold;">
+                        <th>Zähler</th>
+                        <td id="gaga-g1" style="color: var(--gegenkathete-color)">G</td>
+                        <td id="gaga-a1" style="color: var(--ankathete-color)">A</td>
+                        <td id="gaga-g2" style="color: var(--gegenkathete-color)">G</td>
+                        <td id="gaga-a2" style="color: var(--ankathete-color)">A</td>
+                    </tr>
+                    <tr style="border-top: 2px solid #333; font-weight: bold;">
+                        <th>Nenner</th>
+                        <td id="gaga-h1" style="color: var(--hypotenuse-color)">H</td>
+                        <td id="gaga-h2" style="color: var(--hypotenuse-color)">H</td>
+                        <td id="gaga-a3" style="color: var(--ankathete-color)">A</td>
+                        <td id="gaga-g3" style="color: var(--gegenkathete-color)">G</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function calculateTrig() {
+        const ids = ['ak', 'gk', 'hyp', 'theta', 'beta'];
+        let vals = {};
+        
+        ids.forEach(id => {
+            const el = document.getElementById(id);
+            el.classList.remove('calculated');
+            vals[id] = parseFloat(el.value);
+        });
+
+        // Schleife zur iterativen Auflösung aller Variablen
+        for (let i = 0; i < 4; i++) {
+            // Winkel über die Innenwinkelsumme gegenseitig berechnen
+            if (!isNaN(vals.theta) && isNaN(vals.beta)) vals.beta = 90 - vals.theta;
+            if (!isNaN(vals.beta) && isNaN(vals.theta)) vals.theta = 90 - vals.beta;
+
+            // Berechnungen über Winkel theta
+            if (!isNaN(vals.theta)) {
+                let rad = vals.theta * (Math.PI / 180);
+                
+                if (!isNaN(vals.ak) && isNaN(vals.gk)) vals.gk = vals.ak * Math.tan(rad);
+                if (!isNaN(vals.ak) && isNaN(vals.hyp)) vals.hyp = vals.ak / Math.cos(rad);
+                
+                if (!isNaN(vals.gk) && isNaN(vals.ak)) vals.ak = vals.gk / Math.tan(rad);
+                if (!isNaN(vals.gk) && isNaN(vals.hyp)) vals.hyp = vals.gk / Math.sin(rad);
+                
+                if (!isNaN(vals.hyp) && isNaN(vals.ak)) vals.ak = vals.hyp * Math.cos(rad);
+                if (!isNaN(vals.hyp) && isNaN(vals.gk)) vals.gk = vals.hyp * Math.sin(rad);
+            }
+
+            // Pythagoras
+            if (!isNaN(vals.ak) && !isNaN(vals.gk) && isNaN(vals.hyp)) vals.hyp = Math.sqrt(vals.ak**2 + vals.gk**2);
+            if (!isNaN(vals.ak) && !isNaN(vals.hyp) && isNaN(vals.gk) && vals.hyp > vals.ak) vals.gk = Math.sqrt(vals.hyp**2 - vals.ak**2);
+            if (!isNaN(vals.gk) && !isNaN(vals.hyp) && isNaN(vals.ak) && vals.hyp > vals.gk) vals.ak = Math.sqrt(vals.hyp**2 - vals.gk**2);
+
+            // Winkel aus den Seiten rekonstruieren, falls noch unbekannt
+            if (isNaN(vals.theta)) {
+                if (!isNaN(vals.ak) && !isNaN(vals.gk)) vals.theta = Math.atan(vals.gk / vals.ak) * (180 / Math.PI);
+                else if (!isNaN(vals.gk) && !isNaN(vals.hyp)) vals.theta = Math.asin(vals.gk / vals.hyp) * (180 / Math.PI);
+                else if (!isNaN(vals.ak) && !isNaN(vals.hyp)) vals.theta = Math.acos(vals.ak / vals.hyp) * (180 / Math.PI);
+            }
+        }
+
+        // Ergebnisse ins UI schreiben
+        let filledCount = 0;
+        ids.forEach(id => {
+            const inputEl = document.getElementById(id);
+            if (!isNaN(vals[id])) {
+                if (inputEl.value === "") {
+                    inputEl.value = vals[id].toFixed(2);
+                    inputEl.classList.add('calculated');
+                }
+                filledCount++;
+            }
+        });
+
+        if (filledCount < 5 || vals.theta <= 0 || vals.theta >= 90) {
+            alert("Bitte mindestens 2 gültige Werte eingeben.");
+            return;
+        }
+
+        // Grafik und GAGA-Tabelle aktualisieren
+        drawTrigTriangle(vals.ak, vals.gk, vals.hyp, vals.theta, vals.beta);
+        updateGagaTable(vals.gk / vals.hyp, vals.ak / vals.hyp, vals.gk / vals.ak, vals.ak / vals.gk);
+    }
+
+    function drawTrigTriangle(ak, gk, hyp, theta, beta) {
+        const svg = document.getElementById('trigSvg');
+        svg.innerHTML = '';
+
+        const maxSide = Math.max(ak, gk);
+        const scale = 170 / maxSide; 
+
+        const startX = 60;
+        const startY = 230;
+
+        const pA = { x: startX, y: startY };                         // Winkel-Ecke (Theta)
+        const pC = { x: startX + ak * scale, y: startY };             // Rechter Winkel
+        const pB = { x: startX + ak * scale, y: startY - gk * scale }; // Obere Ecke (Beta)
+
+        // Bogen für Theta (unten links)
+        const rArc1 = 30;
+        const arcX1 = startX + rArc1 * Math.cos(-theta * Math.PI / 180);
+        const arcY1 = startY + rArc1 * Math.sin(-theta * Math.PI / 180);
+        const dArc1 = `M ${startX + rArc1} ${startY} A ${rArc1} ${rArc1} 0 0 1 ${arcX1} ${arcY1}`;
+
+        // Bogen für Beta (oben rechts)
+        const rArc2 = 25;
+        // Winkel für Beta zeigt von B aus nach unten (90°) und entlang der Hypotenuse (180 + theta)
+        const arcX2 = pB.x + rArc2 * Math.cos((90 + theta) * Math.PI / 180);
+        const arcY2 = pB.y + rArc2 * Math.sin((90 + theta) * Math.PI / 180);
+        const dArc2 = `M ${pB.x} ${pB.y + rArc2} A ${rArc2} ${rArc2} 0 0 1 ${arcX2} ${arcY2}`;
+
+        // Rechter-Winkel-Quadrat
+        const sq = 12;
+        const rightAngleSquare = `M ${pC.x - sq} ${pC.y} L ${pC.x - sq} ${pC.y - sq} L ${pC.x} ${pC.y - sq}`;
+
+        let svgContent = `
+            <polygon points="${pA.x},${pA.y} ${pC.x},${pC.y} ${pB.x},${pB.y}" fill="rgba(44, 62, 80, 0.02)" stroke="#ccc" stroke-width="1" />
+            
+            <path d="${rightAngleSquare}" fill="none" stroke="#7f8c8d" stroke-width="1.5" />
+            <circle cx="${pC.x - sq/2}" cy="${pC.y - sq/2}" r="1.5" fill="#7f8c8d" />
+
+            <path d="${dArc1}" fill="rgba(44, 62, 80, 0.1)" stroke="var(--primary-color)" stroke-width="1.5" />
+            <text x="${pA.x + 35}" y="${pA.y - 10}" fill="var(--primary-color)" font-size="12" font-weight="bold">&theta; = ${theta.toFixed(1)}°</text>
+
+            <path d="${dArc2}" fill="rgba(127, 140, 141, 0.1)" stroke="#7f8c8d" stroke-width="1.5" />
+            <text x="${pB.x - 20}" y="${pB.y + 40}" fill="#555" font-size="12" font-weight="bold" text-anchor="end">&beta; = ${beta.toFixed(1)}°</text>
+
+            <line x1="${pA.x}" y1="${pA.y}" x2="${pC.x}" y2="${pC.y}" stroke="var(--ankathete-color)" stroke-width="3.5" />
+            <line x1="${pC.x}" y1="${pC.y}" x2="${pB.x}" y2="${pB.y}" stroke="var(--gegenkathete-color)" stroke-width="3.5" />
+            <line x1="${pA.x}" y1="${pA.y}" x2="${pB.x}" y2="${pB.y}" stroke="var(--hypotenuse-color)" stroke-width="4" />
+
+            <text x="${(pA.x + pC.x)/2}" y="${pA.y + 18}" fill="var(--ankathete-color)" font-size="12" font-weight="bold" text-anchor="middle">Ankathete = ${ak.toFixed(1)}</text>
+            <text x="${pC.x + 10}" y="${(pC.y + pB.y)/2 + 4}" fill="var(--gegenkathete-color)" font-size="12" font-weight="bold" text-anchor="start">Gegenkathete = ${gk.toFixed(1)}</text>
+            <text x="${(pA.x + pB.x)/2 - 12}" y="${(pA.y + pB.y)/2 - 12}" fill="var(--hypotenuse-color)" font-size="12" font-weight="bold" text-anchor="end">Hypotenuse = ${hyp.toFixed(1)}</text>
+        `;
+
+        svg.innerHTML = svgContent;
+    }
+
+    function updateGagaTable(sinVal, cosVal, tanVal, cotVal) {
+        document.getElementById('gaga-sin-th').innerHTML = `Sinus (&theta;)<br><small>= ${sinVal.toFixed(3)}</small>`;
+        document.getElementById('gaga-cos-th').innerHTML = `Cosinus (&theta;)<br><small>= ${cosVal.toFixed(3)}</small>`;
+        document.getElementById('gaga-tan-th').innerHTML = `Tangens (&theta;)<br><small>= ${tanVal.toFixed(3)}</small>`;
+        document.getElementById('gaga-cot-th').innerHTML = `Cotangens (&theta;)<br><small>= ${cotVal.toFixed(3)}</small>`;
+        
+        ['gaga-g1', 'gaga-h1', 'gaga-a1', 'gaga-h2', 'gaga-g2', 'gaga-a3', 'gaga-a2', 'gaga-g3'].forEach(id => {
+            document.getElementById(id).className = 'highlight-gaga';
+        });
+    }
+
+    function resetForm() {
+        ['ak', 'gk', 'hyp', 'theta', 'beta'].forEach(id => {
+            const el = document.getElementById(id);
+            el.value = '';
+            el.classList.remove('calculated');
+        });
+        document.getElementById('trigSvg').innerHTML = '<text x="190" y="140" text-anchor="middle" fill="#94a3b8">Gib Werte ein und klicke auf Berechnen</text>';
+        
+        document.getElementById('gaga-sin-th').innerHTML = 'Sinus (sin)';
+        document.getElementById('gaga-cos-th').innerHTML = 'Cosinus (cos)';
+        document.getElementById('gaga-tan-th').innerHTML = 'Tangens (tan)';
+        document.getElementById('gaga-cot-th').innerHTML = 'Cotangens (cot)';
+        
+        ['gaga-g1', 'gaga-h1', 'gaga-a1', 'gaga-h2', 'gaga-g2', 'gaga-a3', 'gaga-a2', 'gaga-g3'].forEach(id => {
+            document.getElementById(id).className = '';
+        });
+    }
+</script>
+
+</body>
+</html>

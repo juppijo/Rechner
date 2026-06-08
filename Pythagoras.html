@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Die Satzgruppe des Pythagoras – Komplettübersicht</title>
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #212529;
+            --border-color: #dee2e6;
+            
+            /* Farben für die mathematischen Elemente */
+            --color-a: #e63946; /* Rot */
+            --color-b: #457b9d; /* Blau */
+            --color-c: #2a9d8f; /* Grün */
+            --color-h: #f4a261; /* Orange */
+            --color-p: #9b5de5; /* Lila */
+            --color-q: #00bbf9; /* Hellblau */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #1d3557;
+        }
+
+        .intro {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+            color: #6c757d;
+        }
+
+        /* Grafik-Bereich */
+        .visualization-box {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: #fafafa;
+            margin-bottom: 30px;
+        }
+
+        svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Formel-Bereich (2x2 Grid) */
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            background: var(--card-bg);
+            transition: transform 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content:开;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .formula {
+            font-size: 1.4em;
+            font-weight: bold;
+            text-align: center;
+            margin: 15px 0;
+            padding: 10px;
+            background: #f1f3f5;
+            border-radius: 6px;
+        }
+
+        .sub-formulas {
+            font-size: 0.95em;
+            background: #fdfdfd;
+            border: 1px dashed #dee2e6;
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        /* Farbige Akzente im Text */
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        .bg-a { background-color: var(--color-a); }
+        .bg-b { background-color: var(--color-b); }
+        .bg-c { background-color: var(--color-c); }
+        .bg-h { background-color: var(--color-h); }
+        .bg-p { background-color: var(--color-p); }
+        .bg-q { background-color: var(--color-q); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Die Satzgruppe des Pythagoras</h1>
+    <p class="intro">Alle fundamentalen Sätze am rechtwinkligen Dreieck in einer Übersicht.</p>
+
+    <div class="visualization-box">
+        <svg width="600" height="400" viewBox="0 0 600 400">
+            <defs>
+                <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#6c757d"/>
+                </marker>
+            </defs>
+
+            <path d="M 334 112 L 356 128 L 342 148" fill="none" stroke="#6c757d" stroke-width="1.5"/>
+            <circle cx="344" cy="129" r="3" fill="#6c757d" />
+
+            <path d="M 324 320 L 324 300 L 344 300" fill="none" stroke="#6c757d" stroke-width="1.5"/>
+            <circle cx="334" cy="310" r="3" fill="#6c757d" />
+
+            <line x1="344" y1="320" x2="524" y2="320" stroke="#9b5de5" stroke-width="4" />
+            <line x1="84" y1="320" x2="344" y2="320" stroke="#00bbf9" stroke-width="4" />
+            
+            <line x1="344" y1="128" x2="344" y2="320" stroke="#f4a261" stroke-width="4" stroke-dasharray="2" />
+            
+            <line x1="344" y1="128" x2="524" y2="320" stroke="#e63946" stroke-width="4" />
+            <line x1="84" y1="320" x2="344" y2="128" stroke="#457b9d" stroke-width="4" />
+
+            <line x1="84" y1="360" x2="524" y2="360" stroke="#2a9d8f" stroke-width="2" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+
+            <text x="65" y="330" font-size="18" font-weight="bold">A</text>
+            <text x="535" y="330" font-size="18" font-weight="bold">B</text>
+            <text x="339" y="115" font-size="18" font-weight="bold">C (90°)</text>
+
+            <text x="200" y="210" font-size="18" font-weight="bold" fill="#457b9d">b</text>
+            <text x="445" y="210" font-size="18" font-weight="bold" fill="#e63946">a</text>
+            <text x="315" y="230" font-size="18" font-weight="bold" fill="#f4a261">h</text>
+            <text x="200" y="310" font-size="18" font-weight="bold" fill="#00bbf9">q</text>
+            <text x="430" y="310" font-size="18" font-weight="bold" fill="#9b5de5">p</text>
+            <text x="300" y="385" font-size="18" font-weight="bold" fill="#2a9d8f">c</text>
+        </svg>
+    </div>
+
+    <div class="grid-container">
+        
+        <div class="card">
+            <h3 style="color: var(--color-c);">Satz des Pythagoras</h3>
+            <p>In jedem rechtwinkligen Dreieck ist die Summe der Quadrate über den Katheten <span class="badge bg-a">a</span> und <span class="badge bg-b">b</span> gleich dem Quadrat über der Hypotenuse <span class="badge bg-c">c</span>.</p>
+            <div class="formula" style="color: var(--color-c);">c² = a² + b²</div>
+            <div class="sub-formulas">
+                <strong>Nach Seiten aufgelöst:</strong><br>
+                • Hypotenuse: c = √(a² + b²)<br>
+                • Kathete a: a = √(c² - b²)
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 style="color: #1d3557;">Der Kehrsatz</h3>
+            <p>Gilt in einem Dreieck die Gleichung der Quadrate, so besitzt das Dreieck einen rechten Winkel gegenüber der längsten Seite.</p>
+            <div class="formula" style="color: #1d3557;">Gilt c² = a² + b² ?</div>
+            <div class="sub-formulas" style="background-color: #f8f9fa;">
+                <strong>Der Dreiecks-Test:</strong><br>
+                Alle 3 Seiten quadrieren und vergleichen. <br>
+                Stimmt die Gleichung? <br>
+                <strong>➔ Ja = Rechtwinklig! (γ = 90°)</strong>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 style="color: var(--color-h);">Der Höhensatz</h3>
+            <p>Das Quadrat über der Höhe <span class="badge bg-h">h</span> ist flächengleich mit dem Rechteck aus den beiden Hypotenusenabschnitten <span class="badge bg-q">q</span> und <span class="badge bg-p">p</span>.</p>
+            <div class="formula" style="color: #d77a2a;">h² = p · q</div>
+            <div class="sub-formulas">
+                <strong>Berechnung der Höhe:</strong><br>
+                • h = √(p · q)
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 style="color: #495057;">Die Kathetensätze</h3>
+            <p>Das Quadrat über einer Kathete ist flächengleich mit dem Rechteck aus der Hypotenuse <span class="badge bg-c">c</span> und dem anliegenden Abschnitt.</p>
+            <div class="formula" style="color: var(--color-a); font-size: 1.2em; margin: 5px 0;">a² = c · p</div>
+            <div class="formula" style="color: var(--color-b); font-size: 1.2em; margin: 5px 0;">b² = c · q</div>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LGS-Rechner & Geometrische Analyse</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-1: #e74c3c; /* Gerade 1 */
+            --accent-2: #3498db; /* Gerade 2 */
+            --bg-color: #9496f7;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            max-width: 750px;
+            width: 100%;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 24px;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        p.description {
+            color: #666;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .system-box {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .equation-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .equation-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .g1-label { color: var(--accent-1); }
+        .g2-label { color: var(--accent-2); }
+
+        input[type="number"] {
+            width: 70px;
+            padding: 8px;
+            border: 2px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 15px;
+            text-align: center;
+            transition: border-color 0.2s;
+        }
+
+        input[type="number"]:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+            transition: background 0.2s;
+        }
+
+        .btn-calc {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .btn-calc:hover { background-color: #1a252f; }
+
+        .btn-reset {
+            background-color: #e2e8f0;
+            color: #475569;
+        }
+        .btn-reset:hover { background-color: #cbd5e1; }
+
+        .result-card {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            border-left: 5px solid transparent;
+        }
+
+        .case-1 { background-color: #e8f8f5; border-color: var(--success-color); color: #117a65; }
+        .case-2 { background-color: #fdf2e9; border-color: var(--accent-1); color: #a04000; }
+        .case-3 { background-color: #fef9e7; border-color: var(--warning-color); color: #7d6608; }
+
+        .result-card h3 { margin: 0 0 5px 0; font-size: 16px; }
+        .result-card p { margin: 0; font-size: 18px; font-weight: bold; }
+
+        .visualization-box {
+            text-align: center;
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px dashed #cbd5e1;
+            margin-bottom: 25px;
+        }
+
+        svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Stile für die dynamischen Rechenwege */
+        .methods-section {
+            border-top: 2px solid #e2e8f0;
+            padding-top: 25px;
+            margin-top: 25px;
+            display: none; /* Wird erst bei Berechnung sichtbar */
+        }
+
+        .methods-title {
+            color: var(--primary-color);
+            font-size: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .grid-methods {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 650px) {
+            .grid-methods {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .method-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .method-card h4 {
+            margin: 0 0 10px 0;
+            color: var(--primary-color);
+            font-size: 16px;
+            border-bottom: 2px solid #cbd5e1;
+            padding-bottom: 5px;
+        }
+
+        .method-steps {
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 15px;
+            padding-left: 18px;
+        }
+
+        .method-steps li {
+            margin-bottom: 4px;
+        }
+
+        .math-box {
+            background: #fff;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 12px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            overflow-x: auto;
+        }
+
+        .math-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+            white-space: nowrap;
+        }
+
+        .math-line:last-child {
+            margin-bottom: 0;
+        }
+
+        .line-label {
+            font-weight: bold;
+            color: #64748b;
+            min-width: 55px;
+            flex-shrink: 0;
+        }
+
+        .line-content {
+            flex-grow: 1;
+        }
+
+        .math-hr {
+            border: none;
+            border-top: 1px solid #cbd5e1;
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Lineare Gleichungssysteme (LGS)</h1>
+    <p class="description">Form: ax + by = c. Das Skript berechnet den exakten Schnittpunkt und analysiert den geometrischen Fall.</p>
+
+    <div class="system-box">
+        <div class="equation-row">
+            <span class="g1-label">I.</span>
+            <input type="number" id="a1" value="1" step="any"> <span>x</span>
+            <span>+</span>
+            <input type="number" id="b1" value="1" step="any"> <span>y</span>
+            <span>=</span>
+            <input type="number" id="c1" value="5" step="any">
+        </div>
+        <div class="equation-row">
+            <span class="g2-label">II.</span>
+            <input type="number" id="a2" value="1" step="any"> <span>x</span>
+            <span>+</span>
+            <input type="number" id="b2" value="-1" step="any"> <span>y</span>
+            <span>=</span>
+            <input type="number" id="c2" value="1" step="any">
+        </div>
+    </div>
+
+    <div class="button-group">
+        <button class="btn-reset" onclick="resetForm()">Zurücksetzen</button>
+        <button class="btn-calc" onclick="solveLGS()">System auflösen</button>
+    </div>
+
+    <div id="resultBox" class="result-card">
+        <h3 id="resultTitle">Geometrischer Fall</h3>
+        <p id="resultText">Lösungsweg</p>
+    </div>
+
+    <div class="visualization-box">
+        <svg id="coordSvg" width="500" height="400" viewBox="0 0 500 400">
+            <line x1="20" y1="200" x2="480" y2="200" stroke="#94a3b8" stroke-width="1.5" /> <line x1="250" y1="20" x2="250" y2="380" stroke="#94a3b8" stroke-width="1.5" /> <text x="250" y="215" text-anchor="middle" fill="#94a3b8">Klicke auf Berechnen</text>
+        </svg>
+    </div>
+
+    <div id="methodsSection" class="methods-section">
+        <h3 class="methods-title">Berechneter mathematischer Lösungsweg</h3>
+        <div class="grid-methods">
+            
+            <div class="method-card">
+                <h4>Einsetzverfahren</h4>
+                <ul class="method-steps">
+                    <li>Gl. I nach einer Variable auflösen</li>
+                    <li>Ausdruck in Gl. II einsetzen</li>
+                    <li>Lösen &rarr; zweite Variable einsetzen &rarr; Probe!</li>
+                </ul>
+                <div id="substitutionMath" class="math-box">
+                    </div>
+            </div>
+
+            <div class="method-card">
+                <h4>Additionsverfahren</h4>
+                <ul class="method-steps">
+                    <li>Koeffizienten angleichen (multiplizieren)</li>
+                    <li>Gleichungen addieren/subtrahieren</li>
+                    <li>Rest ausrechnen &rarr; einsetzen &rarr; Probe!</li>
+                </ul>
+                <div id="additionMath" class="math-box">
+                    </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    // Hilfsfunktion zum sauberen Formatieren von Zahlen (max. 2 Nachkommastellen, entfernt .00)
+    function fmt(num) {
+        return Number(num.toFixed(2)).toString();
+    }
+
+    // Hilfsfunktion zur Darstellung von Vorzeichen in Gleichungen
+    function fmtSign(num, showFirst = false) {
+        if (num >= 0) return showFirst ? `${fmt(num)}` : `+ ${fmt(num)}`;
+        return showFirst ? `-${fmt(Math.abs(num))}` : `- ${fmt(Math.abs(num))}`;
+    }
+
+    function solveLGS() {
+        const a1 = parseFloat(document.getElementById('a1').value);
+        const b1 = parseFloat(document.getElementById('b1').value);
+        const c1 = parseFloat(document.getElementById('c1').value);
+
+        const a2 = parseFloat(document.getElementById('a2').value);
+        const b2 = parseFloat(document.getElementById('b2').value);
+        const c2 = parseFloat(document.getElementById('c2').value);
+
+        if (isNaN(a1) || isNaN(b1) || isNaN(c1) || isNaN(a2) || isNaN(b2) || isNaN(c2)) {
+            alert("Bitte alle Koeffizienten korrekt ausfüllen.");
+            return;
+        }
+
+        const resultBox = document.getElementById('resultBox');
+        const resultTitle = document.getElementById('resultTitle');
+        const resultText = document.getElementById('resultText');
+        const methodsSection = document.getElementById('methodsSection');
+
+        const D = a1 * b2 - b1 * a2;
+        const Dx = c1 * b2 - b1 * c2;
+        const Dy = a1 * c2 - c1 * a2;
+
+        let solutionCase = 0; 
+        let x = 0, y = 0;
+
+        resultBox.className = "result-card";
+
+        if (D !== 0) {
+            solutionCase = 1;
+            x = Dx / D;
+            y = Dy / D;
+            
+            resultBox.classList.add('case-1');
+            resultTitle.innerText = "1. Eindeutige Lösung (Geraden kreuzen sich)";
+            resultText.innerText = `Schnittpunkt S (${x.toFixed(2)} | ${y.toFixed(2)})`;
+            
+            // Berechne und zeige die Lösungswege live an
+            generateMathPaths(a1, b1, c1, a2, b2, c2, x, y);
+            methodsSection.style.display = "block";
+        } else {
+            if (Dx === 0 && Dy === 0) {
+                solutionCase = 3;
+                resultBox.classList.add('case-3');
+                resultTitle.innerText = "3. Unendlich viele Lösungen (Identische Geraden)";
+                resultText.innerText = "Die Geraden liegen deckungsgleich aufeinander.";
+            } else {
+                solutionCase = 2;
+                resultBox.classList.add('case-2');
+                resultTitle.innerText = "2. Unlösbar (Echte Parallele)";
+                resultText.innerText = "Die Geraden verlaufen absolut parallel zueinander.";
+            }
+            // Bei 0 oder unendlich vielen Lösungen machen die Standard-Verfahren keinen Einzelschnittpunkt-Sinn
+            document.getElementById('substitutionMath').innerHTML = '<i>Kein eindeutiger Schnittpunkt berechenbar.</i>';
+            document.getElementById('additionMath').innerHTML = '<i>Kein eindeutiger Schnittpunkt berechenbar.</i>';
+            methodsSection.style.display = "block";
+        }
+
+        resultBox.style.display = "block";
+        drawSystem(a1, b1, c1, a2, b2, c2, solutionCase, x, y);
+    }
+
+    function generateMathPaths(a1, b1, c1, a2, b2, c2, x, y) {
+        // --- 1. EINSETZVERFAHREN GENERIEREN (Wir lösen I nach y auf: y = (c1 - a1*x)/b1) ---
+        let subHtml = '';
+        subHtml += `<div class="math-line"><span class="line-label">I:</span><span class="line-content">${fmt(a1)}x ${fmtSign(b1)}y = ${fmt(c1)}</span></div>`;
+        subHtml += `<div class="math-line"><span class="line-label">II:</span><span class="line-content">${fmt(a2)}x ${fmtSign(b2)}y = ${fmt(c2)}</span></div>`;
+        subHtml += `<div class="math-hr"></div>`;
+        
+        if (b1 !== 0) {
+            // Normaler Weg über y-Auflösung
+            let substX = -a1 / b1;
+            let substC = c1 / b1;
+            subHtml += `<div class="math-line"><span class="line-label">I &rarr; y:</span><span class="line-content">y = ${fmt(substC)} ${fmtSign(substX)}x</span></div>`;
+            subHtml += `<div class="math-line"><span class="line-label">in II:</span><span class="line-content">${fmt(a2)}x ${fmtSign(b2)}(${fmt(substC)} ${fmtSign(substX)}x) = ${fmt(c2)}</span></div>`;
+            let combinedX = a2 + (b2 * substX);
+            let combinedC = b2 * substC;
+            subHtml += `<div class="math-line"><span class="line-label">&rArr;</span><span class="line-content">${fmt(combinedX)}x ${fmtSign(combinedC)} = ${fmt(c2)} | ${fmtSign(-combinedC)}</span></div>`;
+            subHtml += `<div class="math-line"><span class="line-label"></span><span class="line-content">${fmt(combinedX)}x = ${fmt(c2 - combinedC)} | : (${fmt(combinedX)})</span></div>`;
+            subHtml += `<div class="math-line"><span class="line-label">&rArr;</span><span class="line-content"><b>x = ${fmt(x)}</b></span></div>`;
+            subHtml += `<div class="math-line"><span class="line-label">in I:</span><span class="line-content">y = ${fmt(substC)} ${fmtSign(substX)}*(${fmt(x)}) &rarr; <b>y = ${fmt(y)}</b></span></div>`;
+        } else {
+            // Sonderfall b1 == 0 -> I liefert direkt x
+            let directX = c1 / a1;
+            subHtml += `<div class="math-line"><span class="line-label">I &rarr; x:</span><span class="line-content">x = ${fmt(directX)}</span></div>`;
+            subHtml += `<div class="math-line"><span class="line-label">in II:</span><span class="line-content">${fmt(a2)}*(${fmt(directX)}) ${fmtSign(b2)}y = ${fmt(c2)}</span></div>`;
+            subHtml += `<div class="math-line"><span class="line-label"></span><span class="line-content">${fmt(a2*directX)} ${fmtSign(b2)}y = ${fmt(c2)} | ${fmtSign(-a2*directX)}</span></div>`;
+            subHtml += `<div class="math-line"><span class="line-label"></span><span class="line-content">${fmt(b2)}y = ${fmt(c2 - a2*directX)} | : (${fmt(b2)})</span></div>`;
+            subHtml += `<div class="math-line"><span class="line-label">&rArr;</span><span class="line-content"><b>x = ${fmt(x)} | y = ${fmt(y)}</b></span></div>`;
+        }
+        document.getElementById('substitutionMath').innerHTML = subHtml;
+
+        // --- 2. ADDITIONSVERFAHREN GENERIEREN (Wir gleichen x-Koeffizienten an durch Kreuzmultiplikation) ---
+        let addHtml = '';
+        // Multipliziere I mit a2 und II mit a1 um x zu eliminieren (bzw. Subtraktion)
+        let m1 = a2;
+        let m2 = a1;
+        
+        addHtml += `<div class="math-line"><span class="line-label">I:</span><span class="line-content">${fmt(a1)}x ${fmtSign(b1)}y = ${fmt(c1)}  [&middot; ${fmt(m1)}]</span></div>`;
+        addHtml += `<div class="math-line"><span class="line-label">II:</span><span class="line-content">${fmt(a2)}x ${fmtSign(b2)}y = ${fmt(c2)}  [&middot; ${fmt(m2)}]</span></div>`;
+        addHtml += `<div class="math-hr"></div>`;
+        
+        let newA1 = a1 * m1; let newB1 = b1 * m1; let newC1 = c1 * m1;
+        let newA2 = a2 * m2; let newB2 = b2 * m2; let newC2 = c2 * m2;
+        
+        addHtml += `<div class="math-line"><span class="line-label">I':</span><span class="line-content">${fmt(newA1)}x ${fmtSign(newB1)}y = ${fmt(newC1)}</span></div>`;
+        addHtml += `<div class="math-line"><span class="line-label">II':</span><span class="line-content">${fmt(newA2)}x ${fmtSign(newB2)}y = ${fmt(newC2)}</span></div>`;
+        addHtml += `<div class="math-hr"></div>`;
+        
+        // Subtraktion I' - II' eliminiert x
+        let finalB = newB1 - newB2;
+        let finalC = newC1 - newC2;
+        
+        addHtml += `<div class="math-line"><span class="line-label">I' - II':</span><span class="line-content">${fmt(finalB)}y = ${fmt(finalC)} | : (${fmt(finalB)})</span></div>`;
+        addHtml += `<div class="math-line"><span class="line-label">&rArr;</span><span class="line-content"><b>y = ${fmt(y)}</b></span></div>`;
+        
+        if (a1 !== 0) {
+            addHtml += `<div class="math-line"><span class="line-label">in I:</span><span class="line-content">${fmt(a1)}x ${fmtSign(b1)}*(${fmt(y)}) = ${fmt(c1)}</span></div>`;
+            addHtml += `<div class="math-line"><span class="line-label"></span><span class="line-content">${fmt(a1)}x ${fmtSign(b1*y)} = ${fmt(c1)} | ${fmtSign(-b1*y)}</span></div>`;
+            addHtml += `<div class="math-line"><span class="line-label">&rArr;</span><span class="line-content"><b>x = ${fmt(x)}</b></span></div>`;
+        } else {
+            addHtml += `<div class="math-line"><span class="line-label">in II:</span><span class="line-content">${fmt(a2)}x ${fmtSign(b2)}*(${fmt(y)}) = ${fmt(c2)} &rarr; <b>x = ${fmt(x)}</b></span></div>`;
+        }
+        document.getElementById('additionMath').innerHTML = addHtml;
+    }
+
+    function drawSystem(a1, b1, c1, a2, b2, c2, solutionCase, solX, solY) {
+        const svg = document.getElementById('coordSvg');
+        svg.innerHTML = ''; 
+
+        const width = 500;
+        const height = 400;
+        const centerX = width / 2; 
+        const centerY = height / 2; 
+        const scale = 25; 
+
+        let grid = '';
+        for (let i = -10; i <= 10; i++) {
+            let xPos = centerX + i * scale;
+            let yPos = centerY + i * scale;
+            grid += `<line x1="${xPos}" y1="0" x2="${xPos}" y2="${height}" stroke="#f1f5f9" stroke-width="1" />`;
+            grid += `<line x1="0" y1="${yPos}" x2="${width}" y2="${yPos}" stroke="#f1f5f9" stroke-width="1" />`;
+        }
+
+        grid += `<line x1="10" y1="${centerY}" x2="${width - 10}" y2="${centerY}" stroke="#94a3b8" stroke-width="1.5" />`;
+        grid += `<line x1="${centerX}" y1="10" x2="${centerX}" y2="${height - 10}" stroke="#94a3b8" stroke-width="1.5" />`;
+        
+        grid += `<polygon points="${width-10},${centerY-4} ${width},${centerY} ${width-10},${centerY+4}" fill="#94a3b8" />`;
+        grid += `<polygon points="${centerX-4},10 ${centerX},0 ${centerX+4},10" fill="#94a3b8" />`;
+        grid += `<text x="${width-15}" y="${centerY+15}" fill="#64748b" font-size="12">x</text>`;
+        grid += `<text x="${centerX-15}" y="15" fill="#64748b" font-size="12">y</text>`;
+
+        function getLinePoints(a, b, c) {
+            if (b !== 0) {
+                let x1 = -15, x2 = 15;
+                let y1 = (c - a * x1) / b;
+                let y2 = (c - a * x2) / b;
+                return {
+                    x1: centerX + x1 * scale, y1: centerY - y1 * scale,
+                    x2: centerX + x2 * scale, y2: centerY - y2 * scale
+                };
+            } else if (a !== 0) {
+                let xVal = c / a;
+                return {
+                    x1: centerX + xVal * scale, y1: 0,
+                    x2: centerX + xVal * scale, y2: height
+                };
+            }
+            return null;
+        }
+
+        let p1 = getLinePoints(a1, b1, c1);
+        let p2 = getLinePoints(a2, b2, c2);
+
+        let lines = '';
+        if (p1) {
+            lines += `<line x1="${p1.x1}" y1="${p1.y1}" x2="${p1.x2}" y2="${p1.y2}" stroke="var(--accent-1)" stroke-width="2.5" />`;
+        }
+        if (p2) {
+            let strokeStyle = (solutionCase === 3) ? 'stroke-dasharray="5,5"' : '';
+            lines += `<line x1="${p2.x1}" y1="${p2.y1}" x2="${p2.x2}" y2="${p2.y2}" stroke="var(--accent-2)" stroke-width="2.5" ${strokeStyle} />`;
+        }
+
+        let dot = '';
+        if (solutionCase === 1) {
+            let pX = centerX + solX * scale;
+            let pY = centerY - solY * scale;
+            if (pX >= 0 && pX <= width && pY >= 0 && pY <= height) {
+                dot += `<circle cx="${pX}" cy="${pY}" r="6" fill="var(--success-color)" stroke="white" stroke-width="2" />`;
+                dot += `<text x="${pX + 10}" y="${pY - 10}" fill="var(--success-color)" font-size="12" font-weight="bold">S (${solX.toFixed(1)}|${solY.toFixed(1)})</text>`;
+            }
+        }
+
+        svg.innerHTML = grid + lines + dot;
+    }
+
+    function resetForm() {
+        document.getElementById('a1').value = 1; document.getElementById('b1').value = 1; document.getElementById('c1').value = 5;
+        document.getElementById('a2').value = 1; document.getElementById('b2').value = -1; document.getElementById('c2').value = 1;
+        document.getElementById('resultBox').style.display = "none";
+        document.getElementById('methodsSection').style.display = "none";
+        document.getElementById('coordSvg').innerHTML = `
+            <line x1="20" y1="200" x2="480" y2="200" stroke="#94a3b8" stroke-width="1.5" />
+            <line x1="250" y1="20" x2="250" y2="380" stroke="#94a3b8" stroke-width="1.5" />
+            <text x="300" y="215" text-anchor="middle" fill="#94a3b8">Klicke auf Berechnen</text>
+        `;
+    }
+</script>
+
+</body>
+</html>

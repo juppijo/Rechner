@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel-Merger (Gleiche Struktur)</title>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --primary-color: #008080; /* Ein schönes Teal/Türkis */
+            --primary-hover: #006666;
+            --text-color: #333333;
+            --border-color: #cccccc;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-top: 0;
+            color: var(--primary-color);
+            text-align: center;
+        }
+
+        p.description {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        /* Dropzone Styling */
+        #drop-zone {
+            border: 2px dashed var(--primary-color);
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            background-color: rgba(0, 128, 128, 0.02);
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        #drop-zone.hover {
+            background-color: rgba(0, 128, 128, 0.1);
+            border-color: var(--primary-hover);
+        }
+
+        #drop-zone p {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        #drop-zone span {
+            font-size: 13px;
+            color: #888;
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        /* Dateiliste */
+        #file-list {
+            margin: 20px 0;
+            max-height: 150px;
+            overflow-y: auto;
+            padding: 0;
+            list-style: none;
+        }
+
+        #file-list li {
+            background: #f9f9f9;
+            padding: 8px 12px;
+            margin-bottom: 6px;
+            border-radius: 4px;
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            border-left: 3px solid var(--primary-color);
+        }
+
+        /* Button */
+        #merge-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        #merge-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        #merge-btn:disabled {
+            background-color: var(--border-color);
+            cursor: not-allowed;
+        }
+
+        /* Status & Logs */
+        #status {
+            margin-top: 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .success { color: #2e7d32; }
+        .error { color: #c62828; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Excel-Dateien zusammenführen</h1>
+    <p class="description">Wähle mehrere .xlsx-Dateien mit identischer Struktur aus. Die erste Datei liefert die Kopfzeile, alle weiteren werden unten angehängt.</p>
+
+    <div id="drop-zone">
+        <p>Dateien hierher ziehen oder anklicken</p>
+        <span>Unterstützt mehrere .xlsx Dateien</span>
+        <input type="file" id="file-input" multiple accept=".xlsx">
+    </div>
+
+    <ul id="file-list"></ul>
+
+    <button id="merge-btn" disabled>Dateien zusammenführen</button>
+
+    <div id="status"></div>
+</div>
+
+<script>
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const fileList = document.getElementById('file-list');
+    const mergeBtn = document.getElementById('merge-btn');
+    const statusDiv = document.getElementById('status');
+
+    let selectedFiles = [];
+
+    // Klick auf Dropzone triggert das File-Input
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    // Drag & Drop Events
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('hover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('hover');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('hover');
+        handleFiles(e.dataTransfer.files);
+    });
+
+    fileInput.addEventListener('change', (e) => {
+        handleFiles(e.target.files);
+    });
+
+    function handleFiles(files) {
+        // Nur .xlsx annehmen
+        const xlsxFiles = Array.from(files).filter(file => file.name.endsWith('.xlsx'));
+        
+        if (xlsxFiles.length === 0) return;
+
+        selectedFiles = [...selectedFiles, ...xlsxFiles];
+        updateUI();
+    }
+
+    function updateUI() {
+        fileList.innerHTML = '';
+        selectedFiles.forEach((file, index) => {
+            const li = document.createElement('li');
+            li.innerHTML = `<span>${file.name}</span> <span>(${(file.size / 1024).toFixed(1)} KB)</span>`;
+            fileList.appendChild(li);
+        });
+
+        mergeBtn.disabled = selectedFiles.length < 2;
+        statusDiv.className = '';
+        statusDiv.innerText = '';
+    }
+
+    mergeBtn.addEventListener('click', async () => {
+        if (selectedFiles.length < 2) return;
+
+        mergeBtn.disabled = true;
+        statusDiv.className = '';
+        statusDiv.innerText = 'Verarbeite Dateien...';
+
+        try {
+            let combinedData = [];
+            let isFirstFile = true;
+
+            for (const file of selectedFiles) {
+                const data = await readFileAsArrayBuffer(file);
+                const workbook = XLSX.read(data, { type: 'array' });
+                
+                // Wir nehmen das erste Tabellenblatt der Datei
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+
+                // raw: false sorgt dafür, dass Formatierungen (wie Daten/Zahlen) lesbar konvertiert werden
+                // header: 1 liefert ein Array von Arrays (Zeilen)
+                const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false });
+
+                if (rows.length === 0) continue;
+
+                if (isFirstFile) {
+                    // Die erste Datei liefert alles inklusive Kopfzeile
+                    combinedData = [...rows];
+                    isFirstFile = false;
+                } else {
+                    // Bei Folgedateien schneiden wir die erste Zeile (Kopfzeile) ab
+                    combinedData = [...combinedData, ...rows.slice(1)];
+                }
+            }
+
+            // Neues Workbook erstellen
+            const newWorkbook = XLSX.utils.book_new();
+            const newWorksheet = XLSX.utils.aoa_to_sheet(combinedData);
+            XLSX.utils.book_append_sheet(newWorkbook, newWorksheet, "Zusammengeführt");
+
+            // Datei generieren und automatischen Download starten
+            XLSX.writeFile(newWorkbook, "Zusammengefuehrt.xlsx");
+
+            statusDiv.className = 'success';
+            statusDiv.innerText = 'Erfolgreich! Die Datei "Zusammengefuehrt.xlsx" wurde heruntergeladen.';
+            
+            // Zurücksetzen
+            selectedFiles = [];
+            updateUI();
+
+        } catch (error) {
+            console.error(error);
+            statusDiv.className = 'error';
+            statusDiv.innerText = 'Fehler beim Zusammenführen der Dateien.';
+            mergeBtn.disabled = false;
+        }
+    });
+
+    // Hilfsfunktion um File-API mit Promises zu nutzen
+    function readFileAsArrayBuffer(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target.result);
+            reader.onerror = (e) => reject(e);
+            reader.readAsArrayBuffer(file);
+        });
+    }
+</script>
+
+</body>
+</html>

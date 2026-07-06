@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="de" data-theme="dark-gold">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ORES Verbrauchsstatistik</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app" id="appRoot">
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">⚡</div>
+      <div>
+        <h1>ORES<span>Verbrauch</span></h1>
+        <span class="subtitle">Strom&shy;statistik</span>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <span class="file-name-tag" id="fileNameTag"></span>
+      <button class="icon-btn square hidden" id="resetFilesBtn" title="Geladene Dateien entfernen">🗑</button>
+      <label class="file-btn" for="fileInput" title="ORES-Rapport laden (mehrere Monate gleichzeitig möglich)"><span>📁</span><span class="label">Datei laden</span></label>
+      <input type="file" id="fileInput" accept=".xlsx,.xls" multiple hidden>
+      <button class="icon-btn square" id="themeBtn" title="Design wechseln">🎨</button>
+      <button class="icon-btn square" id="fullscreenBtn" title="Vollbild">⛶</button>
+    </div>
+  </header>
+
+  <div id="dropZone" class="drop-zone">
+    <div class="dz-icon">⚡</div>
+    <h2>ORES-Rapport laden</h2>
+    <p>Ziehe eine oder mehrere monatliche ORES-Verbrauchsdateien (.xlsx) hierher, oder wähle sie manuell aus.<br>
+       Mehrere Monate werden automatisch zu einem durchgehenden Zeitraum zusammengeführt.</p>
+    <label class="file-btn" for="fileInput"><span>📁</span><span class="label">Dateien auswählen</span></label>
+    <div class="dz-hint">Erwartet werden die Spalten: Adresse, EAN, Jour, Consommation, Valeur, Unité — weitere Dateien können jederzeit über "Datei laden" oben nachgeladen werden.</div>
+    <div class="dz-error" id="dzError"></div>
+  </div>
+
+  <main id="appMain" class="hidden">
+
+    <section class="kpis" id="kpiRow"></section>
+
+    <section class="filter-bar" id="filterBar">
+      <div class="filter-group">
+        <span class="filter-label">Bezug:</span>
+        <button class="filter-chip" data-group="in" data-value="total">Gesamt</button>
+        <button class="filter-chip" data-group="in" data-value="peak">Spitzenzeit</button>
+        <button class="filter-chip" data-group="in" data-value="off">Nebenzeit</button>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Einspeisung:</span>
+        <button class="filter-chip" data-group="out" data-value="total">Gesamt</button>
+        <button class="filter-chip" data-group="out" data-value="peak">Spitzenzeit</button>
+        <button class="filter-chip" data-group="out" data-value="off">Nebenzeit</button>
+      </div>
+      <button class="filter-reset" id="filterReset">Zurücksetzen</button>
+    </section>
+
+    <nav class="tabs" id="tabs">
+      <button class="tab active" data-view="dashboard">Übersicht</button>
+      <button class="tab" data-view="day">Tag</button>
+      <button class="tab" data-view="week">Woche</button>
+      <button class="tab" data-view="month">Monat</button>
+      <button class="tab" data-view="year">Jahr</button>
+      <button class="tab" data-view="table">Tabelle</button>
+    </nav>
+
+    <!-- Dashboard -->
+    <section id="view-dashboard" class="view active">
+      <div class="panel">
+        <h3 class="panel-title">Verlauf — Bezug &amp; Einspeisung</h3>
+        <p class="panel-desc">Tagessummen über den gesamten geladenen Zeitraum</p>
+        <div class="chart-box"><canvas id="chartOverview"></canvas></div>
+      </div>
+      <div class="chart-grid">
+        <div class="panel">
+          <h3 class="panel-title">Spitzen- vs. Nebenzeit</h3>
+          <p class="panel-desc">Anteil am Netzbezug, gesamter Zeitraum</p>
+          <div class="chart-box small"><canvas id="chartPeakDash"></canvas></div>
+        </div>
+        <div class="panel">
+          <h3 class="panel-title">Kennzahlen</h3>
+          <div class="stat-strip" id="dashStats"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Day -->
+    <section id="view-day" class="view">
+      <div class="panel">
+        <div class="period-nav">
+          <button class="nav-btn" id="dayPrev">‹</button>
+          <input type="date" id="dayPicker">
+          <button class="nav-btn" id="dayNext">›</button>
+          <span class="period-label" id="dayLabel"></span>
+        </div>
+        <h3 class="panel-title">Tagesprofil</h3>
+        <div class="gran-toggle" id="dayGranToggle">
+          <button class="gran-btn active" data-gran="quarter">15 Minuten</button>
+          <button class="gran-btn" data-gran="hour">Stunde</button>
+        </div>
+        <div class="chart-box"><canvas id="chartDay"></canvas></div>
+        <div class="legend-row" id="dayLegend">
+          <span><span class="legend-dot" style="background:var(--accent)"></span><span id="dayLegendIn">Bezug</span></span>
+          <span><span class="legend-dot" style="background:var(--up)"></span><span id="dayLegendOut">Einspeisung</span></span>
+        </div>
+        <p class="filter-note hidden" id="dayFilterNote">Hinweis: Das Profil liegt nur als Gesamtwert vor (keine Spitzen-/Nebenzeit-Aufteilung je Intervall) und zeigt daher immer den vollen Tageswert.</p>
+        <div class="stat-strip" id="dayStats"></div>
+      </div>
+      <div class="panel">
+        <h3 class="panel-title">Spitzen- vs. Nebenzeit — Tag</h3>
+        <div class="chart-box small"><canvas id="chartDayPeak"></canvas></div>
+      </div>
+    </section>
+
+    <!-- Week -->
+    <section id="view-week" class="view">
+      <div class="panel">
+        <div class="period-nav">
+          <button class="nav-btn" id="weekPrev">‹</button>
+          <select id="weekPicker"></select>
+          <button class="nav-btn" id="weekNext">›</button>
+          <span class="period-label" id="weekLabel"></span>
+        </div>
+        <h3 class="panel-title">Verlauf der Tage in der Woche</h3>
+        <p class="panel-desc">Klick auf einen Punkt öffnet den Tag</p>
+        <div class="chart-box"><canvas id="chartWeek"></canvas></div>
+        <div class="stat-strip" id="weekStats"></div>
+      </div>
+      <div class="panel">
+        <h3 class="panel-title">Spitzen- vs. Nebenzeit — Woche</h3>
+        <div class="chart-box small"><canvas id="chartWeekPeak"></canvas></div>
+      </div>
+    </section>
+
+    <!-- Month -->
+    <section id="view-month" class="view">
+      <div class="panel">
+        <div class="period-nav">
+          <button class="nav-btn" id="monthPrev">‹</button>
+          <select id="monthPicker"></select>
+          <button class="nav-btn" id="monthNext">›</button>
+          <span class="period-label" id="monthLabel"></span>
+        </div>
+        <h3 class="panel-title">Verlauf im Monat</h3>
+        <div class="gran-toggle" id="monthGranToggle">
+          <button class="gran-btn active" data-gran="day">Tage</button>
+          <button class="gran-btn" data-gran="week">Wochen</button>
+        </div>
+        <p class="panel-desc" id="monthClickHint">Klick auf einen Punkt öffnet den Tag</p>
+        <div class="chart-box"><canvas id="chartMonth"></canvas></div>
+        <div class="stat-strip" id="monthStats"></div>
+      </div>
+      <div class="panel">
+        <h3 class="panel-title">Spitzen- vs. Nebenzeit — Monat</h3>
+        <div class="chart-box small"><canvas id="chartMonthPeak"></canvas></div>
+      </div>
+    </section>
+
+    <!-- Year -->
+    <section id="view-year" class="view">
+      <div class="panel">
+        <div class="period-nav">
+          <button class="nav-btn" id="yearPrev">‹</button>
+          <select id="yearPicker"></select>
+          <button class="nav-btn" id="yearNext">›</button>
+          <span class="period-label" id="yearLabel"></span>
+        </div>
+        <h3 class="panel-title">Verlauf im Jahr</h3>
+        <p class="panel-desc">Monatssummen · Klick auf einen Punkt öffnet den Monat</p>
+        <div class="chart-box"><canvas id="chartYear"></canvas></div>
+        <div class="stat-strip" id="yearStats"></div>
+      </div>
+      <div class="panel">
+        <h3 class="panel-title">Spitzen- vs. Nebenzeit — Jahr</h3>
+        <div class="chart-box small"><canvas id="chartYearPeak"></canvas></div>
+      </div>
+    </section>
+
+    <!-- Table -->
+    <section id="view-table" class="view">
+      <div class="panel">
+        <div class="table-toolbar">
+          <select id="tableGranularity">
+            <option value="day">Tage</option>
+            <option value="week">Wochen</option>
+            <option value="month">Monate</option>
+            <option value="year">Jahre</option>
+          </select>
+          <button class="icon-btn" id="exportCsvBtn"><span>⬇</span><span class="label">CSV exportieren</span></button>
+        </div>
+        <div class="table-wrap">
+          <table id="dataTable">
+            <thead><tr id="tableHead"></tr></thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>ORES Verbrauchsstatistik · lokale Auswertung, keine Datenübertragung an einen Server</footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

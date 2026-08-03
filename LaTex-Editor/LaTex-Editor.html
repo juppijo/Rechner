@@ -6,7 +6,6 @@
     <title>WRZT - Ultimate Manifest Editor</title>
     <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400&family=Playfair+Display:wght@700&family=Roboto:wght@300;400;700&family=Fira+Code&display=swap" rel="stylesheet">
     
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <style>
@@ -65,6 +64,7 @@
             font-size: 14px; border: 1px solid var(--border-color);
             border-radius: 8px; background: var(--panel-bg);
             color: var(--text-color); resize: none; outline: none;
+            box-sizing: border-box;
         }
 
         .preview-side { flex: 1; padding: 20px; overflow-y: auto; background: #4b5563; }
@@ -77,7 +77,12 @@
             padding: 25mm; box-sizing: border-box;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
             transition: all 0.2s;
+            line-height: 1.6;
         }
+
+        .preview-page h1 { font-size: 2em; margin-top: 0; }
+        .preview-page h2 { font-size: 1.5em; }
+        .preview-page h3 { font-size: 1.2em; }
 
         .fullscreen .editor-side { display: none; }
         .fullscreen .preview-side { flex: 100%; }
@@ -161,6 +166,28 @@ Jede Seite wird individuell gerendert.
     const input = document.getElementById('latexInput');
     const container = document.getElementById('output-container');
 
+    function parseMarkdown(text) {
+        let lines = text.trim().split('\n');
+        let html = '';
+        
+        lines.forEach(line => {
+            let trimmed = line.trim();
+            if (trimmed.startsWith('# ')) {
+                html += `<h1>${trimmed.substring(2)}</h1>`;
+            } else if (trimmed.startsWith('## ')) {
+                html += `<h2>${trimmed.substring(3)}</h2>`;
+            } else if (trimmed.startsWith('### ')) {
+                html += `<h3>${trimmed.substring(4)}</h3>`;
+            } else if (trimmed === '') {
+                html += '<br>';
+            } else {
+                html += `${line}<br>`;
+            }
+        });
+        
+        return html;
+    }
+
     function renderMath() {
         const pages = input.value.split('[PAGE]');
         container.innerHTML = ''; 
@@ -168,14 +195,14 @@ Jede Seite wird individuell gerendert.
         pages.forEach(content => {
             const pageDiv = document.createElement('div');
             pageDiv.className = 'preview-page';
-            pageDiv.innerHTML = content.trim().split('\n').join('<br>');
+            pageDiv.innerHTML = parseMarkdown(content);
             container.appendChild(pageDiv);
         });
 
-        updateStyle(); // Wende aktuelle Stile an
+        updateStyle();
 
         if (window.MathJax) {
-            MathJax.typesetPromise([container]);
+            MathJax.typesetPromise([container]).catch(err => console.log(err));
         }
     }
 
@@ -199,11 +226,10 @@ Jede Seite wird individuell gerendert.
 
         const template = `
 <!DOCTYPE html>
-<html>
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400&family=Playfair+Display:wght@700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"><\/script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"><\/script>
     <style>
         body { background: #f0f2f5; margin: 0; padding: 20px; }
@@ -212,7 +238,11 @@ Jede Seite wird individuell gerendert.
             margin: 0 auto 20px auto; padding: 25mm; box-sizing: border-box;
             box-shadow: 0 0 10px rgba(0,0,0,0.1); page-break-after: always;
             font-family: ${font}; font-size: ${size}; color: ${color};
+            line-height: 1.6;
         }
+        .preview-page h1 { font-size: 2em; margin-top: 0; }
+        .preview-page h2 { font-size: 1.5em; }
+        .preview-page h3 { font-size: 1.2em; }
         @media print { .preview-page { box-shadow: none; margin: 0; width: 100%; } }
     </style>
 </head>

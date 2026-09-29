@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interaktive Mathe-App: Bewegungsproblem</title>
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [
+          ['$', '$'],
+          ['\\(', '\\)']
+        ],
+        displayMath: [
+          ['$$', '$$'],
+          ['\\[', '\\]']
+        ]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN for Weg-Zeit-Diagramm -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        background: linear-gradient(135deg, #f0f4f9 0%, #e2e8f0 100%);
+    }
+    .glass-card {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+    }
+    .custom-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: #3b82f6;
+        cursor: pointer;
+        box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        border: 3px solid white;
+    }
+    .custom-slider::-moz-range-thumb {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: #3b82f6;
+        cursor: pointer;
+        box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        border: 3px solid white;
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-800 p-3 md:p-6 pb-12">
+
+  <div class="max-w-6xl mx-auto space-y-6">
+    <!-- Header -->
+    <header class="glass-card rounded-2xl p-6 shadow-xl text-center md:text-left flex flex-col md:flex-row items-center justify-between gap-4 border-l-8 border-blue-600">
+      <div>
+        <div class="flex items-center justify-center md:justify-start gap-2 text-blue-600 font-bold text-sm tracking-wider uppercase mb-1">
+          <i class="fa-solid fa-graduation-cap"></i> Mathematik • Lineare Funktionen & Bewegung
+        </div>
+        <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900">Treffpunkt-Aufgabe: Fritz & Max</h1>
+      </div>
+      <div class="flex gap-2">
+        <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold flex items-center gap-1">
+          <i class="fa-solid fa-person-walking"></i> Fritz: 0,5 km/h
+        </span>
+        <span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs font-semibold flex items-center gap-1">
+          <i class="fa-solid fa-person-biking"></i> Max: 2 km/h
+        </span>
+      </div>
+    </header>
+
+    <!-- Task Description Box -->
+    <section class="glass-card rounded-2xl p-6 shadow-lg border border-slate-200">
+      <h2 class="text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
+        <i class="fa-solid fa-book-open text-blue-600"></i> Aufgabenstellung
+      </h2>
+      <p class="text-slate-700 leading-relaxed text-base md:text-lg bg-white/70 p-4 rounded-xl border border-slate-100 shadow-sm">
+        <strong>Fritz</strong> fährt um <strong>7:00 Uhr</strong> mit <strong>0,5 km/h</strong> von Aachen los.<br>
+        <strong>Max</strong> fährt ihm auf der gleichen Strecke zur gleichen Zeit mit <strong>2 km/h</strong> vom <strong>10 km</strong> entfernten Rastplatz entgegen.
+      </p>
+    </section>
+
+    <!-- Interactive Simulation & Chart Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Visual Track & Simulation Controls (5 cols) -->
+      <div class="lg:col-span-5 glass-card rounded-2xl p-6 shadow-lg flex flex-col justify-between space-y-6">
+        <div>
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <i class="fa-solid fa-play text-blue-600"></i> Bewegungssimulation
+            </h3>
+            <span id="timeDisplay" class="text-lg font-extrabold bg-blue-600 text-white px-3 py-1 rounded-lg shadow-md">
+              07:00 Uhr (t = 0 h)
+            </span>
+          </div>
+
+          <!-- Animation Road Display -->
+          <div class="relative bg-slate-900 rounded-xl p-4 my-6 shadow-inner overflow-hidden border border-slate-700">
+            <!-- Road track -->
+            <div class="h-16 relative flex items-center justify-between border-b-2 border-dashed border-slate-600 pb-2">
+              <!-- Aachen Marker -->
+              <div class="absolute left-0 bottom-0 text-center z-10">
+                <div class="text-xs font-bold text-blue-400 bg-slate-800/80 px-1 rounded">Aachen (0 km)</div>
+                <i class="fa-solid fa-city text-slate-400 text-lg"></i>
+              </div>
+
+              <!-- Rastplatz Marker -->
+              <div class="absolute right-0 bottom-0 text-center z-10">
+                <div class="text-xs font-bold text-indigo-400 bg-slate-800/80 px-1 rounded">Rastplatz (10 km)</div>
+                <i class="fa-solid fa-square-parking text-slate-400 text-lg"></i>
+              </div>
+
+              <!-- Fritz Sprite -->
+              <div id="fritzSprite" class="absolute transition-all duration-75 flex flex-col items-center transform -translate-x-1/2" style="left: 0%;">
+                <span class="text-[10px] font-bold text-white bg-blue-600 px-1.5 py-0.5 rounded shadow">Fritz</span>
+                <i class="fa-solid fa-person-walking text-blue-400 text-2xl"></i>
+              </div>
+
+              <!-- Max Sprite -->
+              <div id="maxSprite" class="absolute transition-all duration-75 flex flex-col items-center transform -translate-x-1/2" style="left: 100%;">
+                <span class="text-[10px] font-bold text-white bg-indigo-600 px-1.5 py-0.5 rounded shadow">Max</span>
+                <i class="fa-solid fa-person-biking text-indigo-400 text-2xl"></i>
+              </div>
+            </div>
+
+            <!-- Info Strip -->
+            <div class="grid grid-cols-2 gap-2 mt-4 text-xs font-medium">
+              <div class="bg-slate-800/80 p-2 rounded text-blue-300 border border-blue-900/50">
+                Fritz Strecke: <span id="fritzDist" class="font-bold text-white">0.0 km</span>
+              </div>
+              <div class="bg-slate-800/80 p-2 rounded text-indigo-300 border border-indigo-900/50 text-right">
+                Max Strecke: <span id="maxDist" class="font-bold text-white">0.0 km</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Slider Controls -->
+          <div class="space-y-3">
+            <label for="timeSlider" class="text-sm font-semibold text-slate-700 flex justify-between">
+              <span>Verstrichene Zeit (Stunden t):</span>
+              <span id="sliderHoursText" class="text-blue-600 font-bold">0 Std.</span>
+            </label>
+            <input type="range" id="timeSlider" min="0" max="20" step="0.25" value="0" class="w-full h-2 bg-slate-200 rounded-lg appearance-none custom-slider cursor-pointer">
+            <div class="flex justify-between text-xs text-slate-500 font-medium px-1">
+              <span>07:00 (t=0)</span>
+              <span class="text-emerald-600 font-bold">11:00 (Treffpunkt)</span>
+              <span>03:00 (t=20)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Play/Pause Buttons -->
+        <div class="flex gap-2">
+          <button id="btnPlay" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-play"></i> Animation Starten
+          </button>
+          <button id="btnReset" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2.5 px-4 rounded-xl transition flex items-center justify-center">
+            <i class="fa-solid fa-rotate-left"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Chart Container (7 cols) -->
+      <div class="lg:col-span-7 glass-card rounded-2xl p-6 shadow-lg flex flex-col justify-between">
+        <div>
+          <h3 class="text-lg font-bold text-slate-900 mb-2 flex items-center gap-2">
+            <i class="fa-solid fa-chart-line text-blue-600"></i> e) Weg-Zeit-Diagramm
+          </h3>
+          <p class="text-xs text-slate-500 mb-4">Das Diagramm zeigt den Abstand von Aachen (in km) über der Zeit (in Stunden).</p>
+          <div class="relative w-full h-[320px]">
+            <canvas id="motionChart"></canvas>
+          </div>
+        </div>
+        <div class="mt-2 text-xs text-slate-600 bg-blue-50/80 p-3 rounded-lg border border-blue-100 flex items-center gap-2">
+          <i class="fa-solid fa-circle-info text-blue-500 text-base"></i>
+          <span>Der <strong>Schnittpunkt der beiden Geraden</strong> kennzeichnet den Ort und die Uhrzeit des Aufeinandertreffens!</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Questions & Exercises Section -->
+    <section class="glass-card rounded-2xl p-6 shadow-lg space-y-6">
+      <h2 class="text-xl font-extrabold text-slate-900 flex items-center gap-2 border-b border-slate-200 pb-3">
+        <i class="fa-solid fa-pen-to-square text-blue-600"></i> Fragen & Aufgaben
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- Question A -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+          <div class="font-bold text-slate-800 text-base flex justify-between items-center">
+            <span>a) Um wie viel Uhr treffen sie sich?</span>
+            <span class="text-xs text-blue-600 font-semibold bg-blue-50 px-2 py-1 rounded">Uhrzeit</span>
+          </div>
+          <div class="flex gap-2">
+            <input type="text" id="ansA" placeholder="z.B. 11:00 oder 11" class="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-slate-700">
+            <button onclick="checkAnswer('a')" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition">Prüfen</button>
+          </div>
+          <div id="feedbackA" class="hidden text-sm p-3 rounded-lg"></div>
+          <button onclick="toggleSolution('solA')" class="text-xs text-slate-500 hover:text-blue-600 underline font-medium inline-block">
+            <i class="fa-regular fa-lightbulb"></i> Lösungsweg anzeigen
+          </button>
+          <div id="solA" class="hidden text-xs bg-slate-50 p-3 rounded-lg text-slate-700 leading-relaxed space-y-1 border border-slate-200">
+            <p class="font-bold text-blue-800">Lösungsweg:</p>
+            <p>Relativgeschwindigkeit: $v_{ges} = 0,5\,\text{km/h} + 2\,\text{km/h} = 2,5\,\text{km/h}$</p>
+            <p>Zeit bis zum Treffen: $t = \frac{s}{v_{ges}} = \frac{10\,\text{km}}{2,5\,\text{km/h}} = 4\,\text{Stunden}$</p>
+            <p>Uhrzeit: $07:00\,\text{Uhr} + 4\,\text{Stunden} = \mathbf{11:00\,\text{Uhr}}$</p>
+          </div>
+        </div>
+
+        <!-- Question B -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+          <div class="font-bold text-slate-800 text-base flex justify-between items-center">
+            <span>b) Wie viel km sind sie jeweils gefahren?</span>
+            <span class="text-xs text-blue-600 font-semibold bg-blue-50 px-2 py-1 rounded">Strecken</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <input type="number" id="ansB_fritz" placeholder="Fritz (km)" class="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-slate-700">
+            <input type="number" id="ansB_max" placeholder="Max (km)" class="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-slate-700">
+          </div>
+          <button onclick="checkAnswer('b')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition">Prüfen</button>
+          <div id="feedbackB" class="hidden text-sm p-3 rounded-lg"></div>
+          <button onclick="toggleSolution('solB')" class="text-xs text-slate-500 hover:text-blue-600 underline font-medium inline-block">
+            <i class="fa-regular fa-lightbulb"></i> Lösungsweg anzeigen
+          </button>
+          <div id="solB" class="hidden text-xs bg-slate-50 p-3 rounded-lg text-slate-700 leading-relaxed space-y-1 border border-slate-200">
+            <p class="font-bold text-blue-800">Lösungsweg:</p>
+            <p>Fritz in 4 Stunden: $s_{Fritz} = 0,5\,\text{km/h} \cdot 4\,\text{h} = \mathbf{2\,\text{km}}$</p>
+            <p>Max in 4 Stunden: $s_{Max} = 2\,\text{km/h} \cdot 4\,\text{h} = \mathbf{8\,\text{km}}$</p>
+            <p class="text-slate-500 italic">(Probe: $2\,\text{km} + 8\,\text{km} = 10\,\text{km}$)</p>
+          </div>
+        </div>
+
+        <!-- Question C -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+          <div class="font-bold text-slate-800 text-base flex justify-between items-center">
+            <span>c) In wie viel Stunden ist Fritz am Rastplatz?</span>
+            <span class="text-xs text-blue-600 font-semibold bg-blue-50 px-2 py-1 rounded">Dauer</span>
+          </div>
+          <div class="flex gap-2">
+            <input type="number" id="ansC" placeholder="Anzahl Stunden" class="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-slate-700">
+            <button onclick="checkAnswer('c')" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition">Prüfen</button>
+          </div>
+          <div id="feedbackC" class="hidden text-sm p-3 rounded-lg"></div>
+          <button onclick="toggleSolution('solC')" class="text-xs text-slate-500 hover:text-blue-600 underline font-medium inline-block">
+            <i class="fa-regular fa-lightbulb"></i> Lösungsweg anzeigen
+          </button>
+          <div id="solC" class="hidden text-xs bg-slate-50 p-3 rounded-lg text-slate-700 leading-relaxed space-y-1 border border-slate-200">
+            <p class="font-bold text-blue-800">Lösungsweg:</p>
+            <p>Gesamtstrecke $s = 10\,\text{km}$, Geschwindigkeit $v = 0,5\,\text{km/h}$</p>
+            <p>$t = \frac{s}{v} = \frac{10\,\text{km}}{0,5\,\text{km/h}} = \mathbf{20\,\text{Stunden}}$</p>
+            <p class="text-slate-500 italic">(Ankunft um 03:00 Uhr am nächsten Tag)</p>
+          </div>
+        </div>
+
+        <!-- Question D -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+          <div class="font-bold text-slate-800 text-base flex justify-between items-center">
+            <span>d) Wie lange braucht Max nach Aachen?</span>
+            <span class="text-xs text-blue-600 font-semibold bg-blue-50 px-2 py-1 rounded">Dauer</span>
+          </div>
+          <div class="flex gap-2">
+            <input type="number" id="ansD" placeholder="Anzahl Stunden" class="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-slate-700">
+            <button onclick="checkAnswer('d')" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition">Prüfen</button>
+          </div>
+          <div id="feedbackD" class="hidden text-sm p-3 rounded-lg"></div>
+          <button onclick="toggleSolution('solD')" class="text-xs text-slate-500 hover:text-blue-600 underline font-medium inline-block">
+            <i class="fa-regular fa-lightbulb"></i> Lösungsweg anzeigen
+          </button>
+          <div id="solD" class="hidden text-xs bg-slate-50 p-3 rounded-lg text-slate-700 leading-relaxed space-y-1 border border-slate-200">
+            <p class="font-bold text-blue-800">Lösungsweg:</p>
+            <p>Gesamtstrecke $s = 10\,\text{km}$, Geschwindigkeit $v = 2\,\text{km/h}$</p>
+            <p>$t = \frac{s}{v} = \frac{10\,\text{km}}{2\,\text{km/h}} = \mathbf{5\,\text{Stunden}}$</p>
+            <p class="text-slate-500 italic">(Ankunft um 12:00 Uhr mittags)</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // Application State
+    let currentTime = 0; // hours from 07:00
+    let animationInterval = null;
+    let isPlaying = false;
+    let chart = null;
+
+    // Init Chart & Controls
+    window.addEventListener('DOMContentLoaded', () => {
+      initChart();
+      updateSimulation(0);
+
+      // Slider Listener
+      const slider = document.getElementById('timeSlider');
+      slider.addEventListener('input', (e) => {
+        if (isPlaying) stopAnimation();
+        updateSimulation(parseFloat(e.target.value));
+      });
+
+      // Buttons
+      document.getElementById('btnPlay').addEventListener('click', toggleAnimation);
+      document.getElementById('btnReset').addEventListener('click', resetSimulation);
+    });
+
+    // Initialize Chart.js
+    function initChart() {
+      const ctx = document.getElementById('motionChart').getContext('2d');
+
+      // Labels for Time (07:00 to 03:00)
+      const labels = [];
+      for (let t = 0; t <= 20; t++) {
+        let hour = (7 + t) % 24;
+        let hourStr = hour < 10 ? '0' + hour : hour;
+        labels.push(`${hourStr}:00 (${t}h)`);
+      }
+
+      // Fritz: y = 0.5 * t (up to 10km)
+      const fritzData = [];
+      for (let t = 0; t <= 20; t++) {
+        fritzData.push(Math.min(10, 0.5 * t));
+      }
+
+      // Max: y = 10 - 2 * t (stops at 0km after 5h)
+      const maxData = [];
+      for (let t = 0; t <= 20; t++) {
+        maxData.push(Math.max(0, 10 - 2 * t));
+      }
+
+      chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+              label: 'Fritz (von Aachen)',
+              data: fritzData,
+              borderColor: '#3b82f6',
+              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              borderWidth: 3,
+              tension: 0,
+              pointRadius: 2
+            },
+            {
+              label: 'Max (vom Rastplatz)',
+              data: maxData,
+              borderColor: '#6366f1',
+              backgroundColor: 'rgba(99, 102, 241, 0.1)',
+              borderWidth: 3,
+              tension: 0,
+              pointRadius: 2
+            },
+            {
+              label: 'Aktueller Zeitpunkt',
+              data: [{
+                  x: labels[0],
+                  y: 0
+                },
+                {
+                  x: labels[0],
+                  y: 10
+                }
+              ],
+              borderColor: '#ef4444',
+              borderWidth: 2,
+              borderDash: [5, 5],
+              pointRadius: 0,
+              fill: false
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Uhrzeit / Zeit in Stunden',
+                font: {
+                  weight: 'bold'
+                }
+              },
+              grid: {
+                color: 'rgba(0,0,0,0.05)'
+              }
+            },
+            y: {
+              min: 0,
+              max: 10,
+              title: {
+                display: true,
+                text: 'Entfernung von Aachen (km)',
+                font: {
+                  weight: 'bold'
+                }
+              },
+              grid: {
+                color: 'rgba(0,0,0,0.05)'
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              position: 'top'
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `${context.dataset.label}: ${context.parsed.y.toFixed(1)} km`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Update simulation UI & Chart Indicator
+    function updateSimulation(t) {
+      currentTime = t;
+
+      // Fritz Position (0 to 10 km)
+      const fritzKm = Math.min(10, 0.5 * t);
+      const fritzPct = (fritzKm / 10) * 100;
+
+      // Max Position (10 down to 0 km from Aachen)
+      const maxKmFromAachen = Math.max(0, 10 - 2 * t);
+      const maxTraveled = Math.min(10, 2 * t);
+      const maxPct = (maxKmFromAachen / 10) * 100;
+
+      // Update Sprites
+      document.getElementById('fritzSprite').style.left = `${fritzPct}%`;
+      document.getElementById('maxSprite').style.left = `${maxPct}%`;
+
+      // Update Distances
+      document.getElementById('fritzDist').innerText = `${fritzKm.toFixed(1)} km`;
+      document.getElementById('maxDist').innerText = `${maxTraveled.toFixed(1)} km`;
+
+      // Calculate Clock Time
+      let totalMinutes = (7 * 60) + (t * 60);
+      let hours = Math.floor(totalMinutes / 60) % 24;
+      let minutes = Math.floor(totalMinutes % 60);
+      let hoursStr = hours < 10 ? '0' + hours : hours;
+      let minsStr = minutes < 10 ? '0' + minutes : minutes;
+
+      document.getElementById('timeDisplay').innerText = `${hoursStr}:${minsStr} Uhr (t = ${t} h)`;
+      document.getElementById('sliderHoursText').innerText = `${t} Std.`;
+      document.getElementById('timeSlider').value = t;
+
+      // Update Chart Vertical Marker
+      if (chart) {
+        let hourIndex = Math.min(20, Math.floor(t));
+        let exactLabel = chart.data.labels[hourIndex];
+
+        chart.data.datasets[2].data = [{
+            x: exactLabel,
+            y: 0
+          },
+          {
+            x: exactLabel,
+            y: 10
+          }
+        ];
+        chart.update('none');
+      }
+    }
+
+    // Animation Loop Control
+    function toggleAnimation() {
+      if (isPlaying) {
+        stopAnimation();
+      } else {
+        startAnimation();
+      }
+    }
+
+    function startAnimation() {
+      isPlaying = true;
+      document.getElementById('btnPlay').innerHTML = '<i class="fa-solid fa-pause"></i> Pause';
+      document.getElementById('btnPlay').classList.replace('bg-blue-600', 'bg-amber-600');
+      document.getElementById('btnPlay').classList.replace('hover:bg-blue-700', 'hover:bg-amber-700');
+
+      if (currentTime >= 20) currentTime = 0;
+
+      animationInterval = setInterval(() => {
+        currentTime += 0.1;
+        if (currentTime > 20) {
+          currentTime = 20;
+          stopAnimation();
+        }
+        updateSimulation(Math.round(currentTime * 10) / 10);
+      }, 80);
+    }
+
+    function stopAnimation() {
+      isPlaying = false;
+      clearInterval(animationInterval);
+      document.getElementById('btnPlay').innerHTML = '<i class="fa-solid fa-play"></i> Fortsetzen';
+      document.getElementById('btnPlay').classList.replace('bg-amber-600', 'bg-blue-600');
+      document.getElementById('btnPlay').classList.replace('hover:bg-amber-700', 'hover:bg-blue-700');
+    }
+
+    function resetSimulation() {
+      stopAnimation();
+      document.getElementById('btnPlay').innerHTML = '<i class="fa-solid fa-play"></i> Animation Starten';
+      updateSimulation(0);
+    }
+
+    // Interactive Feedback Checker Functions
+    function checkAnswer(q) {
+      if (q === 'a') {
+        const val = document.getElementById('ansA').value.trim().toLowerCase();
+        const fb = document.getElementById('feedbackA');
+        fb.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-emerald-100', 'text-emerald-800');
+
+        if (val.includes('11') || val === '4' || val.includes('4 stunden')) {
+          fb.classList.add('bg-emerald-100', 'text-emerald-800');
+          fb.innerHTML = '<i class="fa-solid fa-circle-check"></i> Richtig! Sie treffen sich um <strong>11:00 Uhr</strong> (nach 4 Stunden).';
+        } else {
+          fb.classList.add('bg-red-100', 'text-red-700');
+          fb.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Noch nicht ganz! Tipp: Überlege, wie schnell sie sich zusammen annähern ($0,5 + 2 = 2,5$ km/h).';
+        }
+      } else if (q === 'b') {
+        const fritz = parseFloat(document.getElementById('ansB_fritz').value);
+        const max = parseFloat(document.getElementById('ansB_max').value);
+        const fb = document.getElementById('feedbackB');
+        fb.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-emerald-100', 'text-emerald-800');
+
+        if (fritz === 2 && max === 8) {
+          fb.classList.add('bg-emerald-100', 'text-emerald-800');
+          fb.innerHTML = '<i class="fa-solid fa-circle-check"></i> Perfekt! Fritz fährt <strong>2 km</strong> und Max <strong>8 km</strong>.';
+        } else {
+          fb.classList.add('bg-red-100', 'text-red-700');
+          fb.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Nicht ganz! Multipliziere die jeweilige Geschwindigkeit mit den 4 Stunden Fahrzeit.';
+        }
+      } else if (q === 'c') {
+        const val = parseFloat(document.getElementById('ansC').value);
+        const fb = document.getElementById('feedbackC');
+        fb.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-emerald-100', 'text-emerald-800');
+
+        if (val === 20) {
+          fb.classList.add('bg-emerald-100', 'text-emerald-800');
+          fb.innerHTML = '<i class="fa-solid fa-circle-check"></i> Genau! Fritz benötigt <strong>20 Stunden</strong> ($10 / 0,5$).';
+        } else {
+          fb.classList.add('bg-red-100', 'text-red-700');
+          fb.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Versuche es nochmal! Formel: $t = s / v = 10 / 0,5$.';
+        }
+      } else if (q === 'd') {
+        const val = parseFloat(document.getElementById('ansD').value);
+        const fb = document.getElementById('feedbackD');
+        fb.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-emerald-100', 'text-emerald-800');
+
+        if (val === 5) {
+          fb.classList.add('bg-emerald-100', 'text-emerald-800');
+          fb.innerHTML = '<i class="fa-solid fa-circle-check"></i> Ausgezeichnet! Max benötigt <strong>5 Stunden</strong> ($10 / 2$).';
+        } else {
+          fb.classList.add('bg-red-100', 'text-red-700');
+          fb.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Noch nicht ganz! Formel: $t = s / v = 10 / 2$.';
+        }
+      }
+    }
+
+    function toggleSolution(id) {
+      const el = document.getElementById(id);
+      el.classList.toggle('hidden');
+    }
+  </script>
+</body>
+</html>

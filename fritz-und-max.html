@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fritz & Max – Begegnungsaufgabe</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f5f3ee;--card:#fff;--ink:#1d2433;--mut:#667085;--line:#e3e0d8;--f:#e2622b;--m:#2563c9;--ok:#1f8a4c;--bad:#c23b3b;--acc:#1d2433;--accink:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12151c;--card:#1b202b;--ink:#eef0f5;--mut:#9aa3b5;--line:#2c3342;--f:#ff8a55;--m:#6ea0ff;--ok:#4cc27f;--bad:#ff7a7a;--acc:#eef0f5;--accink:#12151c}}
+:root[data-theme="dark"]{--bg:#12151c;--card:#1b202b;--ink:#eef0f5;--mut:#9aa3b5;--line:#2c3342;--f:#ff8a55;--m:#6ea0ff;--ok:#4cc27f;--bad:#ff7a7a;--acc:#eef0f5;--accink:#12151c}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:760px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:1.7rem;margin:.2em 0 .1em;letter-spacing:-.02em}
+.sub{color:var(--mut);margin:0 0 18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin:14px 0}
+.story{display:grid;gap:10px}
+.who{display:flex;gap:10px;align-items:flex-start}
+.dot{flex:none;width:12px;height:12px;border-radius:50%;margin-top:8px}
+.route{position:relative;height:56px;margin:14px 6px 4px}
+.route .bar{position:absolute;left:0;right:0;top:26px;height:4px;border-radius:2px;background:var(--line)}
+.route .tag{position:absolute;top:34px;font-size:.78rem;color:var(--mut);white-space:nowrap}
+.route .pin{position:absolute;top:8px;width:20px;height:20px;border-radius:50%;transform:translateX(-50%);border:3px solid var(--card)}
+.prog{display:flex;align-items:center;gap:10px;font-size:.9rem;color:var(--mut)}
+.pb{flex:1;height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.pb i{display:block;height:100%;width:0;background:var(--ok);transition:width .4s}
+h2{font-size:1.05rem;margin:0 0 8px}
+h2 b{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:8px;background:var(--acc);color:var(--accink);font-size:.85rem;margin-right:8px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+input[type=text],input[type=number]{font:inherit;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;width:110px}
+input:focus{outline:2px solid var(--m);outline-offset:1px}
+button{font:inherit;cursor:pointer;border-radius:10px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);padding:8px 14px}
+button.p{background:var(--acc);color:var(--accink);border-color:var(--acc)}
+.fb{min-height:1.4em;font-weight:600;margin:4px 0}
+.fb.ok{color:var(--ok)}.fb.bad{color:var(--bad)}
+.sol{display:none;background:var(--bg);border-left:4px solid var(--m);border-radius:8px;padding:10px 14px;margin-top:8px;font-size:.95rem}
+.sol.on{display:block}
+.sol code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.92em}
+svg{width:100%;height:auto;display:block;background:var(--card);border-radius:12px}
+.gt{fill:var(--mut);font-size:11px}
+.lg{display:flex;gap:16px;flex-wrap:wrap;font-size:.9rem;margin-top:6px}
+.lg span::before{content:"";display:inline-block;width:18px;height:4px;border-radius:2px;margin-right:6px;vertical-align:middle;background:var(--c)}
+input[type=range]{width:100%;accent-color:var(--m)}
+.read{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.92rem}
+.read div{background:var(--bg);border-radius:10px;padding:8px 10px}
+.done{display:none;text-align:center;font-weight:700;color:var(--ok);padding:10px}
+</style>
+</head>
+<body>
+<main>
+<h1>Fritz & Max – Wer trifft wen?</h1>
+<p class="sub">Bewegungsaufgabe · Gleichungen &amp; Geraden</p>
+
+<div class="card story">
+  <div class="who"><span class="dot" style="background:var(--f)"></span><div><b>Fritz</b> fährt um <b>7 Uhr</b> mit <b>0,5 km/h</b> von <b>Aachen</b> los.</div></div>
+  <div class="who"><span class="dot" style="background:var(--m)"></span><div><b>Max</b> fährt ihm auf der gleichen Strecke zur gleichen Zeit mit <b>2 km/h</b> vom <b>10 km</b> entfernten Rastplatz entgegen.</div></div>
+  <div class="route"><div class="bar"></div>
+    <div class="pin" id="pf" style="left:0;background:var(--f)"></div>
+    <div class="pin" id="pm" style="left:100%;background:var(--m)"></div>
+    <span class="tag" style="left:0">Aachen (0 km)</span><span class="tag" style="right:0">Rastplatz (10 km)</span></div>
+  <div class="prog"><span id="pt">0 / 5</span><div class="pb"><i id="pbar"></i></div></div>
+</div>
+
+<div class="card">
+  <h2><b>a</b>Um wie viel Uhr treffen sie sich?</h2>
+  <div class="row"><input type="text" id="a" placeholder="z. B. 9:30" inputmode="text"><button class="p" onclick="chk('a')">Prüfen</button><button onclick="sol('a')">Lösungsweg</button></div>
+  <div class="fb" id="fa"></div>
+  <div class="sol" id="sa">Treffen: beide Wege zusammen ergeben 10 km.<br>
+  <code>0,5·t + 2·t = 10</code> → <code>2,5·t = 10</code> → <code>t = 4 h</code><br>
+  7 Uhr + 4 h = <b>11:00 Uhr</b></div>
+</div>
+
+<div class="card">
+  <h2><b>b</b>Wie viel km sind sie jeweils gefahren?</h2>
+  <div class="row">Fritz: <input type="number" step="any" id="b1"> km &nbsp; Max: <input type="number" step="any" id="b2"> km
+  <button class="p" onclick="chk('b')">Prüfen</button><button onclick="sol('b')">Lösungsweg</button></div>
+  <div class="fb" id="fb"></div>
+  <div class="sol" id="sb"><code>Fritz: 0,5 km/h · 4 h = 2 km</code><br><code>Max: 2 km/h · 4 h = 8 km</code><br>Probe: 2 km + 8 km = 10 km ✓</div>
+</div>
+
+<div class="card">
+  <h2><b>c</b>In wie viel Stunden kommt Fritz am Rastplatz an?</h2>
+  <div class="row"><input type="number" step="any" id="c"> h <button class="p" onclick="chk('c')">Prüfen</button><button onclick="sol('c')">Lösungsweg</button></div>
+  <div class="fb" id="fc"></div>
+  <div class="sol" id="sc"><code>t = s / v = 10 km / 0,5 km/h = 20 h</code></div>
+</div>
+
+<div class="card">
+  <h2><b>d</b>Wie lange braucht Max bis Aachen?</h2>
+  <div class="row"><input type="number" step="any" id="d"> h <button class="p" onclick="chk('d')">Prüfen</button><button onclick="sol('d')">Lösungsweg</button></div>
+  <div class="fb" id="fd"></div>
+  <div class="sol" id="sd"><code>t = s / v = 10 km / 2 km/h = 5 h</code></div>
+</div>
+
+<div class="card">
+  <h2><b>e</b>Beide Geraden im Diagramm – zeichnerische Probe</h2>
+  <p style="margin:0 0 8px;color:var(--mut)">Erst überlegen, dann einzeichnen: Fritz startet bei 0 km, Max bei 10 km. Wo schneiden sich die Geraden?</p>
+  <div class="row"><button class="p" onclick="drawLines()">Geraden einzeichnen</button><button onclick="markX()">Schnittpunkt zeigen</button><button onclick="sol('e')">Lösungsweg</button></div>
+  <svg id="g" viewBox="0 0 640 400" role="img" aria-label="Weg-Zeit-Diagramm von Fritz und Max"></svg>
+  <div class="lg"><span style="--c:var(--f)">Fritz: s = 0,5·t</span><span style="--c:var(--m)">Max: s = 10 − 2·t</span></div>
+  <div class="row" style="margin-top:12px"><label for="sl" style="min-width:110px">Zeit t: <b id="tv">0,0</b> h</label><input type="range" id="sl" min="0" max="5" step="0.1" value="0" style="flex:1"></div>
+  <div class="read"><div>Fritz: <b id="rf">0,0 km</b></div><div>Max: <b id="rm">10,0 km</b></div><div>Uhrzeit: <b id="ru">7:00</b></div><div>Abstand: <b id="rd">10,0 km</b></div></div>
+  <div class="sol" id="se">Gleichsetzen: <code>0,5·t = 10 − 2·t</code> → <code>t = 4 h</code>.<br>
+  Ablesen im Diagramm: Schnittpunkt bei <b>t = 4 h</b> und <b>s = 2 km</b> – das passt zu a) und b).<br>
+  Fritz-Gerade erreicht 10 km erst bei t = 20 h, Max-Gerade schneidet die t-Achse bei t = 5 h (c, d).</div>
+  <div class="fb" id="fe"></div>
+</div>
+
+<div class="done card" id="done">🎉 Alles gelöst – stark gerechnet!</div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const N=v=>parseFloat(String(v).replace(',','.'));
+const near=(a,b)=>Math.abs(a-b)<0.011;
+const solved=new Set();
+function ok(id,good,msg,bad){
+  const f=$('f'+id);
+  f.className='fb '+(good?'ok':'bad');
+  f.textContent=good?msg:bad;
+  if(good){solved.add(id)}
+  $('pt').textContent=solved.size+' / 5';
+  $('pbar').style.width=solved.size*20+'%';
+  if(solved.size===5)$('done').style.display='block';
+}
+function chk(id){
+  if(id==='a'){
+    const m=$('a').value.match(/(\d{1,2})(?:\s*[:.,h]\s*(\d{1,2}))?/);
+    const t=m?(+m[1])+(m[2]?(+m[2])/60:0):NaN;
+    ok('a',near(t,11),'✓ Richtig: um 11:00 Uhr.','✗ Noch nicht. Tipp: Wie schnell nähern sich beide zusammen an?');
+  }
+  if(id==='b'){
+    const f=N($('b1').value),m=N($('b2').value);
+    ok('b',near(f,2)&&near(m,8),'✓ Richtig: Fritz 2 km, Max 8 km.','✗ Noch nicht. Tipp: Weg = Geschwindigkeit · Zeit, und beide Wege ergeben zusammen 10 km.');
+  }
+  if(id==='c')ok('c',near(N($('c').value),20),'✓ Richtig: 20 Stunden.','✗ Noch nicht. Tipp: t = s : v mit der ganzen Strecke.');
+  if(id==='d')ok('d',near(N($('d').value),5),'✓ Richtig: 5 Stunden.','✗ Noch nicht. Tipp: t = s : v mit der ganzen Strecke.');
+}
+function sol(id){$('s'+id).classList.toggle('on')}
+
+/* Diagramm */
+const ML=50,MT=20,W=570,H=335,TMAX=6,SMAX=10;
+const X=t=>ML+t/TMAX*W, Y=s=>MT+H-s/SMAX*H;
+let lines=false,cross=false;
+const clock=t=>{const m=Math.round((7+t)*60);return Math.floor(m/60)%24+':'+String(m%60).padStart(2,'0')};
+function render(){
+  const t=+$('sl').value;
+  let s='';
+  for(let i=0;i<=SMAX;i++){s+=`<line x1="${ML}" x2="${ML+W}" y1="${Y(i)}" y2="${Y(i)}" stroke="var(--line)"/><text class="gt" x="${ML-8}" y="${Y(i)+4}" text-anchor="end">${i}</text>`}
+  for(let i=0;i<=TMAX;i++){s+=`<line y1="${MT}" y2="${MT+H}" x1="${X(i)}" x2="${X(i)}" stroke="var(--line)"/><text class="gt" x="${X(i)}" y="${MT+H+16}" text-anchor="middle">${i}</text><text class="gt" x="${X(i)}" y="${MT+H+30}" text-anchor="middle" opacity=".7">${7+i} Uhr</text>`}
+  s+=`<line x1="${ML}" x2="${ML}" y1="${MT}" y2="${MT+H}" stroke="var(--ink)"/><line x1="${ML}" x2="${ML+W}" y1="${MT+H}" y2="${MT+H}" stroke="var(--ink)"/>`;
+  s+=`<text class="gt" x="${ML+W}" y="${MT+H-6}" text-anchor="end">t in h</text><text class="gt" x="${ML+6}" y="${MT+10}">s in km</text>`;
+  if(lines){
+    s+=`<line x1="${X(0)}" y1="${Y(0)}" x2="${X(6)}" y2="${Y(3)}" stroke="var(--f)" stroke-width="3.5" stroke-linecap="round"/>`;
+    s+=`<line x1="${X(0)}" y1="${Y(10)}" x2="${X(5)}" y2="${Y(0)}" stroke="var(--m)" stroke-width="3.5" stroke-linecap="round"/>`;
+    s+=`<circle cx="${X(t)}" cy="${Y(.5*t)}" r="7" fill="var(--f)" stroke="var(--card)" stroke-width="2"/>`;
+    s+=`<circle cx="${X(t)}" cy="${Y(10-2*t)}" r="7" fill="var(--m)" stroke="var(--card)" stroke-width="2"/>`;
+  }
+  if(cross){
+    s+=`<line x1="${X(4)}" x2="${X(4)}" y1="${Y(2)}" y2="${Y(0)}" stroke="var(--ok)" stroke-dasharray="5 4"/><line x1="${ML}" x2="${X(4)}" y1="${Y(2)}" y2="${Y(2)}" stroke="var(--ok)" stroke-dasharray="5 4"/>`;
+    s+=`<circle cx="${X(4)}" cy="${Y(2)}" r="8" fill="none" stroke="var(--ok)" stroke-width="3"/><text x="${X(4)+12}" y="${Y(2)-10}" fill="var(--ok)" font-size="13" font-weight="700">(4 | 2)</text>`;
+  }
+  $('g').innerHTML=s;
+  $('tv').textContent=t.toFixed(1).replace('.',',');
+  const f=.5*t,m=Math.max(10-2*t,0);
+  $('rf').textContent=f.toFixed(1).replace('.',',')+' km';
+  $('rm').textContent=(10-2*t).toFixed(1).replace('.',',')+' km';
+  $('ru').textContent=clock(t)+' Uhr';
+  $('rd').textContent=Math.abs(10-2.5*t).toFixed(1).replace('.',',')+' km';
+  $('pf').style.left=(f/10*100)+'%';$('pm').style.left=(m/10*100)+'%';
+}
+function drawLines(){lines=true;render();ok('e',cross,'','');}
+function markX(){
+  lines=true;cross=true;render();
+  $('sl').value=4;render();
+  $('fe').className='fb ok';$('fe').textContent='✓ Schnittpunkt (4 | 2): Treffen nach 4 h (11:00 Uhr), 2 km von Aachen – stimmt mit a) und b) überein.';
+  solved.add('e');$('pt').textContent=solved.size+' / 5';$('pbar').style.width=solved.size*20+'%';
+  if(solved.size===5)$('done').style.display='block';
+}
+$('sl').addEventListener('input',render);
+render();
+</script>
+</body>
+</html>

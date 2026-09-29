@@ -505,9 +505,134 @@
   <p>d) Wie lange wird Max brauchen, um in Aachen anzukommen?</p>
   <p>e) Zeichne beide Geraden in ein Diagramm und überprüfe so zeichnerisch deine Rechnungen!</p>
   <hr>
-  <p>
+  
+  <details style="border:1px solid #2a2a2a;border-radius:6px;padding:10px 14px;background:#141414;color:#e8e8e4;">
+  <summary style="cursor:pointer;color:#c9a227;font-weight:600;">Lösung</summary>
+  <p style="margin:10px 0 0;font-size:14px;line-height:1.5;">
+    
+    <p>Hier ist der vollständige Lösungsweg für die Bewegung Aufgabe mit ausführlicher Erklärung – sowohl rechnerisch (mit dem <strong>Einsetzungsverfahren</strong> und dem <strong>Additionsverfahren</strong>) als auch für die zeichnerische Lösung.</p>
+<hr>
+<h3>1. Grunddaten &amp; Variablen festlegen</h3>
+<ul>
+<li><strong>$t$</strong>: Fahrzeit in Stunden ($\text{h}$) ab 7:00 Uhr.</li>
+<li><strong>$s_1$</strong>: Von Fritz zurückgelegte Strecke in Kilometern ($\text{km}$).</li>
+<li><strong>$s_2$</strong>: Von Max zurückgelegte Strecke in Kilometern ($\text{km}$).</li>
+</ul>
+<p><strong>Gegebene Werte:</strong></p>
+<ul>
+<li><p><strong>Fritz:</strong></p>
+</li>
+<li><p>Startpunkt: Aachen ($0\text{ km}$)</p>
+</li>
+<li><p>Geschwindigkeit: $v_1 = 0{,}5\text{ km/h}$</p>
+</li>
+<li><p><strong>Max:</strong></p>
+</li>
+<li><p>Startpunkt: Rastplatz ($10\text{ km}$ entfernt von Aachen)</p>
+</li>
+<li><p>Geschwindigkeit: $v_2 = 2\text{ km/h}$</p>
+</li>
+<li><p>Gesamtdistanz zwischen Aachen und Rastplatz: $10\text{ km}$</p>
+</li>
+</ul>
+<hr>
+<h3>2. Gleichungssystem für den Treffpunkt aufstellen</h3>
+<p>Wenn sich Fritz und Max entgegenfahren, gilt zum Zeitpunkt des Treffens:</p>
+<ol>
+<li>Die Summe der von beiden gefahrenen Strecken ergibt die Gesamtdistanz von $10\text{ km}$:</li>
+</ol>
+<p>$$\text{I: } s_1 + s_2 = 10$$</p>
+<ol start="2">
+<li>Da die Strecke gleich Geschwindigkeit mal Zeit ist ($s = v \cdot t$), gilt nach der Zeit $t$:</li>
+</ol>
+<ul>
+<li>Strecke von Fritz: $s_1 = 0{,}5 \cdot t$</li>
+<li>Strecke von Max: $s_2 = 2 \cdot t$</li>
+</ul>
+<p>Daraus ergibt sich das Gleichungssystem:</p>
+<p>$$\begin{aligned} \text{I: } &amp; s_1 + s_2 = 10 \ \text{II: } &amp; s_1 = 0{,}5t \ \text{III: } &amp; s_2 = 2t \end{aligned}$$</p>
+<hr>
+<h3>3. Rechnerischer Lösungsweg</h3>
+<h4>Variante A: Einsetzungsverfahren</h4>
+<p>Beim <strong>Einsetzungsverfahren</strong> setzen wir die Ausdrücke für $s_1$ (Gleichung II) und $s_2$ (Gleichung III) direkt in Gleichung I ein:</p>
+<p>$$\text{II und III in I einsetzen:}$$</p>
+<p>$$0{,}5t + 2t = 10$$</p>
+<ol>
+<li><strong>Gleichartige Terme zusammenfassen:</strong></li>
+</ol>
+<p>$$2{,}5t = 10$$</p>
+<ol start="2">
+<li><strong>Nach $t$ auflösen (durch $2{,}5$ teilen):</strong></li>
+</ol>
+<p>$$t = \frac{10}{2{,}5} = 4\text{ Stunden}$$</p>
+<hr>
+<h4>Variante B: Additionsverfahren / Subtraktionsverfahren</h4>
+<p>Man kann die Bewegungen auch als Weg-Zeit-Funktionen bezogen auf den Abstand von Aachen darstellen:</p>
+<ul>
+<li>Position von Fritz nach $t$ Stunden: $y_1 = 0{,}5t$</li>
+<li>Position von Max nach $t$ Stunden: $y_2 = 10 - 2t$</li>
+</ul>
+<p>Am Treffpunkt sind beide am selben Ort ($y_1 = y_2 = y$):</p>
+<p>$$\begin{aligned} \text{I: } &amp; y - 0{,}5t = 0 \ \text{II: } &amp; y + 2t = 10 \end{aligned}$$</p>
+<p>Wir subtrahieren Gleichung I von Gleichung II ($\text{II} - \text{I}$), um die Variable $y$ zu eliminieren:</p>
+<p>$$\begin{aligned} (y + 2t) - (y - 0{,}5t) &amp;= 10 - 0 \ 2t + 0{,}5t &amp;= 10 \ 2{,}5t &amp;= 10 \quad \vert{} : 2{,}5 \ t &amp;= 4\text{ Stunden} \end{aligned}$$</p>
+<hr>
+<h3>4. Beantwortung aller Teilaufgaben</h3>
+<h4>a) Um wie viel Uhr treffen sie sich?</h4>
+<ul>
+<li><strong>Fahrzeit bis zum Treffen:</strong> $t = 4\text{ Stunden}$.</li>
+<li><strong>Uhrzeit:</strong> Start um 7:00 Uhr $+ 4\text{ Stunden} =$ <strong>11:00 Uhr</strong>.</li>
+</ul>
+<h4>b) Wie viel km sind sie jeweils gefahren?</h4>
+<ul>
+<li><strong>Fritz ($s_1$):</strong> $s_1 = 0{,}5\text{ km/h} \cdot 4\text{ h} =$ <strong>$2\text{ km}$</strong></li>
+<li><strong>Max ($s_2$):</strong> $s_2 = 2\text{ km/h} \cdot 4\text{ h} =$ <strong>$8\text{ km}$</strong>
+<em>(Probe: $2\text{ km} + 8\text{ km} = 10\text{ km}$ Gesamtweg)</em></li>
+</ul>
+<h4>c) In wie viel Stunden wird Fritz am Rastplatz ankommen?</h4>
+<p>Fritz muss die gesamten $10\text{ km}$ mit $0{,}5\text{ km/h}$ zurücklegen:</p>
+<p>$$t_{\text{Fritz}} = \frac{\text{Strecke}}{\text{Geschwindigkeit}} = \frac{10\text{ km}}{0{,}5\text{ km/h}} = \mathbf{20\text{ Stunden}}$$</p>
+<p><em>(Er kommt also am nächsten Morgen um 3:00 Uhr an).</em></p>
+<h4>d) Wie lange wird Max brauchen, um in Aachen anzukommen?</h4>
+<p>Max muss die gesamten $10\text{ km}$ mit $2\text{ km/h}$ zurücklegen:</p>
+<p>$$t_{\text{Max}} = \frac{\text{Strecke}}{\text{Geschwindigkeit}} = \frac{10\text{ km}}{2\text{ km/h}} = \mathbf{5\text{ Stunden}}$$</p>
+<p><em>(Er kommt um 12:00 Uhr mittags in Aachen an).</em></p>
+<hr>
+<h3>5. e) Zeichnerische Lösung (Weg-Zeit-Diagramm)</h3>
+<p>Um die Rechnungen zeichnerisch zu überprüfen:</p>
+<ol>
+<li><strong>Koordinatensystem zeichnerisch anlegen:</strong></li>
+</ol>
+<ul>
+<li><strong>x-Achse (Zeit $t$ in Stunden):</strong> Skalierung von $0$ bis $20$ Stunden (oder $7:00$ Uhr bis $27:00$ Uhr).</li>
+<li><strong>y-Achse (Entfernung von Aachen in $\text{km}$):</strong> Skalierung von $0\text{ km}$ (Aachen) bis $10\text{ km}$ (Rastplatz).</li>
+</ul>
+<ol start="2">
+<li><strong>Gerade für Fritz einzeichnen:</strong></li>
+</ol>
+<ul>
+<li><strong>Startpunkt ($t=0$):</strong> $(0 \mid 0)$ in Aachen.</li>
+<li><strong>Zweiter Punkt ($t=20$):</strong> $(20 \mid 10)$ am Rastplatz.</li>
+<li>Verbinde beide Punkte zu einer Geraden.</li>
+</ul>
+<ol start="3">
+<li><strong>Gerade für Max einzeichnen:</strong></li>
+</ol>
+<ul>
+<li><strong>Startpunkt ($t=0$):</strong> $(0 \mid 10)$ am Rastplatz.</li>
+<li><strong>Zielpunkt ($t=5$):</strong> $(5 \mid 0)$ in Aachen.</li>
+<li>Verbinde beide Punkte zu einer Geraden.</li>
+</ul>
+<ol start="4">
+<li><strong>Schnittpunkt ablesen:</strong></li>
+</ol>
+<ul>
+<li>Der Schnittpunkt beider Geraden liegt bei <strong>$S(4 \mid 2)$</strong>.</li>
+<li>Das bedeutet: Nach <strong>4 Stunden</strong> treffen sie sich in einer Entfernung von <strong>$2\text{ km}$ von Aachen</strong> (also $8\text{ km}$ vom Rastplatz entfernt).</li>
+</ul>
+</details>
 
-  </p>
+
 
   <hr>
 

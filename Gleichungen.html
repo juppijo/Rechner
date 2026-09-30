@@ -59,6 +59,75 @@
         background: #666688;
         padding: 10px 19px;
       }
+    	.link-box-container {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 20px 24px;
+      background: linear-gradient(135deg, #1e1b4b, #312e81);
+      color: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #818cf8;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+      text-decoration: none;
+      font-family: system-ui, -apple-system, sans-serif;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-sizing: border-box;
+    }
+    
+    .link-box-container:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 12px 20px rgba(0,0,0,0.15);
+    }
+    
+    .link-box-icon {
+      font-size: 28px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    
+    .link-box-content {
+      flex-grow: 1;
+    }
+    
+    .link-box-title {
+      margin: 0 0 4px 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: #ffffff;
+    }
+    
+    .link-box-description {
+      margin: 0;
+      font-size: 13px;
+      opacity: 0.85;
+      color: #ffffff;
+      line-height: 1.4;
+    }
+    
+    .link-box-button {
+      padding: 10px 18px;
+      background: #6366f1;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 8px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: opacity 0.2s ease;
+    }
+    
+    .link-box-container:hover .link-box-button {
+      opacity: 0.9;
+    }
+    
+    @media (max-width: 520px) {
+      .link-box-container {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+      }
+    }
   </style>
 </head>
 <body>
@@ -505,163 +574,230 @@
   <p>d) Wie lange wird Max brauchen, um in Aachen anzukommen?</p>
   <p>e) Zeichne beide Geraden in ein Diagramm und überprüfe so zeichnerisch deine Rechnungen!</p>
   <hr>
-  
+
   <details style="border:1px solid #2a2a2a;border-radius:6px;padding:10px 14px;background:#141414;color:#e8e8e4;">
-  <summary style="cursor:pointer;color:#c9a227;font-weight:600;">Lösung</summary>
-  <p style="margin:10px 0 0;font-size:14px;line-height:1.5;">
-    
+    <summary style="cursor:pointer;color:#c9a227;font-weight:600;">Lösung</summary>
+    <p style="margin:10px 0 0;font-size:14px;line-height:1.5;">
+
     <p>Hier ist der vollständige Lösungsweg für die Bewegung Aufgabe mit ausführlicher Erklärung – sowohl rechnerisch (mit dem <strong>Einsetzungsverfahren</strong> und dem <strong>Additionsverfahren</strong>) als auch für die zeichnerische Lösung.</p>
-<hr>
-<h3>1. Grunddaten &amp; Variablen festlegen</h3>
-<ul>
-<li><strong>$t$</strong>: Fahrzeit in Stunden ($\text{h}$) ab 7:00 Uhr.</li>
-<li><strong>$s_1$</strong>: Von Fritz zurückgelegte Strecke in Kilometern ($\text{km}$).</li>
-<li><strong>$s_2$</strong>: Von Max zurückgelegte Strecke in Kilometern ($\text{km}$).</li>
-</ul>
-<p><strong>Gegebene Werte:</strong></p>
-<ul>
-<li><p><strong>Fritz:</strong></p>
-</li>
-<li><p>Startpunkt: Aachen ($0\text{ km}$)</p>
-</li>
-<li><p>Geschwindigkeit: $v_1 = 0{,}5\text{ km/h}$</p>
-</li>
-<li><p><strong>Max:</strong></p>
-</li>
-<li><p>Startpunkt: Rastplatz ($10\text{ km}$ entfernt von Aachen)</p>
-</li>
-<li><p>Geschwindigkeit: $v_2 = 2\text{ km/h}$</p>
-</li>
-<li><p>Gesamtdistanz zwischen Aachen und Rastplatz: $10\text{ km}$</p>
-</li>
-</ul>
-<hr>
-<h3>2. Gleichungssystem für den Treffpunkt aufstellen</h3>
-<p>Wenn sich Fritz und Max entgegenfahren, gilt zum Zeitpunkt des Treffens:</p>
-<ol>
-<li>Die Summe der von beiden gefahrenen Strecken ergibt die Gesamtdistanz von $10\text{ km}$:</li>
-</ol>
-<p>$$\text{I: } s_1 + s_2 = 10$$</p>
-<ol start="2">
-<li>Da die Strecke gleich Geschwindigkeit mal Zeit ist ($s = v \cdot t$), gilt nach der Zeit $t$:</li>
-</ol>
-<ul>
-<li>Strecke von Fritz: $s_1 = 0{,}5 \cdot t$</li>
-<li>Strecke von Max: $s_2 = 2 \cdot t$</li>
-</ul>
-<p>Daraus ergibt sich das Gleichungssystem:</p>
-<p>$$\begin{aligned} \text{I: } &amp; s_1 + s_2 = 10 \ \text{II: } &amp; s_1 = 0{,}5t \ \text{III: } &amp; s_2 = 2t \end{aligned}$$</p>
-<hr>
-<h3>3. Rechnerischer Lösungsweg</h3>
-<h4>Variante A: Einsetzungsverfahren</h4>
-<p>Beim <strong>Einsetzungsverfahren</strong> setzen wir die Ausdrücke für $s_1$ (Gleichung II) und $s_2$ (Gleichung III) direkt in Gleichung I ein:</p>
-<p>$$\text{II und III in I einsetzen:}$$</p>
-<p>$$0{,}5t + 2t = 10$$</p>
-<ol>
-<li><strong>Gleichartige Terme zusammenfassen:</strong></li>
-</ol>
-<p>$$2{,}5t = 10$$</p>
-<ol start="2">
-<li><strong>Nach $t$ auflösen (durch $2{,}5$ teilen):</strong></li>
-</ol>
-<p>$$t = \frac{10}{2{,}5} = 4\text{ Stunden}$$</p>
-<hr>
-<h4>Variante B: Additionsverfahren / Subtraktionsverfahren</h4>
-<p>Man kann die Bewegungen auch als Weg-Zeit-Funktionen bezogen auf den Abstand von Aachen darstellen:</p>
-<ul>
-<li>Position von Fritz nach $t$ Stunden: $y_1 = 0{,}5t$</li>
-<li>Position von Max nach $t$ Stunden: $y_2 = 10 - 2t$</li>
-</ul>
-<p>Am Treffpunkt sind beide am selben Ort ($y_1 = y_2 = y$):</p>
-<p>$$\begin{aligned} \text{I: } &amp; y - 0{,}5t = 0 \ \text{II: } &amp; y + 2t = 10 \end{aligned}$$</p>
-<p>Wir subtrahieren Gleichung I von Gleichung II ($\text{II} - \text{I}$), um die Variable $y$ zu eliminieren:</p>
-<p>$$\begin{aligned} (y + 2t) - (y - 0{,}5t) &amp;= 10 - 0 \ 2t + 0{,}5t &amp;= 10 \ 2{,}5t &amp;= 10 \quad \vert{} : 2{,}5 \ t &amp;= 4\text{ Stunden} \end{aligned}$$</p>
-<hr>
-<h3>4. Beantwortung aller Teilaufgaben</h3>
-<h4>a) Um wie viel Uhr treffen sie sich?</h4>
-<ul>
-<li><strong>Fahrzeit bis zum Treffen:</strong> $t = 4\text{ Stunden}$.</li>
-<li><strong>Uhrzeit:</strong> Start um 7:00 Uhr $+ 4\text{ Stunden} =$ <strong>11:00 Uhr</strong>.</li>
-</ul>
-<h4>b) Wie viel km sind sie jeweils gefahren?</h4>
-<ul>
-<li><strong>Fritz ($s_1$):</strong> $s_1 = 0{,}5\text{ km/h} \cdot 4\text{ h} =$ <strong>$2\text{ km}$</strong></li>
-<li><strong>Max ($s_2$):</strong> $s_2 = 2\text{ km/h} \cdot 4\text{ h} =$ <strong>$8\text{ km}$</strong>
-<em>(Probe: $2\text{ km} + 8\text{ km} = 10\text{ km}$ Gesamtweg)</em></li>
-</ul>
-<h4>c) In wie viel Stunden wird Fritz am Rastplatz ankommen?</h4>
-<p>Fritz muss die gesamten $10\text{ km}$ mit $0{,}5\text{ km/h}$ zurücklegen:</p>
-<p>$$t_{\text{Fritz}} = \frac{\text{Strecke}}{\text{Geschwindigkeit}} = \frac{10\text{ km}}{0{,}5\text{ km/h}} = \mathbf{20\text{ Stunden}}$$</p>
-<p><em>(Er kommt also am nächsten Morgen um 3:00 Uhr an).</em></p>
-<h4>d) Wie lange wird Max brauchen, um in Aachen anzukommen?</h4>
-<p>Max muss die gesamten $10\text{ km}$ mit $2\text{ km/h}$ zurücklegen:</p>
-<p>$$t_{\text{Max}} = \frac{\text{Strecke}}{\text{Geschwindigkeit}} = \frac{10\text{ km}}{2\text{ km/h}} = \mathbf{5\text{ Stunden}}$$</p>
-<p><em>(Er kommt um 12:00 Uhr mittags in Aachen an).</em></p>
-<hr>
-<h3>5. e) Zeichnerische Lösung (Weg-Zeit-Diagramm)</h3>
-<p>Um die Rechnungen zeichnerisch zu überprüfen:</p>
-<ol>
-<li><strong>Koordinatensystem zeichnerisch anlegen:</strong></li>
-</ol>
-<ul>
-<li><strong>x-Achse (Zeit $t$ in Stunden):</strong> Skalierung von $0$ bis $20$ Stunden (oder $7:00$ Uhr bis $27:00$ Uhr).</li>
-<li><strong>y-Achse (Entfernung von Aachen in $\text{km}$):</strong> Skalierung von $0\text{ km}$ (Aachen) bis $10\text{ km}$ (Rastplatz).</li>
-</ul>
-<ol start="2">
-<li><strong>Gerade für Fritz einzeichnen:</strong></li>
-</ol>
-<ul>
-<li><strong>Startpunkt ($t=0$):</strong> $(0 \mid 0)$ in Aachen.</li>
-<li><strong>Zweiter Punkt ($t=20$):</strong> $(20 \mid 10)$ am Rastplatz.</li>
-<li>Verbinde beide Punkte zu einer Geraden.</li>
-</ul>
-<ol start="3">
-<li><strong>Gerade für Max einzeichnen:</strong></li>
-</ol>
-<ul>
-<li><strong>Startpunkt ($t=0$):</strong> $(0 \mid 10)$ am Rastplatz.</li>
-<li><strong>Zielpunkt ($t=5$):</strong> $(5 \mid 0)$ in Aachen.</li>
-<li>Verbinde beide Punkte zu einer Geraden.</li>
-</ul>
-<ol start="4">
-<li><strong>Schnittpunkt ablesen:</strong></li>
-</ol>
-<ul>
-<li>Der Schnittpunkt beider Geraden liegt bei <strong>$S(4 \mid 2)$</strong>.</li>
-<li>Das bedeutet: Nach <strong>4 Stunden</strong> treffen sie sich in einer Entfernung von <strong>$2\text{ km}$ von Aachen</strong> (also $8\text{ km}$ vom Rastplatz entfernt).</li>
-</ul>
-</details>
+    <hr>
+    <h3>1. Grunddaten &amp; Variablen festlegen</h3>
+    <ul>
+      <li><strong>$t$</strong>: Fahrzeit in Stunden ($\text{h}$) ab 7:00 Uhr.</li>
+      <li><strong>$s_1$</strong>: Von Fritz zurückgelegte Strecke in Kilometern ($\text{km}$).</li>
+      <li><strong>$s_2$</strong>: Von Max zurückgelegte Strecke in Kilometern ($\text{km}$).</li>
+    </ul>
+    <p><strong>Gegebene Werte:</strong></p>
+    <ul>
+      <li>
+        <p><strong>Fritz:</strong></p>
+      </li>
+      <li>
+        <p>Startpunkt: Aachen ($0\text{ km}$)</p>
+      </li>
+      <li>
+        <p>Geschwindigkeit: $v_1 = 0{,}5\text{ km/h}$</p>
+      </li>
+      <li>
+        <p><strong>Max:</strong></p>
+      </li>
+      <li>
+        <p>Startpunkt: Rastplatz ($10\text{ km}$ entfernt von Aachen)</p>
+      </li>
+      <li>
+        <p>Geschwindigkeit: $v_2 = 2\text{ km/h}$</p>
+      </li>
+      <li>
+        <p>Gesamtdistanz zwischen Aachen und Rastplatz: $10\text{ km}$</p>
+      </li>
+    </ul>
+    <hr>
+    <h3>2. Gleichungssystem für den Treffpunkt aufstellen</h3>
+    <p>Wenn sich Fritz und Max entgegenfahren, gilt zum Zeitpunkt des Treffens:</p>
+    <ol>
+      <li>Die Summe der von beiden gefahrenen Strecken ergibt die Gesamtdistanz von $10\text{ km}$:</li>
+    </ol>
+    <p>$$\text{I: } s_1 + s_2 = 10$$</p>
+    <ol start="2">
+      <li>Da die Strecke gleich Geschwindigkeit mal Zeit ist ($s = v \cdot t$), gilt nach der Zeit $t$:</li>
+    </ol>
+    <ul>
+      <li>Strecke von Fritz: $s_1 = 0{,}5 \cdot t$</li>
+      <li>Strecke von Max: $s_2 = 2 \cdot t$</li>
+    </ul>
+    <p>Daraus ergibt sich das Gleichungssystem:</p>
+    <p>$$\begin{aligned} \text{I: } &amp; s_1 + s_2 = 10 \ \text{II: } &amp; s_1 = 0{,}5t \ \text{III: } &amp; s_2 = 2t \end{aligned}$$</p>
+    <hr>
+    <h3>3. Rechnerischer Lösungsweg</h3>
+    <h4>Variante A: Einsetzungsverfahren</h4>
+    <p>Beim <strong>Einsetzungsverfahren</strong> setzen wir die Ausdrücke für $s_1$ (Gleichung II) und $s_2$ (Gleichung III) direkt in Gleichung I ein:</p>
+    <p>$$\text{II und III in I einsetzen:}$$</p>
+    <p>$$0{,}5t + 2t = 10$$</p>
+    <ol>
+      <li><strong>Gleichartige Terme zusammenfassen:</strong></li>
+    </ol>
+    <p>$$2{,}5t = 10$$</p>
+    <ol start="2">
+      <li><strong>Nach $t$ auflösen (durch $2{,}5$ teilen):</strong></li>
+    </ol>
+    <p>$$t = \frac{10}{2{,}5} = 4\text{ Stunden}$$</p>
+    <hr>
+    <h4>Variante B: Additionsverfahren / Subtraktionsverfahren</h4>
+    <p>Man kann die Bewegungen auch als Weg-Zeit-Funktionen bezogen auf den Abstand von Aachen darstellen:</p>
+    <ul>
+      <li>Position von Fritz nach $t$ Stunden: $y_1 = 0{,}5t$</li>
+      <li>Position von Max nach $t$ Stunden: $y_2 = 10 - 2t$</li>
+    </ul>
+    <p>Am Treffpunkt sind beide am selben Ort ($y_1 = y_2 = y$):</p>
+    <p>$$\begin{aligned} \text{I: } &amp; y - 0{,}5t = 0 \ \text{II: } &amp; y + 2t = 10 \end{aligned}$$</p>
+    <p>Wir subtrahieren Gleichung I von Gleichung II ($\text{II} - \text{I}$), um die Variable $y$ zu eliminieren:</p>
+    <p>$$\begin{aligned} (y + 2t) - (y - 0{,}5t) &amp;= 10 - 0 \ 2t + 0{,}5t &amp;= 10 \ 2{,}5t &amp;= 10 \quad \vert{} : 2{,}5 \ t &amp;= 4\text{ Stunden} \end{aligned}$$</p>
+    <hr>
+    <h3>4. Beantwortung aller Teilaufgaben</h3>
+    <h4>a) Um wie viel Uhr treffen sie sich?</h4>
+    <ul>
+      <li><strong>Fahrzeit bis zum Treffen:</strong> $t = 4\text{ Stunden}$.</li>
+      <li><strong>Uhrzeit:</strong> Start um 7:00 Uhr $+ 4\text{ Stunden} =$ <strong>11:00 Uhr</strong>.</li>
+    </ul>
+    <h4>b) Wie viel km sind sie jeweils gefahren?</h4>
+    <ul>
+      <li><strong>Fritz ($s_1$):</strong> $s_1 = 0{,}5\text{ km/h} \cdot 4\text{ h} =$ <strong>$2\text{ km}$</strong></li>
+      <li><strong>Max ($s_2$):</strong> $s_2 = 2\text{ km/h} \cdot 4\text{ h} =$ <strong>$8\text{ km}$</strong>
+        <em>(Probe: $2\text{ km} + 8\text{ km} = 10\text{ km}$ Gesamtweg)</em>
+      </li>
+    </ul>
+    <h4>c) In wie viel Stunden wird Fritz am Rastplatz ankommen?</h4>
+    <p>Fritz muss die gesamten $10\text{ km}$ mit $0{,}5\text{ km/h}$ zurücklegen:</p>
+    <p>$$t_{\text{Fritz}} = \frac{\text{Strecke}}{\text{Geschwindigkeit}} = \frac{10\text{ km}}{0{,}5\text{ km/h}} = \mathbf{20\text{ Stunden}}$$</p>
+    <p><em>(Er kommt also am nächsten Morgen um 3:00 Uhr an).</em></p>
+    <h4>d) Wie lange wird Max brauchen, um in Aachen anzukommen?</h4>
+    <p>Max muss die gesamten $10\text{ km}$ mit $2\text{ km/h}$ zurücklegen:</p>
+    <p>$$t_{\text{Max}} = \frac{\text{Strecke}}{\text{Geschwindigkeit}} = \frac{10\text{ km}}{2\text{ km/h}} = \mathbf{5\text{ Stunden}}$$</p>
+    <p><em>(Er kommt um 12:00 Uhr mittags in Aachen an).</em></p>
+    <hr>
+    <h3>5. e) Zeichnerische Lösung (Weg-Zeit-Diagramm)</h3>
+    <p>Um die Rechnungen zeichnerisch zu überprüfen:</p>
+    <ol>
+      <li><strong>Koordinatensystem zeichnerisch anlegen:</strong></li>
+    </ol>
+    <ul>
+      <li><strong>x-Achse (Zeit $t$ in Stunden):</strong> Skalierung von $0$ bis $20$ Stunden (oder $7:00$ Uhr bis $27:00$ Uhr).</li>
+      <li><strong>y-Achse (Entfernung von Aachen in $\text{km}$):</strong> Skalierung von $0\text{ km}$ (Aachen) bis $10\text{ km}$ (Rastplatz).</li>
+    </ul>
+    <ol start="2">
+      <li><strong>Gerade für Fritz einzeichnen:</strong></li>
+    </ol>
+    <ul>
+      <li><strong>Startpunkt ($t=0$):</strong> $(0 \mid 0)$ in Aachen.</li>
+      <li><strong>Zweiter Punkt ($t=20$):</strong> $(20 \mid 10)$ am Rastplatz.</li>
+      <li>Verbinde beide Punkte zu einer Geraden.</li>
+    </ul>
+    <ol start="3">
+      <li><strong>Gerade für Max einzeichnen:</strong></li>
+    </ol>
+    <ul>
+      <li><strong>Startpunkt ($t=0$):</strong> $(0 \mid 10)$ am Rastplatz.</li>
+      <li><strong>Zielpunkt ($t=5$):</strong> $(5 \mid 0)$ in Aachen.</li>
+      <li>Verbinde beide Punkte zu einer Geraden.</li>
+    </ul>
+    <ol start="4">
+      <li><strong>Schnittpunkt ablesen:</strong></li>
+    </ol>
+    <ul>
+      <li>Der Schnittpunkt beider Geraden liegt bei <strong>$S(4 \mid 2)$</strong>.</li>
+      <li>Das bedeutet: Nach <strong>4 Stunden</strong> treffen sie sich in einer Entfernung von <strong>$2\text{ km}$ von Aachen</strong> (also $8\text{ km}$ vom Rastplatz entfernt).</li>
+    </ul>
+  </details>
 
   <hr>
-  
+
   <h2>
-    🧮 Blatt 7 
+    🧮 Blatt 7
   </h2>
-  
+
   <p><strong>C. Ich kann Kosten und Erlösaufgaben berechnen – ab wann macht man Gewinn?</strong></p>
-<p>Hans stellt Kerzen her. Monatlich hat er 150 Euro Kosten für die Werkstatt und das Material pro Kerze kostet 75 Cent. Jede Kerze möchte er für 1 Euro verkaufen.</p>
-<p>a) Ab wie viel verkauften Kerzen macht er Gewinn?</p>
-<p>b) Wie viel Geld muss er einnehmen, bis er Gewinn machen kann?</p>
-<p>c) Wie viel Geld hat er verdient, wenn er im Monat 200 Kerzen verkauft? Reicht das schon, um schwarze Zahlen zu schreiben?</p>
-<p>d) Er will sich ein Auto für 5000 Euro kaufen. Wie viele Kerzen müsste er dafür verkauft haben?</p>
-  
+  <p>Hans stellt Kerzen her. Monatlich hat er 150 Euro Kosten für die Werkstatt und das Material pro Kerze kostet 75 Cent. Jede Kerze möchte er für 1 Euro verkaufen.</p>
+  <p>a) Ab wie viel verkauften Kerzen macht er Gewinn?</p>
+  <p>b) Wie viel Geld muss er einnehmen, bis er Gewinn machen kann?</p>
+  <p>c) Wie viel Geld hat er verdient, wenn er im Monat 200 Kerzen verkauft? Reicht das schon, um schwarze Zahlen zu schreiben?</p>
+  <p>d) Er will sich ein Auto für 5000 Euro kaufen. Wie viele Kerzen müsste er dafür verkauft haben?</p>
+
   <hr>
-  
-    <h2>
-    🧮 Blatt 8 
+
+  <details style="border:1px solid #2a2a2a;border-radius:6px;padding:10px 14px;background:#141414;color:#e8e8e4;">
+    <summary style="cursor:pointer;color:#c9a227;font-weight:600;">Antwort</summary>
+    <p style="margin:10px 0 0;font-size:14px;line-height:1.5;">
+
+    <p>Hier ist die schrittweise Berechnung für Hans’ Kerzenproduktion:</p>
+    <h3><strong>Grunddaten:</strong></h3>
+    <ul>
+      <li><strong>Fixkosten ($K_f$):</strong> $150\text{ €}$ pro Monat</li>
+      <li><strong>Variable Kosten pro Stück ($k_v$):</strong> $0{,}75\text{ €}$</li>
+      <li><strong>Verkaufspreis pro Stück ($p$):</strong> $1{,}00\text{ €}$</li>
+      <li><strong>Deckungsbeitrag pro Kerze ($DB$):</strong> $1{,}00\text{ €} - 0{,}75\text{ €} = 0{,}25\text{ €}$ Gewinn pro Kerze zur Deckung der Fixkosten.</li>
+    </ul>
+    <hr>
+    <h3><strong>a) Ab wie viel verkauften Kerzen macht er Gewinn?</strong></h3>
+    <p>Um die Gewinnschwelle (Break-Even-Point) zu erreichen, müssen die Fixkosten durch den Deckungsbeitrag gedeckt werden:</p>
+    <p>$$\text{Anzahl Kerzen} = \frac{\text{Fixkosten}}{\text{Deckungsbeitrag}} = \frac{150\text{ €}}{0{,}25\text{ €}} = 600\text{ Kerzen}$$</p>
+    <ul>
+      <li>Bei <strong>600 Kerzen</strong> sind die Gesamtkosten genau gedeckt (Gewinn = $0\text{ €}$).</li>
+      <li><strong>Ab der 601. Kerze</strong> macht Hans Gewinn.</li>
+    </ul>
+    <hr>
+    <h3><strong>b) Wie viel Geld muss er einnehmen, bis er Gewinn machen kann?</strong></h3>
+    <p>Der Umsatz bei der Gewinnschwelle beträgt:</p>
+    <p>$$\text{Umsatz} = 600\text{ Kerzen} \cdot 1{,}00\text{ €/Kerze} = 600\text{ €}$$</p>
+    <ul>
+      <li>Hans muss mindestens <strong>600,01 €</strong> einnehmen (also mehr als $600\text{ €}$), um im Gewinnbereich zu sein.</li>
+    </ul>
+    <hr>
+    <h3><strong>c) Gewinn bei 200 Kerzen pro Monat</strong></h3>
+    <p><strong>Berechnung:</strong></p>
+    <ul>
+      <li><strong>Erlös (Einnahmen):</strong> $200 \cdot 1{,}00\text{ €} = 200\text{ €}$</li>
+      <li><strong>Gesamtkosten ($K$):</strong> $150\text{ € (Fixkosten)} + (200 \cdot 0{,}75\text{ € (Variable Kosten)}) = 150\text{ €} + 150\text{ €} = 300\text{ €}$</li>
+      <li><strong>Gewinn / Verlust:</strong> $200\text{ €} - 300\text{ €} = -100\text{ €}$</li>
+      <li><strong>Antwort:</strong> Bei 200 Kerzen macht er <strong>$100\text{ €}$ Verlust</strong> (sein Verdienst / Gewinn ist $-100\text{ €}$).</li>
+      <li><strong>Schwarze Zahlen?</strong> Nein, das reicht <strong>nicht</strong>, um schwarze Zahlen zu schreiben. Er befindet sich noch in den roten Zahlen, da er weniger als die benötigten 600 Kerzen verkauft hat.</li>
+    </ul>
+    <hr>
+    <h3><strong>d) Verkaufte Kerzen für ein Auto für 5000 Euro</strong></h3>
+    <p>Um neben den laufenden Fixkosten einen Reingewinn von $5.000\text{ €}$ zu erzielen, müssen die Fixkosten <strong>und</strong> der Zielgewinn abgedeckt werden:</p>
+    <p>$$\text{Gesamter benötigter Deckungsbeitrag} = 150\text{ € (Fixkosten)} + 5.000\text{ € (Gewinn)} = 5.150\text{ €}$$</p>
+    <p>$$\text{Benötigte Kerzen} = \frac{5.150\text{ €}}{0{,}25\text{ €/Kerze}} = 20.600\text{ Kerzen}$$</p>
+    <p><em>(Hinweis: Falls die $5.000\text{ €}$ rein aus dem kumulierten Reingewinn angespart werden sollen – d.h. die $150\text{ €}$ monatliche Werkstattmiete werden laufend aus den Monatsverkäufen getragen –, benötigt er allein für den Gewinn von $5.000\text{ €}$ genau $\frac{5.000\text{ €}}{0{,}25\text{ €}} = 20.000\text{ Kerzen}$ zusätzlich zu den jeweiligen Break-Even-Mengen der Monate.)</em></p>
+    <ul>
+      <li><strong>Antwort:</strong> Insgesamt müsste er in diesem Monat <strong>20.600 Kerzen</strong> verkaufen, um die Miete zu bezahlen und netto $5.000\text{ €}$ Gewinn für das Auto übrig zu haben.</li>
+    </ul>
+
+  </details>
+
+
+  <hr>
+
+  <h2>
+    🧮 Blatt 8
   </h2>
 
-<p><strong>D. Ich kann Angebotsaufgaben rechnen – welches Angebot ist günstiger?</strong></p>
-<p>Für eine Klassenfahrt stehen zwei Angebote von Busunternehmen zur Auswahl. Der Lehrer ist sich nicht sicher, ab welcher Personenzahl welches Angebot günstiger ist. Bitte lösen Sie das Problem des Lehrers.</p>
-<p>Folgende Angebote stehen bereit:
-Vertrag I: Grundbetrag 200 Euro plus 20 Cent je gefahrenem Kilometer
-Vertrag II: Grundbetrag 150 Euro plus 30 Cent je gefahrenem Kilometer</p>
-<p>a) Stellen Sie für beide Verträge die Kosten als Funktion der gefahrenen Kilometer auf.
-b) Zeichnen Sie beide Funktionen in ein gemeinsames Diagramm und lesen Sie die Lösung ab. ($100\text{ km } 1\text{ cm}, 100\text{ Euro } 1\text{ cm}$)
-c) Berechnen Sie die Lösung. Welches Angebot ist ab welcher Strecke günstiger?
-d) Welche drei mathematischen Lösungsverfahren sind bei der Berechnung möglich?</p>
+  <p><strong>D. Ich kann Angebotsaufgaben rechnen – welches Angebot ist günstiger?</strong></p>
+  <p>Für eine Klassenfahrt stehen zwei Angebote von Busunternehmen zur Auswahl. Der Lehrer ist sich nicht sicher, ab welcher Personenzahl welches Angebot günstiger ist. Bitte lösen Sie das Problem des Lehrers.</p>
+  <p>Folgende Angebote stehen bereit:
+    Vertrag I: Grundbetrag 200 Euro plus 20 Cent je gefahrenem Kilometer
+    Vertrag II: Grundbetrag 150 Euro plus 30 Cent je gefahrenem Kilometer</p>
+  <p>a) Stellen Sie für beide Verträge die Kosten als Funktion der gefahrenen Kilometer auf.
+    b) Zeichnen Sie beide Funktionen in ein gemeinsames Diagramm und lesen Sie die Lösung ab. ($100\text{ km } 1\text{ cm}, 100\text{ Euro } 1\text{ cm}$)
+    c) Berechnen Sie die Lösung. Welches Angebot ist ab welcher Strecke günstiger?
+    d) Welche drei mathematischen Lösungsverfahren sind bei der Berechnung möglich?</p>
 
-
+  <a href="https://juppijo.github.io/Rechner/Gleichung2.html" class="link-box-container" target="_blank" rel="noopener noreferrer">
+    <div class="link-box-icon">🚀</div>
+    <div class="link-box-content">
+      <h3 class="link-box-title">Lösung</h3>
+      <p class="link-box-description">Link Gleichung2</p>
+    </div>
+    <div class="link-box-button">Jetzt ansehen →</div>
+  </a>
 
 
   <script>

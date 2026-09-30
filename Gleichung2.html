@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">  
+<title>Gleichung 2</title>
+   <script>
+    MathJax = {
+      tex: {
+        inlineMath: [
+          ['$', '$'],
+          ['\\(', '\\)']
+        ],
+        displayMath: [
+          ['$$', '$$'],
+          ['\\[', '\\]']
+        ]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+  body {
+    font-family: sans-serif;
+    margin: 40px;
+    color: #112255;
+    background: #ededfd;
+    max-width : 1000px;
+    text-align: justify;
+    padding : auto;
+    margin  : auto;
+    }
+    h1 {
+      color: #112299;
+    }
+    .button-container {
+      display: flex;
+      justify-content: flex-end; 
+      padding: 10px 15px; 
+      gap: 10px; 
+    }
+    .link-box-button {
+      justify-content: flex-end;
+      padding: 10px 18px;
+      background: #112299;
+      color: #eeddff;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 8px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: opacity 0.2s ease;
+      cursor: pointer; 
+      border: none;
+    }
+    .link-box-button:hover {
+      background: #666688;
+      padding: 10px 19px;
+    }
+
+    /* Styles für das interaktive Diagramm */
+    .diagram-container {
+      background: #ffffff;
+      border: 1px solid #bbbcde;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 25px 0;
+      box-shadow: 0 4px 12px rgba(17, 34, 153, 0.08);
+    }
+    .diagram-header {
+      margin-bottom: 15px;
+      text-align: left;
+    }
+    .diagram-header h4 {
+      margin: 0 0 5px 0;
+      color: #112299;
+      font-size: 1.1em;
+    }
+    .diagram-header p {
+      margin: 0;
+      font-size: 0.9em;
+      color: #555577;
+    }
+    .controls-panel {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      background: #f4f4fe;
+      padding: 12px 18px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+    .slider-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-grow: 1;
+    }
+    .slider-group label {
+      font-weight: bold;
+      font-size: 0.9em;
+      white-space: nowrap;
+    }
+    .slider-group input[type="range"] {
+      flex-grow: 1;
+      cursor: pointer;
+    }
+    .info-badge {
+      background: #112299;
+      color: #ffffff;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 0.9em;
+      white-space: nowrap;
+    }
+    .canvas-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      background: #ffffff;
+    }
+    .legend {
+      display: flex;
+      justify-content: center;
+      gap: 25px;
+      margin-top: 15px;
+      font-size: 0.9em;
+      font-weight: 600;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .legend-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div class="button-container">
+    <button class="link-box-button" onclick="toggleFullscreen()">⛶</button>
+  </div>
+  <h1>Gleichung 2</h1>
+
+  <p>Hier ist die vollständige Lösung für den Aufgabenstellung.</p>
+<hr>
+<h3>a) Kostenfunktionen aufstellen</h3>
+<p>Die Gesamtkosten $K$ hängen von den gefahrenen Kilometern $x$ ab. Ein Cent wird als $0{,}01\text{ Euro}$ dargestellt (also $20\text{ Ct} = 0{,}20\text{ Euro}$ und $30\text{ Ct} = 0{,}30\text{ Euro}$).</p>
+<ul>
+<li><strong>Vertrag I:</strong></li>
+</ul>
+<p>$$K_1(x) = 0{,}20 \cdot x + 200$$</p>
+<ul>
+<li><strong>Vertrag II:</strong></li>
+</ul>
+<p>$$K_2(x) = 0{,}30 \cdot x + 150$$</p>
+<hr>
+<h3>b) Grafische Lösung</h3>
+<p>Zur Erstellung des Diagramms bestimmen wir Wertepaare für den relevanten Bereich ($0$ bis $800\text{ km}$):</p>
+<table>
+<thead>
+<tr>
+<th>Kilometer ($x$)</th>
+<th>Kosten Vertrag I ($K_1$)</th>
+<th>Kosten Vertrag II ($K_2$)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$0\text{ km}$</td>
+<td>$200\text{ Euro}$</td>
+<td>$150\text{ Euro}$</td>
+</tr>
+<tr>
+<td>$500\text{ km}$ (Schnittpunkt)</td>
+<td><strong>$300\text{ Euro}$</strong></td>
+<td><strong>$300\text{ Euro}$</strong></td>
+</tr>
+<tr>
+<td>$800\text{ km}$</td>
+<td>$360\text{ Euro}$</td>
+<td>$390\text{ Euro}$</td>
+</tr>
+</tbody></table>
+<p><strong>Maßstab für das Koordinatensystem:</strong></p>
+<ul>
+<li><strong>x-Achse (Strecke):</strong> $100\text{ km} \hat{=} 1\text{ cm}$</li>
+<li><strong>y-Achse (Kosten):</strong> $100\text{ Euro} \hat{=} 1\text{ cm}$</li>
+</ul>
+  
+<!-- INTERAKTIVES DIAGRAMM START -->
+<div class="diagram-container">
+  <div class="diagram-header">
+    <h4>Interaktiver Kostenvergleich (Vertrag I vs. Vertrag II)</h4>
+    <p>Bewege den Schieberegler, um die Gesamtkosten bei verschiedenen Kilometerständen abzulesen.</p>
+  </div>
+
+  <div class="controls-panel">
+    <div class="slider-group">
+      <label for="kmSlider">Fahrstrecke:</label>
+      <input type="range" id="kmSlider" min="0" max="800" step="10" value="500" oninput="updateChart()">
+      <span id="kmValue" class="info-badge">500 km</span>
+    </div>
+  </div>
+
+  <div class="canvas-wrapper">
+    <canvas id="costCanvas" width="800" height="500"></canvas>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: #2575fc;"></div>
+      <span>Vertrag I: K₁(x) = 0,20x + 200 €</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: #de2d29;"></div>
+      <span>Vertrag II: K₂(x) = 0,30x + 150 €</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  function drawChart() {
+    const canvas = document.getElementById('costCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const kmInput = document.getElementById('kmSlider');
+    const currentKm = parseFloat(kmInput.value);
+
+    document.getElementById('kmValue').innerText = currentKm + ' km';
+
+    // Dimensionen & Abstände
+    const w = canvas.width;
+    const h = canvas.height;
+    const padding = { top: 40, right: 40, bottom: 60, left: 70 };
+    const graphWidth = w - padding.left - padding.right;
+    const graphHeight = h - padding.top - padding.bottom;
+
+    // Wertebereiche
+    const xMax = 800; // km
+    const yMin = 0;   // €
+    const yMax = 400; // €
+
+    // Umrechnung Koordinaten -> Pixel
+    function getXPix(x) {
+      return padding.left + (x / xMax) * graphWidth;
+    }
+    function getYPix(y) {
+      return h - padding.bottom - ((y - yMin) / (yMax - yMin)) * graphHeight;
+    }
+
+    // Canvas leeren
+    ctx.clearRect(0, 0, w, h);
+
+    // Gitterlinien zeichnen
+    ctx.strokeStyle = '#e3e3f3';
+    ctx.lineWidth = 1;
+
+    // Vertikale Gitterlinien (alle 100 km)
+    for (let x = 0; x <= xMax; x += 100) {
+      const px = getXPix(x);
+      ctx.beginPath();
+      ctx.moveTo(px, padding.top);
+      ctx.lineTo(px, h - padding.bottom);
+      ctx.stroke();
+
+      // Beschriftung x-Achse
+      ctx.fillStyle = '#112255';
+      ctx.font = '12px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(x + ' km', px, h - padding.bottom + 20);
+    }
+
+    // Horizontale Gitterlinien (alle 50 €)
+    for (let y = yMin; y <= yMax; y += 50) {
+      const py = getYPix(y);
+      ctx.beginPath();
+      ctx.moveTo(padding.left, py);
+      ctx.lineTo(w - padding.right, py);
+      ctx.stroke();
+
+      // Beschriftung y-Achse
+      ctx.fillStyle = '#112255';
+      ctx.font = '12px sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(y + ' €', padding.left - 10, py + 4);
+    }
+
+    // Achsen zeichnen
+    ctx.strokeStyle = '#112299';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    // y-Achse
+    ctx.moveTo(padding.left, padding.top);
+    ctx.lineTo(padding.left, h - padding.bottom);
+    // x-Achse
+    ctx.lineTo(w - padding.right, h - padding.bottom);
+    ctx.stroke();
+
+    // Funktionen berechnen
+    const k1 = (x) => 0.20 * x + 200;
+    const k2 = (x) => 0.30 * x + 150;
+
+    // Vertrag I Graph zeichnen (Blau)
+    ctx.strokeStyle = '#2575fc';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(getXPix(0), getYPix(k1(0)));
+    ctx.lineTo(getXPix(800), getYPix(k1(800)));
+    ctx.stroke();
+
+    // Vertrag II Graph zeichnen (Rot)
+    ctx.strokeStyle = '#de2d29';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(getXPix(0), getYPix(k2(0)));
+    ctx.lineTo(getXPix(800), getYPix(k2(800)));
+    ctx.stroke();
+
+    // Schnittpunkt markieren (500 km, 300 €)
+    const intersectX = 500;
+    const intersectY = 300;
+    const ixPix = getXPix(intersectX);
+    const iyPix = getYPix(intersectY);
+
+    // Gestrichelte Linien zum Schnittpunkt
+    ctx.setLineDash([5, 5]);
+    ctx.strokeStyle = '#112299';
+    ctx.lineWidth = 1.5;
+    
+    ctx.beginPath();
+    ctx.moveTo(ixPix, h - padding.bottom);
+    ctx.lineTo(ixPix, iyPix);
+    ctx.lineTo(padding.left, iyPix);
+    ctx.stroke();
+    ctx.setLineDash([]); // Reset Dash
+
+    // Schnittpunkt-Kreis
+    ctx.fillStyle = '#112299';
+    ctx.beginPath();
+    ctx.arc(ixPix, iyPix, 6, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#112299';
+    ctx.font = 'bold 12px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('Schnittpunkt (500 km | 300 €)', ixPix + 10, iyPix - 10);
+
+    // Aktueller Wert vom Slider anzeigen
+    const currK1 = k1(currentKm);
+    const currK2 = k2(currentKm);
+    const currXPix = getXPix(currentKm);
+
+    // Vertikale Linie für ausgewählte Kilometer
+    ctx.strokeStyle = '#8888aa';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath();
+    ctx.moveTo(currXPix, padding.top);
+    ctx.lineTo(currXPix, h - padding.bottom);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Punkt auf Vertrag I
+    ctx.fillStyle = '#2575fc';
+    ctx.beginPath();
+    ctx.arc(currXPix, getYPix(currK1), 5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Punkt auf Vertrag II
+    ctx.fillStyle = '#de2d29';
+    ctx.beginPath();
+    ctx.arc(currXPix, getYPix(currK2), 5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Infobox für aktuellen Stand
+    const boxWidth = 160;
+    const boxHeight = 55;
+    let boxX = currXPix + 15;
+    if (boxX + boxWidth > w - padding.right) {
+      boxX = currXPix - boxWidth - 15;
+    }
+    const boxY = padding.top + 10;
+
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+    ctx.strokeStyle = '#112299';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(boxX, boxY, boxWidth, boxHeight, 6);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.font = 'bold 12px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#2575fc';
+    ctx.fillText(`Vertrag I:  ${currK1.toFixed(2)} €`, boxX + 10, boxY + 22);
+    ctx.fillStyle = '#de2d29';
+    ctx.fillText(`Vertrag II: ${currK2.toFixed(2)} €`, boxX + 10, boxY + 42);
+  }
+
+  function updateChart() {
+    drawChart();
+  }
+
+  // Initialisieren sobald die Seite geladen ist
+  window.addEventListener('load', drawChart);
+</script>
+<!-- INTERAKTIVES DIAGRAMM ENDE -->
+  
+<p><strong>Ablesung aus dem Diagramm:</strong>
+Die beiden Geraden schneiden sich genau beim Punkt $(500 \mid 300)$. Das bedeutet: Bei einer Fahrstrecke von <strong>$500\text{ km}$</strong> kosten beide Angebote exakt <strong>$300\text{ Euro}$</strong>.</p>
+<hr>
+<h3>c) Rechnerische Lösung</h3>
+<p>Um den Schnittpunkt zu berechnen, setzen wir die beiden Funktionsgleichungen gleich ($K_1(x) = K_2(x)$):</p>
+<p>$$0{,}20x + 200 = 0{,}30x + 150$$</p>
+<p>Subtraktion von $0{,}20x$ auf beiden Seiten:</p>
+<p>$$200 = 0{,}10x + 150$$</p>
+<p>Subtraktion von $150$:</p>
+<p>$$50 = 0{,}10x$$</p>
+<p>Dividieren durch $0{,}10$:</p>
+<p>$$x = 500$$</p>
+<p><strong>Ergebnis und Empfehlung für die Fahrtstrecke:</strong></p>
+<ul>
+<li><strong>Unter $500\text{ km}$</strong> ist <strong>Vertrag II</strong> günstiger (niedrigerer Grundpreis).</li>
+<li><strong>Bei exakt $500\text{ km}$</strong> kosten beide Verträge gleich viel ($300\text{ Euro}$).</li>
+<li><strong>Über $500\text{ km}$</strong> ist <strong>Vertrag I</strong> günstiger (geringere Kilometerpauschale).</li>
+</ul>
+<blockquote>
+<p><strong>Hinweis zur Personenzahl:</strong> In der Aufgabenstellung wird nach der Personenzahl gefragt. Da beide Verträge jedoch Fixpreise für den gesamten Bus (unabhängig von der Mitfahreranzahl) angeben, hängt die Wahl des günstigeren Angebots rein von der <strong>gefahrenen Gesamtkilometerzahl</strong> ab, nicht von der Schüleranzahl.</p>
+</blockquote>
+<hr>
+<h3>d) Die drei mathematischen Lösungsverfahren</h3>
+<p>Ein lineares Gleichungssystem mit zwei Variablen lässt sich algebraisch durch folgende drei Standardverfahren lösen:</p>
+<ol>
+<li><strong>Gleichsetzungsverfahren:</strong> Beide Funktionsgleichungen werden nach derselben Variable aufgestellt und gleichgesetzt ($K_1(x) = K_2(x)$), wie in Aufgabenteil c gezeigt.</li>
+<li><strong>Einsetzungsverfahren:</strong> Eine Gleichung wird nach einer Variable aufgelöst und in die andere Gleichung eingesetzt.</li>
+<li><strong>Additionsverfahren (bzw. Subtraktionsverfahren):</strong> Die Gleichungen werden so miteinander verrechnet (addiert/subtrahiert), dass eine der Variablen eliminiert wird.</li>
+</ol>
+
+
+  
+  <script>
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(err => {
+        alert("Fehler beim Aktivieren des Vollbildmodus!");
+      });
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+  }
+  </script>
+</body>
+</html>

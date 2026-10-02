@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lineare Gleichungssysteme - Schnittpunkte</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f4f4f9;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        svg {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <svg viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+        <style>
+            .grid { stroke: #cccccc; stroke-width: 1; }
+            .axis-frame { stroke: #333333; stroke-width: 1.5; fill: none; }
+            .line-blue { stroke: #1f77b4; stroke-width: 2.5; fill: none; }
+            .line-orange { stroke: #ff7f0e; stroke-width: 2.5; fill: none; }
+            .dot-red { fill: #ff0000; }
+            .text-title { font-size: 18px; font-weight: normal; text-anchor: middle; fill: #000; }
+            .text-tick { font-size: 13px; fill: #000; text-anchor: middle; }
+            .text-tick-y { font-size: 13px; fill: #000; text-anchor: end; }
+            .legend-box { fill: #ffffff; stroke: #cccccc; stroke-width: 1; opacity: 0.9; }
+            .legend-text { font-size: 14px; fill: #000; }
+        </style>
+
+        <!-- SUBPLOT a) S(-3 | 1) -->
+        <g transform="translate(20, 20)">
+            <text x="225" y="22" class="text-title">a) S(-3 | 1)</text>
+            <rect x="50" y="35" width="350" height="380" class="axis-frame" />
+            <!-- Grid H -->
+            <line x1="50" y1="111" x2="400" y2="111" class="grid"/><text x="42" y="115" class="text-tick-y">5</text>
+            <line x1="50" y1="187" x2="400" y2="187" class="grid"/><text x="42" y="191" class="text-tick-y">0</text>
+            <line x1="50" y1="263" x2="400" y2="263" class="grid"/><text x="42" y="267" class="text-tick-y">-5</text>
+            <line x1="50" y1="339" x2="400" y2="339" class="grid"/><text x="42" y="343" class="text-tick-y">-10</text>
+            <line x1="50" y1="415" x2="400" y2="415" class="grid"/><text x="42" y="419" class="text-tick-y">-15</text>
+            <!-- Grid V -->
+            <line x1="50" y1="35" x2="50" y2="415" class="grid"/><text x="50" y="432" class="text-tick">-6</text>
+            <line x1="108" y1="35" x2="108" y2="415" class="grid"/><text x="108" y="432" class="text-tick">-4</text>
+            <line x1="167" y1="35" x2="167" y2="415" class="grid"/><text x="167" y="432" class="text-tick">-2</text>
+            <line x1="225" y1="35" x2="225" y2="415" class="grid"/><text x="225" y="432" class="text-tick">0</text>
+            <line x1="283" y1="35" x2="283" y2="415" class="grid"/><text x="283" y="432" class="text-tick">2</text>
+            <line x1="342" y1="35" x2="342" y2="415" class="grid"/><text x="342" y="432" class="text-tick">4</text>
+            <line x1="400" y1="35" x2="400" y2="415" class="grid"/><text x="400" y="432" class="text-tick">6</text>
+
+            <clipPath id="clip-a">
+                <rect x="50" y="35" width="350" height="380"/>
+            </clipPath>
+            <line x1="50" y1="80.6" x2="400" y2="445.4" class="line-blue" clip-path="url(#clip-a)"/>
+            <line x1="50" y1="217.4" x2="400" y2="35" class="line-orange" />
+
+            <circle cx="137.5" cy="171.8" r="6" class="dot-red" />
+
+            <rect x="60" y="270" width="135" height="75" class="legend-box"/>
+            <line x1="70" y1="287" x2="95" y2="287" class="line-blue"/>
+            <text x="103" y="291" class="legend-text">y = −2x − 5</text>
+            <line x1="70" y1="310" x2="95" y2="310" class="line-orange"/>
+            <text x="103" y="314" class="legend-text">y = x + 4</text>
+            <circle cx="82.5" cy="332" r="5" class="dot-red"/>
+            <text x="103" y="336" class="legend-text">S(-3, 1)</text>
+        </g>
+
+        <!-- SUBPLOT b) S(-2 | -5) -->
+        <g transform="translate(520, 20)">
+            <text x="225" y="22" class="text-title">b) S(-2 | -5)</text>
+            <rect x="50" y="35" width="350" height="380" class="axis-frame" />
+            <!-- Grid H -->
+            <line x1="50" y1="35" x2="400" y2="35" class="grid"/><text x="42" y="39" class="text-tick-y">20</text>
+            <line x1="50" y1="89" x2="400" y2="89" class="grid"/><text x="42" y="93" class="text-tick-y">15</text>
+            <line x1="50" y1="143" x2="400" y2="143" class="grid"/><text x="42" y="147" class="text-tick-y">10</text>
+            <line x1="50" y1="198" x2="400" y2="198" class="grid"/><text x="42" y="202" class="text-tick-y">5</text>
+            <line x1="50" y1="252" x2="400" y2="252" class="grid"/><text x="42" y="256" class="text-tick-y">0</text>
+            <line x1="50" y1="306" x2="400" y2="306" class="grid"/><text x="42" y="310" class="text-tick-y">-5</text>
+            <line x1="50" y1="361" x2="400" y2="361" class="grid"/><text x="42" y="365" class="text-tick-y">-10</text>
+            <line x1="50" y1="415" x2="400" y2="415" class="grid"/><text x="42" y="419" class="text-tick-y">-15</text>
+            <!-- Grid V -->
+            <line x1="50" y1="35" x2="50" y2="415" class="grid"/><text x="50" y="432" class="text-tick">-6</text>
+            <line x1="108" y1="35" x2="108" y2="415" class="grid"/><text x="108" y="432" class="text-tick">-4</text>
+            <line x1="167" y1="35" x2="167" y2="415" class="grid"/><text x="167" y="432" class="text-tick">-2</text>
+            <line x1="225" y1="35" x2="225" y2="415" class="grid"/><text x="225" y="432" class="text-tick">0</text>
+            <line x1="283" y1="35" x2="283" y2="415" class="grid"/><text x="283" y="432" class="text-tick">2</text>
+            <line x1="342" y1="35" x2="342" y2="415" class="grid"/><text x="342" y="432" class="text-tick">4</text>
+            <line x1="400" y1="35" x2="400" y2="415" class="grid"/><text x="400" y="432" class="text-tick">6</text>
+
+            <clipPath id="clip-b">
+                <rect x="50" y="35" width="350" height="380"/>
+            </clipPath>
+            <line x1="50" y1="436.7" x2="400" y2="45.9" class="line-blue" clip-path="url(#clip-b)"/>
+            <line x1="50" y1="350.1" x2="400" y2="219.6" class="line-orange" />
+
+            <circle cx="166.7" cy="306.4" r="6" class="dot-red" />
+
+            <rect x="60" y="45" width="135" height="75" class="legend-box"/>
+            <line x1="70" y1="62" x2="95" y2="62" class="line-blue"/>
+            <text x="103" y="66" class="legend-text">y = 3x + 1</text>
+            <line x1="70" y1="85" x2="95" y2="85" class="line-orange"/>
+            <text x="103" y="89" class="legend-text">y = x − 3</text>
+            <circle cx="82.5" cy="107" r="5" class="dot-red"/>
+            <text x="103" y="111" class="legend-text">S(-2, -5)</text>
+        </g>
+
+        <!-- SUBPLOT c) S(1 | 0) -->
+        <g transform="translate(20, 500)">
+            <text x="225" y="22" class="text-title">c) S(1 | 0)</text>
+            <rect x="50" y="35" width="350" height="380" class="axis-frame" />
+            <!-- Grid H -->
+            <line x1="50" y1="35" x2="400" y2="35" class="grid"/><text x="42" y="39" class="text-tick-y">15</text>
+            <line x1="50" y1="98" x2="400" y2="98" class="grid"/><text x="42" y="102" class="text-tick-y">10</text>
+            <line x1="50" y1="162" x2="400" y2="162" class="grid"/><text x="42" y="166" class="text-tick-y">5</text>
+            <line x1="50" y1="225" x2="400" y2="225" class="grid"/><text x="42" y="229" class="text-tick-y">0</text>
+            <line x1="50" y1="288" x2="400" y2="288" class="grid"/><text x="42" y="292" class="text-tick-y">-5</text>
+            <line x1="50" y1="352" x2="400" y2="352" class="grid"/><text x="42" y="356" class="text-tick-y">-10</text>
+            <line x1="50" y1="415" x2="400" y2="415" class="grid"/><text x="42" y="419" class="text-tick-y">-15</text>
+            <!-- Grid V -->
+            <line x1="50" y1="35" x2="50" y2="415" class="grid"/><text x="50" y="432" class="text-tick">-6</text>
+            <line x1="108" y1="35" x2="108" y2="415" class="grid"/><text x="108" y="432" class="text-tick">-4</text>
+            <line x1="167" y1="35" x2="167" y2="415" class="grid"/><text x="167" y="432" class="text-tick">-2</text>
+            <line x1="225" y1="35" x2="225" y2="415" class="grid"/><text x="225" y="432" class="text-tick">0</text>
+            <line x1="283" y1="35" x2="283" y2="415" class="grid"/><text x="283" y="432" class="text-tick">2</text>
+            <line x1="342" y1="35" x2="342" y2="415" class="grid"/><text x="342" y="432" class="text-tick">4</text>
+            <line x1="400" y1="35" x2="400" y2="415" class="grid"/><text x="400" y="432" class="text-tick">6</text>
+
+            <line x1="50" y1="402.3" x2="400" y2="98.3" class="line-blue" />
+            <line x1="50" y1="47.7" x2="400" y2="351.7" class="line-orange" />
+
+            <circle cx="254.2" cy="225.0" r="6" class="dot-red" />
+
+            <rect x="250" y="45" width="140" height="75" class="legend-box"/>
+            <line x1="260" y1="62" x2="285" y2="62" class="line-blue"/>
+            <text x="293" y="66" class="legend-text">y = 2x − 2</text>
+            <line x1="260" y1="85" x2="285" y2="85" class="line-orange"/>
+            <text x="293" y="89" class="legend-text">y = −2x + 2</text>
+            <circle cx="272.5" cy="107" r="5" class="dot-red"/>
+            <text x="293" y="111" class="legend-text">S(1, 0)</text>
+        </g>
+
+        <!-- SUBPLOT d) S(1.5 | 3.5) -->
+        <g transform="translate(520, 500)">
+            <text x="225" y="22" class="text-title">d) S(1.5 | 3.5)</text>
+            <rect x="50" y="35" width="350" height="380" class="axis-frame" />
+            <!-- Grid H -->
+            <line x1="50" y1="35" x2="400" y2="35" class="grid"/><text x="42" y="39" class="text-tick-y">10</text>
+            <line x1="50" y1="89" x2="400" y2="89" class="grid"/><text x="42" y="93" class="text-tick-y">8</text>
+            <line x1="50" y1="143" x2="400" y2="143" class="grid"/><text x="42" y="147" class="text-tick-y">6</text>
+            <line x1="50" y1="198" x2="400" y2="198" class="grid"/><text x="42" y="202" class="text-tick-y">4</text>
+            <line x1="50" y1="252" x2="400" y2="252" class="grid"/><text x="42" y="256" class="text-tick-y">2</text>
+            <line x1="50" y1="306" x2="400" y2="306" class="grid"/><text x="42" y="310" class="text-tick-y">0</text>
+            <line x1="50" y1="361" x2="400" y2="361" class="grid"/><text x="42" y="365" class="text-tick-y">-2</text>
+            <line x1="50" y1="415" x2="400" y2="415" class="grid"/><text x="42" y="419" class="text-tick-y">-4</text>
+            <!-- Grid V -->
+            <line x1="50" y1="35" x2="50" y2="415" class="grid"/><text x="50" y="432" class="text-tick">-6</text>
+            <line x1="108" y1="35" x2="108" y2="415" class="grid"/><text x="108" y="432" class="text-tick">-4</text>
+            <line x1="167" y1="35" x2="167" y2="415" class="grid"/><text x="167" y="432" class="text-tick">-2</text>
+            <line x1="225" y1="35" x2="225" y2="415" class="grid"/><text x="225" y="432" class="text-tick">0</text>
+            <line x1="283" y1="35" x2="283" y2="415" class="grid"/><text x="283" y="432" class="text-tick">2</text>
+            <line x1="342" y1="35" x2="342" y2="415" class="grid"/><text x="342" y="432" class="text-tick">4</text>
+            <line x1="400" y1="35" x2="400" y2="415" class="grid"/><text x="400" y="432" class="text-tick">6</text>
+
+            <clipPath id="clip-d">
+                <rect x="50" y="35" width="350" height="380"/>
+            </clipPath>
+            <line x1="50" y1="415" x2="400" y2="89.3" class="line-blue" />
+            <line x1="50" y1="8" x2="400" y2="333.6" class="line-orange" clip-path="url(#clip-d)"/>
+
+            <circle cx="268.8" cy="211.6" r="6" class="dot-red" />
+
+            <rect x="235" y="45" width="155" height="75" class="legend-box"/>
+            <line x1="245" y1="62" x2="270" y2="62" class="line-blue"/>
+            <text x="278" y="66" class="legend-text">y = x + 2</text>
+            <line x1="245" y1="85" x2="270" y2="85" class="line-orange"/>
+            <text x="278" y="89" class="legend-text">y = −x + 5</text>
+            <circle cx="257.5" cy="107" r="5" class="dot-red"/>
+            <text x="278" y="111" class="legend-text">S(1.5, 3.5)</text>
+        </g>
+    </svg>
+</div>
+
+</body>
+</html>

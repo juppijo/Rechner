@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gleichungen</title>
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [
+          ['$', '$'],
+          ['\\(', '\\)']
+        ],
+        displayMath: [
+          ['$$', '$$'],
+          ['\\[', '\\]']
+        ]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 40px;
+      color: #112255;
+      background: #ededfd;
+      max-width : 1000px;
+      text-align: justify;
+      padding : auto;
+      margin  : auto;
+      }
+      h1 {
+        color: #112299;
+      }
+      .button-container {
+        display: flex;
+        justify-content: flex-end; 
+        padding: 10px 15px; 
+        gap: 10px; 
+      }
+      .link-box-button {
+        justify-content: flex-end;
+        padding: 10px 18px;
+        background: #112299;
+        color: #eeddff;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 8px;
+        white-space: nowrap;
+        flex-shrink: 0;
+        transition: opacity 0.2s ease;
+        cursor: pointer; 
+      }
+      .link-box-button:hover {
+        background: #666688;
+        padding: 10px 19px;
+      }
+  </style>
+</head>
+<body>
+  <div class="button-container">
+    <button class="link-box-button" onclick="toggleFullscreen()">⛶</button>
+  </div>
+  <h1>Gleichungen</h1>
+
+  <p>Hier sind die vollständigen Lösungen zu allen drei Übungen aus dem Bild.</p>
+  <hr>
+  <h1>Übung 1</h1>
+  <p>1a. <strong>Textaufgabe</strong></p>
+  <p>Für einen Automaten werden meist 50-Cent- und 20-Cent-Münzen benötigt. Nach dem entsprechenden Wechsel von 8 € wurden 31 Münzen ausgezahlt. Wie viele Münzen jeder Sorte sind das?</p>
+  <hr>
+  <p>1b. <strong>Erklärung der Aufgabe &amp; Lösungsansatz</strong></p>
+  <p>Insgesamt wurden 31 Münzen ausgezahlt. Die Anzahl aller Münzen zusammen ergibt somit 31.
+    Der Gesamtwert aller Münzen beträgt 8 € = 800 Cent. Jede 50-Cent-Münze trägt 50 Cent bei, jede 20-Cent-Münze 20 Cent.</p>
+  <p>Wir definieren $x$ als Anzahl der 50-Cent-Münzen und $y$ als Anzahl der 20-Cent-Münzen und lösen das entstandene Gleichungssystem.</p>
+  <hr>
+  <ol start="2">
+    <li><strong>Gleichungssystem</strong></li>
+  </ol>
+  <ul>
+    <li>$x$: Anzahl der 50-Cent-Münzen</li>
+    <li>$y$: Anzahl der 20-Cent-Münzen</li>
+  </ul>
+  <ol>
+    <li>
+      <p><strong>Münzanzahl-Gleichung:</strong> $x + y = 31$</p>
+    </li>
+    <li>
+      <p><strong>Wert-Gleichung (in Cent):</strong> $50x + 20y = 800$</p>
+    </li>
+  </ol>
+  <hr>
+  <ol start="3">
+    <li><strong>Lösungswege</strong></li>
+  </ol>
+  <h3>Additionsverfahren</h3>
+  <p><strong>Schritt 1:</strong> Multiplikation der 1. Gleichung mit $-20$:</p>
+  <p>$$(x + y = 31) \cdot (-20) \implies -20x - 20y = -620$$</p>
+  <p><strong>Schritt 2:</strong> Addieren der beiden Gleichungen:</p>
+
+  <p>
+    $$
+    \begin{align*}
+    -20x - 20y &= -620 \\
+    + \quad (50x + 20y &= 800) \\
+    \hline
+    30x &= 180
+    \end{align*}
+    $$
+  </p>
+
+  <p><strong>Schritt 3:</strong> Teilen durch 30:</p>
+  <p>$$x = 6$$</p>
+  <p><strong>Schritt 4:</strong> Einsetzen von $x = 6$ in $x + y = 31$:</p>
+  <p>$$6 + y = 31 \implies y = 25$$</p>
+  <hr>
+  <h3>Einsetzungsverfahren (Substitutionsverfahren)</h3>
+  <p><strong>Schritt 1:</strong> Umstellen der 1. Gleichung nach $y$:</p>
+  <p>$$y = 31 - x$$</p>
+  <p><strong>Schritt 2:</strong> Einsetzen in die 2. Gleichung ($50x + 20y = 800$):</p>
+  <p>$$50x + 20(31 - x) = 800$$</p>
+  <p>$$50x + 620 - 20x = 800$$</p>
+  <p>$$30x + 620 = 800$$</p>
+  <p>$$30x = 180$$</p>
+  <p>$$x = 6$$</p>
+  <p><strong>Schritt 3:</strong> Einsetzen von $x = 6$ in $y = 31 - x$:</p>
+  <p>$$y = 31 - 6 = 25$$</p>
+  <p><strong>Ergebnis:</strong> Es sind <strong>6 Münzen zu 50 Cent</strong> und <strong>25 Münzen zu 20 Cent</strong>.</p>
+  <hr>
+  <ol start="4">
+    <li><strong>Grafische Darstellung (Python-Skript)</strong></li>
+  </ol>
+  <pre><code class="language-python">import matplotlib.pyplot as plt
+import numpy as np
+
+x = np.linspace(0, 31, 100)
+
+y1 = 31 - x
+y2 = (800 - 50 * x) / 20
+
+plt.figure(figsize=(8, 6))
+plt.plot(x, y1, label=&#39;Anzahl: $x + y = 31$&#39;, color=&#39;blue&#39;)
+plt.plot(x, y2, label=&#39;Wert: $50x + 20y = 800$&#39;, color=&#39;orange&#39;)
+plt.plot(6, 25, &#39;ro&#39;, markersize=8, label=&#39;Schnittpunkt (6, 25)&#39;)
+plt.annotate(&#39;Schnittpunkt (6x 50ct, 25x 20ct)&#39;, xy=(6, 25), xytext=(10, 28),
+             arrowprops=dict(facecolor=&#39;black&#39;, shrink=0.05, width=1, headwidth=6))
+
+plt.title(&#39;Übung 1: Münzen wechseln&#39;)
+plt.xlabel(&#39;50-Cent-Münzen (x)&#39;)
+plt.ylabel(&#39;20-Cent-Münzen (y)&#39;)
+plt.xlim(0, 31)
+plt.ylim(0, 40)
+plt.grid(True)
+plt.legend()
+plt.show()
+</code></pre>
+  <hr>
+  <ol start="5">
+    <li><strong>Das Python-Ergebnis anzeigen</strong></li>
+  </ol>
+  <hr>
+  <hr>
+  <h1>Übung 2</h1>
+  <p>1a. <strong>Textaufgabe</strong></p>
+  <p>Ein 10-€-Schein wird in 1-€- und 2-€-Münzen gewechselt. Dabei werden 6 (7, 9) Münzen ausgezahlt.
+    a) Wie heißen die Gleichungen des entsprechenden linearen Gleichungssystems in der Form $y = mx + b$?
+    b) Wie wurde ausgezahlt?</p>
+  <hr>
+  <p>1b. <strong>Erklärung der Aufgabe &amp; Lösungsansatz</strong></p>
+  <p>Wir betrachten die drei Teilfälle für 6, 7 und 9 Münzen.
+    $x$ bezeichnen wir als Anzahl der 1-€-Münzen und $y$ als Anzahl der 2-€-Münzen.
+    Der Gesamtwert beträgt stets 10 € ($1x + 2y = 10$). Die Anzahl der Münzen bestimmt die zweite Gleichung ($x + y = N$, wobei $N \in {6, 7, 9}$).</p>
+  <hr>
+  <ol start="2">
+    <li><strong>Gleichungssysteme</strong></li>
+  </ol>
+  <ul>
+    <li>$x$: Anzahl 1-€-Münzen</li>
+    <li>$y$: Anzahl 2-€-Münzen</li>
+  </ul>
+  <p>Wert-Gleichung (für alle Fälle gleich):</p>
+  <p>$$x + 2y = 10 \implies 2y = -x + 10 \implies y = -0{,}5x + 5$$</p>
+  <p>a) <strong>Gleichungen in der Form $y = mx + b$:</strong></p>
+  <ul>
+    <li><strong>Fall 1 (6 Münzen):</strong></li>
+  </ul>
+  <ol>
+    <li>$y = -0{,}5x + 5$</li>
+    <li>$x + y = 6 \implies y = -x + 6$</li>
+  </ol>
+  <ul>
+    <li><strong>Fall 2 (7 Münzen):</strong></li>
+  </ul>
+  <ol>
+    <li>$y = -0{,}5x + 5$</li>
+    <li>$x + y = 7 \implies y = -x + 7$</li>
+  </ol>
+  <ul>
+    <li><strong>Fall 3 (9 Münzen):</strong></li>
+  </ul>
+  <ol>
+    <li>$y = -0{,}5x + 5$</li>
+    <li>$x + y = 9 \implies y = -x + 9$</li>
+  </ol>
+  <hr>
+  <ol start="3">
+    <li><strong>Lösungswege (für alle 3 Fälle)</strong></li>
+  </ol>
+  <h3>Fall 1: 6 Münzen ($y = -0{,}5x + 5$ und $y = -x + 6$)</h3>
+  <p><strong>Einsetzungsverfahren:</strong></p>
+  <p>$$-0{,}5x + 5 = -x + 6$$</p>
+  <p>$$0{,}5x = 1 \implies x = 2$$</p>
+  <p>$$y = 6 - 2 = 4$$</p>
+  <p><strong>Ergebnis:</strong> 2x 1-€-Münzen und 4x 2-€-Münzen.</p>
+  <hr>
+  <h3>Fall 2: 7 Münzen ($y = -0{,}5x + 5$ und $y = -x + 7$)</h3>
+  <p><strong>Einsetzungsverfahren:</strong></p>
+  <p>$$-0{,}5x + 5 = -x + 7$$</p>
+  <p>$$0{,}5x = 2 \implies x = 4$$</p>
+  <p>$$y = 7 - 4 = 3$$</p>
+  <p><strong>Ergebnis:</strong> 4x 1-€-Münzen und 3x 2-€-Münzen.</p>
+  <hr>
+  <h3>Fall 3: 9 Münzen ($y = -0{,}5x + 5$ und $y = -x + 9$)</h3>
+  <p><strong>Einsetzungsverfahren:</strong></p>
+  <p>$$-0{,}5x + 5 = -x + 9$$</p>
+  <p>$$0{,}5x = 4 \implies x = 8$$</p>
+  <p>$$y = 9 - 8 = 1$$</p>
+  <p><strong>Ergebnis:</strong> 8x 1-€-Münzen und 1x 2-€-Münzen.</p>
+  <hr>
+  <p>b) <strong>Zusammenfassende Antwort für b):</strong></p>
+  <ul>
+    <li>Bei <strong>6 Münzen:</strong> 2 Münzen zu 1 € und 4 Münzen zu 2 €.</li>
+    <li>Bei <strong>7 Münzen:</strong> 4 Münzen zu 1 € und 3 Münzen zu 2 €.</li>
+    <li>Bei <strong>9 Münzen:</strong> 8 Münzen zu 1 € und 1 Münze zu 2 €.</li>
+  </ul>
+  <hr>
+  <ol start="4">
+    <li><strong>Grafische Darstellung (Python-Skript)</strong></li>
+  </ol>
+  <pre><code class="language-python">import matplotlib.pyplot as plt
+import numpy as np
+
+x = np.linspace(0, 10, 100)
+
+y_wert = -0.5 * x + 5
+y_6 = -x + 6
+y_7 = -x + 7
+y_9 = -x + 9
+
+plt.figure(figsize=(8, 6))
+
+plt.plot(x, y_wert, label=&#39;Wert: $y = -0.5x + 5$&#39;, color=&#39;black&#39;, linewidth=2)
+plt.plot(x, y_6, label=&#39;6 Münzen: $y = -x + 6$&#39;, color=&#39;blue&#39;)
+plt.plot(x, y_7, label=&#39;7 Münzen: $y = -x + 7$&#39;, color=&#39;green&#39;)
+plt.plot(x, y_9, label=&#39;9 Münzen: $y = -x + 9$&#39;, color=&#39;purple&#39;)
+
+plt.plot(2, 4, &#39;bo&#39;, markersize=8, label=&#39;Schnittpunkt 1 (2, 4)&#39;)
+plt.plot(4, 3, &#39;go&#39;, markersize=8, label=&#39;Schnittpunkt 2 (4, 3)&#39;)
+plt.plot(8, 1, &#39;mo&#39;, markersize=8, label=&#39;Schnittpunkt 3 (8, 1)&#39;)
+
+plt.title(&#39;Übung 2: 10 € wechseln&#39;)
+plt.xlabel(&#39;1-€-Münzen (x)&#39;)
+plt.ylabel(&#39;2-€-Münzen (y)&#39;)
+plt.xlim(0, 10)
+plt.ylim(0, 10)
+plt.grid(True)
+plt.legend()
+plt.show()
+</code></pre>
+  <hr>
+  <ol start="5">
+    <li><strong>Das Python-Ergebnis anzeigen</strong></li>
+  </ol>
+  <hr>
+  <hr>
+  <h1>Übung 3</h1>
+  <p>1a. <strong>Textaufgabe</strong></p>
+  <p>Zeichne die Geraden in ein Koordinatensystem und bestimme aus der Zeichnung die Koordinaten des Schnittpunktes.
+    a) $y = -2x - 5$ und $y = x + 4$
+    b) $y = 3x + 1$ und $y = x - 3$
+    c) $y = 2x - 2$ und $y = -2x + 2$
+    d) $y = x + 2$ und $y = -x + 5$</p>
+  <hr>
+  <p>1b. <strong>Erklärung der Aufgabe &amp; Lösungsansatz</strong></p>
+  <p>Wir lösen jede der vier Aufgabenstellungen sowohl rechnerisch als auch grafisch, um die Schnittpunkte der gegebenen Geradenpaare zu bestimmen.</p>
+  <hr>
+  <h2>Aufgabenteil a) $y = -2x - 5$ und $y = x + 4$</h2>
+  <ol start="2">
+    <li><strong>Gleichungssystem:</strong></li>
+    <li>$y = -2x - 5$</li>
+    <li>$y = x + 4$</li>
+    <li><strong>Lösung (Einsetzungsverfahren):</strong></li>
+  </ol>
+  <p>$$-2x - 5 = x + 4$$</p>
+  <p>$$-3x = 9 \implies x = -3$$</p>
+  <p>$$y = -3 + 4 = 1$$</p>
+  <p><strong>Schnittpunkt:</strong> $S(-3 \vert{} 1)$</p>
+  <hr>
+  <h2>Aufgabenteil b) $y = 3x + 1$ und $y = x - 3$</h2>
+  <ol start="2">
+    <li><strong>Gleichungssystem:</strong></li>
+    <li>$y = 3x + 1$</li>
+    <li>$y = x - 3$</li>
+    <li><strong>Lösung (Einsetzungsverfahren):</strong></li>
+  </ol>
+  <p>$$3x + 1 = x - 3$$</p>
+  <p>$$2x = -4 \implies x = -2$$</p>
+  <p>$$y = -2 - 3 = -5$$</p>
+  <p><strong>Schnittpunkt:</strong> $S(-2 \vert{} -5)$</p>
+  <hr>
+  <h2>Aufgabenteil c) $y = 2x - 2$ und $y = -2x + 2$</h2>
+  <ol start="2">
+    <li><strong>Gleichungssystem:</strong></li>
+    <li>$y = 2x - 2$</li>
+    <li>$y = -2x + 2$</li>
+    <li><strong>Lösung (Einsetzungsverfahren):</strong></li>
+  </ol>
+  <p>$$2x - 2 = -2x + 2$$</p>
+  <p>$$4x = 4 \implies x = 1$$</p>
+  <p>$$y = 2(1) - 2 = 0$$</p>
+  <p><strong>Schnittpunkt:</strong> $S(1 \vert{} 0)$</p>
+  <hr>
+  <h2>Aufgabenteil d) $y = x + 2$ und $y = -x + 5$</h2>
+  <ol start="2">
+    <li><strong>Gleichungssystem:</strong></li>
+    <li>$y = x + 2$</li>
+    <li>$y = -x + 5$</li>
+    <li><strong>Lösung (Einsetzungsverfahren):</strong></li>
+  </ol>
+  <p>$$x + 2 = -x + 5$$</p>
+  <p>$$2x = 3 \implies x = 1{,}5$$</p>
+  <p>$$y = 1{,}5 + 2 = 3{,}5$$</p>
+  <p><strong>Schnittpunkt:</strong> $S(1{,}5 \vert{} 3{,}5)$</p>
+  <hr>
+  <ol start="4">
+    <li><strong>Grafische Darstellung (Python-Skript für alle 4 Teilaufgaben)</strong></li>
+  </ol>
+  <pre><code class="language-python">import matplotlib.pyplot as plt
+import numpy as np
+
+fig, axs = plt.subplots(2, 2, figsize=(10, 10))
+x = np.linspace(-6, 6, 100)
+
+# Teilaufgabe a
+axs[0, 0].plot(x, -2*x - 5, label=&#39;$y = -2x - 5$&#39;)
+axs[0, 0].plot(x, x + 4, label=&#39;$y = x + 4$&#39;)
+axs[0, 0].plot(-3, 1, &#39;ro&#39;, label=&#39;S(-3, 1)&#39;)
+axs[0, 0].set_title(&#39;a) S(-3 | 1)&#39;)
+axs[0, 0].grid(True)
+axs[0, 0].legend()
+
+# Teilaufgabe b
+axs[0, 1].plot(x, 3*x + 1, label=&#39;$y = 3x + 1$&#39;)
+axs[0, 1].plot(x, x - 3, label=&#39;$y = x - 3$&#39;)
+axs[0, 1].plot(-2, -5, &#39;ro&#39;, label=&#39;S(-2, -5)&#39;)
+axs[0, 1].set_title(&#39;b) S(-2 | -5)&#39;)
+axs[0, 1].grid(True)
+axs[0, 1].legend()
+
+# Teilaufgabe c
+axs[1, 0].plot(x, 2*x - 2, label=&#39;$y = 2x - 2$&#39;)
+axs[1, 0].plot(x, -2*x + 2, label=&#39;$y = -2x + 2$&#39;)
+axs[1, 0].plot(1, 0, &#39;ro&#39;, label=&#39;S(1, 0)&#39;)
+axs[1, 0].set_title(&#39;c) S(1 | 0)&#39;)
+axs[1, 0].grid(True)
+axs[1, 0].legend()
+
+# Teilaufgabe d
+axs[1, 1].plot(x, x + 2, label=&#39;$y = x + 2$&#39;)
+axs[1, 1].plot(x, -x + 5, label=&#39;$y = -x + 5$&#39;)
+axs[1, 1].plot(1.5, 3.5, &#39;ro&#39;, label=&#39;S(1.5, 3.5)&#39;)
+axs[1, 1].set_title(&#39;d) S(1.5 | 3.5)&#39;)
+axs[1, 1].grid(True)
+axs[1, 1].legend()
+
+plt.tight_layout()
+plt.show()
+</code></pre>
+  <hr>
+  <ol start="5">
+    <li><strong>Das Python-Ergebnis anzeigen (Übung 3a bis 3d)</strong></li>
+  </ol>
+
+  <script>
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          alert("Fehler beim Aktivieren des Vollbildmodus!");
+        });
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+  </script>
+</body>
+</html>

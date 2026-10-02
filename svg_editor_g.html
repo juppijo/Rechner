@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="de" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SVG Live Editor</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              800: '#075985',
+              900: '#0c4a6e',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- CodeMirror (Code Editor with Syntax Highlighting) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/dracula.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/xml/xml.min.js"></script>
+
+  <style>
+    /* CodeMirror integration tweaks */
+    .CodeMirror {
+      height: 100% !important;
+      font-family: 'Fira Code', 'Cascadia Code', Consolas, Monaco, monospace;
+      font-size: 14px;
+      line-height: 1.5;
+      background-color: #0f172a !important;
+    }
+    .CodeMirror-gutters {
+      background-color: #1e293b !important;
+      border-right: 1px solid #334155 !important;
+    }
+
+    /* Checkerboard Background for Transparency */
+    .bg-checkerboard-dark {
+      background-color: #0f172a;
+      background-image: 
+        linear-gradient(45deg, #1e293b 25%, transparent 25%),
+        linear-gradient(-45deg, #1e293b 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #1e293b 75%),
+        linear-gradient(-45deg, transparent 75%, #1e293b 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    }
+    .bg-checkerboard-light {
+      background-color: #ffffff;
+      background-image: 
+        linear-gradient(45deg, #f1f5f9 25%, transparent 25%),
+        linear-gradient(-45deg, #f1f5f9 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #f1f5f9 75%),
+        linear-gradient(-45deg, transparent 75%, #f1f5f9 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    }
+
+    /* Custom Splitter Styles */
+    .gutter {
+      background-color: #334155;
+      background-repeat: no-repeat;
+      background-position: 50%;
+      cursor: col-resize;
+      transition: background-color 0.2s;
+    }
+    .gutter:hover {
+      background-color: #38bdf8;
+    }
+
+    /* Canvas pan/zoom cursor */
+    .svg-container {
+      cursor: grab;
+      user-select: none;
+    }
+    .svg-container:active {
+      cursor: grabbing;
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans h-screen flex flex-col overflow-hidden">
+
+  <!-- Top Navigation Header -->
+  <header class="h-14 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-4 z-20 shrink-0">
+    <div class="flex items-center space-x-3">
+      <div class="bg-gradient-to-tr from-brand-600 to-cyan-400 p-2 rounded-lg text-white shadow-lg shadow-brand-500/20">
+        <i data-lucide="code-2" class="w-5 h-5"></i>
+      </div>
+      <div>
+        <h1 class="font-bold text-slate-100 text-base leading-none">SVG Live Editor</h1>
+        <p class="text-xs text-slate-400 mt-0.5">Erstellen, Editieren & Exportieren</p>
+      </div>
+    </div>
+
+    <!-- Action Bar -->
+    <div class="flex items-center space-x-2">
+      <!-- File Input Hidden -->
+      <input type="file" id="fileInput" accept=".svg" class="hidden">
+      
+      <!-- Open Button -->
+      <button onclick="document.getElementById('fileInput').click()" 
+              class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition border border-slate-700">
+        <i data-lucide="folder-open" class="w-4 h-4 text-brand-500"></i>
+        <span>Datei laden</span>
+      </button>
+
+      <!-- Prettify Button -->
+      <button onclick="prettifySVG()" 
+              class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition border border-slate-700" 
+              title="Code Formatieren">
+        <i data-lucide="sparkles" class="w-4 h-4 text-amber-400"></i>
+        <span class="hidden sm:inline">Formatieren</span>
+      </button>
+
+      <!-- Snippets Menu Dropdown -->
+      <div class="relative inline-block text-left">
+        <button id="snippetBtn" onclick="toggleDropdown('snippetMenu')" 
+                class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition border border-slate-700">
+          <i data-lucide="plus-circle" class="w-4 h-4 text-emerald-400"></i>
+          <span>Vorlagen</span>
+          <i data-lucide="chevron-down" class="w-3.5 h-3.5 ml-0.5"></i>
+        </button>
+        <div id="snippetMenu" class="hidden absolute right-0 mt-2 w-48 rounded-lg bg-slate-900 border border-slate-700 shadow-xl z-50 py-1">
+          <button onclick="insertSnippet('rect')" class="w-full text-left px-3 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center gap-2">
+            <i data-lucide="square" class="w-4 h-4"></i> Rechteck
+          </button>
+          <button onclick="insertSnippet('circle')" class="w-full text-left px-3 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center gap-2">
+            <i data-lucide="circle" class="w-4 h-4"></i> Kreis
+          </button>
+          <button onclick="insertSnippet('text')" class="w-full text-left px-3 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center gap-2">
+            <i data-lucide="type" class="w-4 h-4"></i> Text-Element
+          </button>
+          <button onclick="insertSnippet('gradient')" class="w-full text-left px-3 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center gap-2">
+            <i data-lucide="palette" class="w-4 h-4"></i> Farbverlauf (Gradient)
+          </button>
+          <button onclick="insertSnippet('chart')" class="w-full text-left px-3 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center gap-2">
+            <i data-lucide="bar-chart-2" class="w-4 h-4"></i> Diagramm
+          </button>
+        </div>
+      </div>
+
+      <!-- Export Dropdown -->
+      <div class="relative inline-block text-left">
+        <button id="exportBtn" onclick="toggleDropdown('exportMenu')" 
+                class="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold shadow-lg shadow-brand-600/20 transition">
+          <i data-lucide="download" class="w-4 h-4"></i>
+          <span>Speichern</span>
+          <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
+        </button>
+        <div id="exportMenu" class="hidden absolute right-0 mt-2 w-48 rounded-lg bg-slate-900 border border-slate-700 shadow-xl z-50 py-1">
+          <button onclick="downloadSVG()" class="w-full text-left px-3 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center justify-between">
+            <span>Als SVG speichern</span>
+            <span class="text-[10px] text-brand-400 font-mono">.svg</span>
+          </button>
+          <button onclick="downloadRaster('png')" class="w-full text-left px-3 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center justify-between">
+            <span>Export als PNG</span>
+            <span class="text-[10px] text-emerald-400 font-mono">.png</span>
+          </button>
+          <button onclick="downloadRaster('jpeg')" class="w-full text-left px-3 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center justify-between">
+            <span>Export als JPEG</span>
+            <span class="text-[10px] text-amber-400 font-mono">.jpg</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Fullscreen App Button -->
+      <button onclick="toggleAppFullscreen()" 
+              class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition border border-slate-700" 
+              title="Vollbildmodus">
+        <i data-lucide="maximize" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="flex-1 flex flex-col md:flex-row overflow-hidden relative" id="editorContainer">
+
+    <!-- Left Container: Code Editor Panel -->
+    <div id="leftPanel" class="w-full md:w-1/2 h-1/2 md:h-full flex flex-col border-r border-slate-800 bg-slate-900">
+      
+      <!-- Editor Toolbar Header -->
+      <div class="h-9 bg-slate-900/90 border-b border-slate-800 px-3 flex items-center justify-between text-xs font-medium text-slate-400">
+        <div class="flex items-center space-x-2">
+          <i data-lucide="file-code" class="w-4 h-4 text-brand-400"></i>
+          <span>SVG Code</span>
+        </div>
+        
+        <!-- XML Error Status Indicator -->
+        <div id="errorIndicator" class="hidden flex items-center space-x-1.5 text-xs text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/20">
+          <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i>
+          <span id="errorMessage">Syntaxfehler</span>
+        </div>
+      </div>
+
+      <!-- Code Editor Window -->
+      <div class="flex-1 relative overflow-hidden">
+        <textarea id="svgCode"></textarea>
+      </div>
+    </div>
+
+    <!-- Right Container: Interactive SVG Preview Panel -->
+    <div id="rightPanel" class="w-full md:w-1/2 h-1/2 md:h-full flex flex-col bg-slate-950 relative">
+      
+      <!-- Preview Controls Header -->
+      <div class="h-9 bg-slate-900/90 border-b border-slate-800 px-3 flex items-center justify-between text-xs font-medium text-slate-400 z-10">
+        <div class="flex items-center space-x-2">
+          <i data-lucide="eye" class="w-4 h-4 text-emerald-400"></i>
+          <span>Vorschau Canvas</span>
+        </div>
+
+        <div class="flex items-center space-x-1.5">
+          <!-- Background Grid Toggle -->
+          <button onclick="toggleGridTheme()" 
+                  class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition" 
+                  title="Hintergrund Raster Umschalten">
+            <i data-lucide="grid" class="w-4 h-4"></i>
+          </button>
+
+          <!-- Zoom Out -->
+          <button onclick="zoomCanvas(-0.15)" 
+                  class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition" 
+                  title="Verkleinern">
+            <i data-lucide="zoom-out" class="w-4 h-4"></i>
+          </button>
+
+          <!-- Zoom Indicator/Reset -->
+          <button onclick="resetZoomPan()" 
+                  class="px-2 py-0.5 rounded hover:bg-slate-800 text-slate-300 font-mono text-[11px] transition" 
+                  title="Ansicht zurücksetzen">
+            <span id="zoomLevel">100%</span>
+          </button>
+
+          <!-- Zoom In -->
+          <button onclick="zoomCanvas(0.15)" 
+                  class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition" 
+                  title="Vergrößern">
+            <i data-lucide="zoom-in" class="w-4 h-4"></i>
+          </button>
+
+          <!-- Preview Container Fullscreen -->
+          <button onclick="togglePreviewFullscreen()" 
+                  class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition ml-1" 
+                  title="Vorschau-Vollbild">
+            <i data-lucide="expand" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Interactive SVG Canvas Surface -->
+      <div id="previewContainer" class="flex-1 bg-checkerboard-dark overflow-hidden relative flex items-center justify-center svg-container">
+        <!-- Interactive Viewport Wrapper -->
+        <div id="viewport" class="transition-transform duration-75 origin-center inline-block">
+          <div id="svgRenderOutput"></div>
+        </div>
+      </div>
+
+      <!-- Footer Info Bar -->
+      <div class="h-6 bg-slate-900 border-t border-slate-800/80 px-3 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+        <span id="dimensionsDisplay">Dimensionen: -</span>
+        <span>Mausrad: Zoom | Ziehen: Verschieben</span>
+      </div>
+    </div>
+  </main>
+
+  <!-- Notification Toast Container -->
+  <div id="toast" class="fixed bottom-4 right-4 bg-slate-800 border border-slate-700 text-slate-200 px-4 py-2.5 rounded-lg shadow-xl flex items-center space-x-2 text-xs font-medium translate-y-20 opacity-0 transition-all duration-300 z-50">
+    <i id="toastIcon" data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i>
+    <span id="toastMsg">Aktion erfolgreich</span>
+  </div>
+
+  <script>
+    // Initial Default SVG Template
+    const DEFAULT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="50%" stop-color="#1e1b4b" />
+      <stop offset="100%" stop-color="#311042" />
+    </linearGradient>
+
+    <!-- Glow Effect Filter -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <!-- Vibrant Circle Gradient -->
+    <linearGradient id="circleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="50%" stop-color="#818cf8" />
+      <stop offset="100%" stop-color="#c084fc" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="600" rx="24" fill="url(#bgGrad)" />
+
+  <!-- Decorative Grid Pattern Lines -->
+  <g stroke="#ffffff" stroke-opacity="0.05" stroke-width="1">
+    <line x1="0" y1="150" x2="800" y2="150" />
+    <line x1="0" y1="300" x2="800" y2="300" />
+    <line x1="0" y1="450" x2="800" y2="450" />
+    <line x1="200" y1="0" x2="200" y2="600" />
+    <line x1="400" y1="0" x2="400" y2="600" />
+    <line x1="600" y1="0" x2="600" y2="600" />
+  </g>
+
+  <!-- Center Glowing Shape -->
+  <circle cx="400" cy="270" r="110" fill="none" stroke="url(#circleGrad)" stroke-width="12" filter="url(#glow)" />
+  
+  <polygon points="400,200 450,310 350,310" fill="#f43f5e" opacity="0.85" filter="url(#glow)"/>
+
+  <!-- Styled Typography -->
+  <text x="400" y="440" font-family="system-ui, sans-serif" font-size="34" font-weight="bold" fill="#ffffff" text-anchor="middle" letter-spacing="1">
+    SVG LIVE EDITOR
+  </text>
+  
+  <text x="400" y="480" font-family="system-ui, sans-serif" font-size="16" fill="#94a3b8" text-anchor="middle">
+    Bearbeite den Code auf der linken Seite in Echtzeit
+  </text>
+</svg>`;
+
+    // State Variables
+    let editor;
+    let zoomLevel = 1;
+    let panX = 0;
+    let panY = 0;
+    let isDragging = false;
+    let startX, startY;
+    let isDarkCheckerboard = true;
+
+    // Initialize Editor and Application on Load
+    window.addEventListener('DOMContentLoaded', () => {
+      // Initialize Lucide Icons
+      lucide.createIcons();
+
+      // Initialize CodeMirror
+      editor = CodeMirror.fromTextArea(document.getElementById('svgCode'), {
+        mode: 'xml',
+        theme: 'dracula',
+        lineNumbers: true,
+        autoCloseTags: true,
+        matchTags: true,
+        lineWrapping: true,
+        tabSize: 2
+      });
+
+      // Set default content
+      editor.setValue(DEFAULT_SVG);
+
+      // Event listener for live code changes
+      editor.on('change', () => {
+        updatePreview();
+      });
+
+      // Setup Pan and Zoom
+      setupPanAndZoom();
+
+      // Setup File Input Listener
+      document.getElementById('fileInput').addEventListener('change', handleFileSelect);
+
+      // Close dropdowns on click outside
+      window.addEventListener('click', (e) => {
+        if (!e.target.closest('#exportBtn') && !e.target.closest('#exportMenu')) {
+          document.getElementById('exportMenu').classList.add('hidden');
+        }
+        if (!e.target.closest('#snippetBtn') && !e.target.closest('#snippetMenu')) {
+          document.getElementById('snippetMenu').classList.add('hidden');
+        }
+      });
+
+      // Initial Render
+      updatePreview();
+    });
+
+    // Update Interactive SVG Preview
+    function updatePreview() {
+      const code = editor.getValue();
+      const output = document.getElementById('svgRenderOutput');
+      const errorIndicator = document.getElementById('errorIndicator');
+      const errorMessage = document.getElementById('errorMessage');
+
+      // Basic XML Parsing Validation
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(code, 'image/svg+xml');
+      const parserError = doc.querySelector('parsererror');
+
+      if (parserError) {
+        errorIndicator.classList.remove('hidden');
+        errorMessage.textContent = 'Syntax-Fehler im XML';
+      } else {
+        errorIndicator.classList.add('hidden');
+        output.innerHTML = code;
+
+        // Update dimension info in footer
+        const svgEl = output.querySelector('svg');
+        if (svgEl) {
+          const width = svgEl.getAttribute('width') || svgEl.viewBox?.baseVal?.width || 'auto';
+          const height = svgEl.getAttribute('height') || svgEl.viewBox?.baseVal?.height || 'auto';
+          document.getElementById('dimensionsDisplay').textContent = `Dimensionen: ${width} × ${height}`;
+        }
+      }
+    }
+
+    function setupPanAndZoom() {
+      const container = document.getElementById('previewContainer');
+      
+      // Mouse Wheel Zoom
+      container.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const delta = e.deltaY < 0 ? 0.1 : -0.1;
+        zoomCanvas(delta);
+      }, { passive: false });
+
+      // Pan Dragging Handlers
+      container.addEventListener('mousedown', (e) => {
+        if (e.button !== 0) return; // Only left-click
+        isDragging = true;
+        startX = e.clientX - panX;
+        startY = e.clientY - panY;
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        panX = e.clientX - startX;
+        panY = e.clientY - startY;
+        applyTransform();
+      });
+
+      window.addEventListener('mouseup', () => {
+        isDragging = false;
+      });
+    }
+
+    function zoomCanvas(amount) {
+      zoomLevel = Math.max(0.2, Math.min(5, zoomLevel + amount));
+      document.getElementById('zoomLevel').textContent = `${Math.round(zoomLevel * 100)}%`;
+      applyTransform();
+    }
+
+    function applyTransform() {
+      const viewport = document.getElementById('viewport');
+      viewport.style.transform = `translate(${panX}px, ${panY}px) scale(${zoomLevel})`;
+    }
+
+    function resetZoomPan() {
+      zoomLevel = 1;
+      panX = 0;
+      panY = 0;
+      document.getElementById('zoomLevel').textContent = '100%';
+      applyTransform();
+      showToast('Ansicht zurückgesetzt', 'rotate-ccw');
+    }
+
+    function toggleGridTheme() {
+      const container = document.getElementById('previewContainer');
+      isDarkCheckerboard = !isDarkCheckerboard;
+      if (isDarkCheckerboard) {
+        container.className = container.className.replace('bg-checkerboard-light', 'bg-checkerboard-dark');
+      } else {
+        container.className = container.className.replace('bg-checkerboard-dark', 'bg-checkerboard-light');
+      }
+    }
+
+    // File Import
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      if (!file.name.endsWith('.svg') && file.type !== 'image/svg+xml') {
+        showToast('Bitte wähle eine gültige SVG-Datei.', 'alert-triangle');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        editor.setValue(e.target.result);
+        resetZoomPan();
+        showToast('SVG erfolgreich geladen', 'check-circle-2');
+      };
+      reader.readAsText(file);
+    }
+
+    // Download SVG Code directly
+    function downloadSVG() {
+      const svgCode = editor.getValue();
+      const blob = new Blob([svgCode], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'grafik.svg';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      showToast('SVG heruntergeladen', 'download');
+    }
+
+    // Export Raster Image (PNG/JPEG) via Canvas Rendering
+    function downloadRaster(format) {
+      const svgElement = document.querySelector('#svgRenderOutput svg');
+      if (!svgElement) {
+        showToast('Keine valide SVG zum Exportieren', 'alert-circle');
+        return;
+      }
+
+      const svgString = new XMLSerializer().serializeToString(svgElement);
+      const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+      const URLObj = window.URL || window.webkitURL || window;
+      const blobURL = URLObj.createObjectURL(svgBlob);
+
+      const image = new Image();
+      image.onload = () => {
+        const canvas = document.createElement('canvas');
+        
+        // Get viewbox or fallback to dimensions
+        const viewBox = svgElement.viewBox.baseVal;
+        const width = viewBox && viewBox.width ? viewBox.width : (svgElement.clientWidth || 800);
+        const height = viewBox && viewBox.height ? viewBox.height : (svgElement.clientHeight || 600);
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const context = canvas.getContext('2d');
+
+        // Fill white background for JPEG exports
+        if (format === 'jpeg') {
+          context.fillStyle = '#FFFFFF';
+          context.fillRect(0, 0, width, height);
+        }
+
+        context.drawImage(image, 0, 0, width, height);
+
+        const mimeType = format === 'png' ? 'image/png' : 'image/jpeg';
+        const dataURL = canvas.toDataURL(mimeType, 0.95);
+
+        const downloadLink = document.createElement('a');
+        downloadLink.href = dataURL;
+        downloadLink.download = `grafik.${format}`;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        URLObj.revokeObjectURL(blobURL);
+
+        showToast(`Als ${format.toUpperCase()} exportiert`, 'file-image');
+      };
+
+      image.src = blobURL;
+    }
+
+    // Basic XML Prettify/Formatter
+    function prettifySVG() {
+      try {
+        let xml = editor.getValue();
+        let formatted = '';
+        let reg = /(>)(<)(\/*)/g;
+        xml = xml.replace(reg, '$1\r\n$2$3');
+        let pad = 0;
+
+        xml.split('\r\n').forEach((node) => {
+          let indent = 0;
+          if (node.match(/.+<\/\w[^>]*>$/)) {
+            indent = 0;
+          } else if (node.match(/^<\/\w/)) {
+            if (pad !== 0) pad -= 1;
+          } else if (node.match(/^<\w[^>]*[^\/]>.*$/)) {
+            indent = 1;
+          } else {
+            indent = 0;
+          }
+
+          let padding = '';
+          for (let i = 0; i < pad; i++) {
+            padding += '  ';
+          }
+
+          formatted += padding + node + '\r\n';
+          pad += indent;
+        });
+
+        editor.setValue(formatted.trim());
+        showToast('Code formatiert', 'sparkles');
+      } catch (e) {
+        showToast('Fehler beim Formatieren', 'alert-circle');
+      }
+    }
+
+    // Insert Snippets into Code
+    function insertSnippet(type) {
+      let snippet = '';
+      switch (type) {
+        case 'rect':
+          snippet = '\n  <rect x="50" y="50" width="150" height="100" fill="#38bdf8" rx="8" />';
+          break;
+        case 'circle':
+          snippet = '\n  <circle cx="200" cy="200" r="60" fill="#f43f5e" />';
+          break;
+        case 'text':
+          snippet = '\n  <text x="100" y="100" font-family="sans-serif" font-size="24" fill="#ffffff">Hallo SVG</text>';
+          break;
+        case 'gradient':
+          snippet = `\n  <defs>
+    <linearGradient id="myGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4f46e5" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+  </defs>
+  <rect x="20" y="20" width="200" height="120" fill="url(#myGradient)" rx="12" />`;
+          break;
+        case 'chart':
+          snippet = `\n  <!-- Balkendiagramm Gruppe -->
+  <g transform="translate(100, 100)">
+    <rect x="0" y="100" width="40" height="100" fill="#38bdf8" rx="4" />
+    <rect x="60" y="40" width="40" height="160" fill="#818cf8" rx="4" />
+    <rect x="120" y="70" width="40" height="130" fill="#c084fc" rx="4" />
+  </g>`;
+          break;
+      }
+
+      const doc = editor.getDoc();
+      const cursor = doc.getCursor();
+      doc.replaceRange(snippet, cursor);
+      document.getElementById('snippetMenu').classList.add('hidden');
+      showToast('Vorlage eingefügt', 'plus');
+    }
+
+    // Toggle Fullscreen Modes
+    function toggleAppFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    function togglePreviewFullscreen() {
+      const preview = document.getElementById('rightPanel');
+      if (!document.fullscreenElement) {
+        preview.requestFullscreen();
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    function toggleDropdown(id) {
+      const el = document.getElementById(id);
+      el.classList.toggle('hidden');
+    }
+
+    // Show Custom UI Toast Notification
+    function showToast(message, iconName = 'check-circle-2') {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMsg');
+      const toastIcon = document.getElementById('toastIcon');
+
+      toastMsg.textContent = message;
+      toastIcon.setAttribute('data-lucide', iconName);
+      lucide.createIcons();
+
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 2500);
+    }
+  </script>
+</body>
+</html>

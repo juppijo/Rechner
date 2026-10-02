@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matplotlib in PyScript</title>
+    
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css" />
+    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+</head>
+<body>
+
+    <h2>Grafische Lösung des Gleichungssystems</h2>
+    
+    <div id="plot-container"></div>
+
+    <py-config>
+        packages = ["matplotlib", "numpy"]
+    </py-config>
+
+    <script type="py" target="plot-container">
+import matplotlib.pyplot as plt
+import numpy as np
+from pyscript import display  # <-- HIER: display explizit importieren
+
+# Wertebereich für das Alter der Tochter (y)
+y = np.linspace(0, 25, 400)
+
+x1 = 48 - y
+x2 = 2 * y + 3
+
+y_intersect = 15
+x_intersect = 33
+
+fig, ax = plt.subplots(figsize=(8, 6))
+ax.plot(y, x1, label='I: x + y = 48 (Summe)', color='blue')
+ax.plot(y, x2, label='II: x = 2y + 3 (Verhältnis)', color='green')
+
+ax.plot(y_intersect, x_intersect, 'ro', label='Schnittpunkt (15, 33)')
+ax.annotate(
+    f'Schnittpunkt\nTochter: {y_intersect} J.\nMutter: {x_intersect} J.',
+    xy=(y_intersect, x_intersect),
+    xytext=(y_intersect - 5, x_intersect + 5),
+    arrowprops=dict(facecolor='black', shrink=0.05, width=1, headwidth=6),
+)
+
+ax.set_xlabel('Alter der Tochter (y)')
+ax.set_ylabel('Alter der Mutter (x)')
+ax.set_title('Grafische Lösung des Gleichungssystems')
+ax.grid(True)
+ax.legend()
+plt.tight_layout()
+
+# Grafik rendern
+display(fig, target="plot-container")
+    </script>
+
+</body>
+</html>

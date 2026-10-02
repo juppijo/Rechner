@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Python Editor</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d0d0f;--panel:#16161a;--line:#2a2a30;--gold:#d4af37;--text:#e8e6df;--mut:#8a887f;
+--kw:#d4af37;--str:#9ccc65;--com:#6b6a62;--num:#e6965a;--bi:#6fb3d2;--fn:#f0d47a;--dec:#c792ea;--err:#ff6b6b;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--text);font-family:Barlow,system-ui,sans-serif}
+#app{height:100%;display:flex;flex-direction:column;padding:12px;gap:10px;background:var(--bg)}
+header{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+h1{font-family:'Bebas Neue',Impact,sans-serif;font-weight:400;letter-spacing:2px;color:var(--gold);margin:0;font-size:28px;margin-right:auto}
+button{background:var(--panel);color:var(--gold);border:1px solid var(--gold);padding:8px 14px;font:600 14px Barlow,sans-serif;cursor:pointer;border-radius:4px}
+button:hover:not(:disabled){background:var(--gold);color:#000}
+button:disabled{opacity:.5;cursor:wait}
+#run{background:var(--gold);color:#000}
+#run:hover:not(:disabled){background:#f0d47a}
+#name{background:var(--panel);color:var(--text);border:1px solid var(--line);padding:8px 10px;border-radius:4px;font:14px Barlow,sans-serif;width:160px}
+.ed{flex:1;min-height:0;display:flex;background:var(--panel);overflow:hidden}
+#main{flex:1;min-height:0;display:flex;flex-direction:column}
+#main.row{flex-direction:row}
+.pane{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:4px;overflow:hidden;min-width:0;min-height:0}
+#edwrap{flex:1;background:var(--panel)}
+#split{flex:none;height:10px;margin:2px 0;background:var(--line);border-radius:4px;cursor:row-resize;touch-action:none;transition:background .15s}
+#split:hover,#split.drag{background:var(--gold)}
+#main.row #split{width:10px;height:auto;margin:0 2px;cursor:col-resize}
+.pbtns{display:flex;gap:6px}
+.pane:fullscreen{background:var(--bg);width:100%;height:100%;border:0;border-radius:0}
+.pane.max{position:fixed;inset:0;z-index:50;border-radius:0;background:var(--bg);padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.mono,#nums,#code,#hl{font:14px/1.5 ui-monospace,Menlo,Consolas,monospace;tab-size:4}
+#nums{margin:0;padding:12px 8px 40px;text-align:right;color:var(--mut);background:#111114;border-right:1px solid var(--line);overflow:hidden;user-select:none;min-width:44px}
+.wrap{position:relative;flex:1;min-width:0}
+#hl,#code{position:absolute;inset:0;margin:0;padding:12px 12px 40px;white-space:pre;border:0;overflow:auto;letter-spacing:0}
+#hl{overflow:hidden;pointer-events:none;color:var(--text)}
+#code{outline:0;resize:none;background:transparent;color:transparent;caret-color:var(--gold);-webkit-text-fill-color:transparent}
+#code::selection{background:rgba(212,175,55,.3);-webkit-text-fill-color:transparent}
+#code::placeholder{color:var(--mut);-webkit-text-fill-color:var(--mut)}
+.k{color:var(--kw);font-weight:600}.s{color:var(--str)}.c{color:var(--com);font-style:italic}.n{color:var(--num)}
+.b{color:var(--bi)}.f{color:var(--fn)}.d{color:var(--dec)}
+#outwrap{flex:none;height:30%;min-height:60px;background:#0a0a0c}
+#main.row #outwrap{height:auto;width:40%;min-width:120px}
+#outhead,#edhead{display:flex;align-items:center;justify-content:space-between;padding:4px 10px;border-bottom:1px solid var(--line);font:400 18px 'Bebas Neue',Impact,sans-serif;letter-spacing:1.5px;color:var(--gold)}
+#outhead button,#edhead button{padding:2px 10px;font-size:12px}
+#out{flex:1;margin:0;padding:10px 12px;overflow:auto;white-space:pre-wrap;word-break:break-word;font:13px/1.45 ui-monospace,Menlo,Consolas,monospace}
+#out .err{color:var(--err)}#out .sys{color:var(--mut)}
+#out img{display:block;max-width:100%;background:#fff;border-radius:4px;margin:6px 0}
+footer{display:flex;gap:16px;color:var(--mut);font-size:13px;flex-wrap:wrap}
+#state.dirty{color:var(--gold)}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>PYTHON EDITOR</h1>
+    <input id="name" value="skript.py" aria-label="Dateiname">
+    <button id="run" class="runbtn" title="Strg/Cmd + Enter">▶ Ausführen</button>
+    <button id="lay" title="Editor und Ausgabe nebeneinander oder untereinander">Layout ⇄</button>
+    <button id="new">Neu</button>
+    <button id="load">Laden</button>
+    <button id="save">Speichern</button>
+    <button id="fs">Vollbild</button>
+    <input type="file" id="file" accept=".py,.txt,text/x-python,text/plain" hidden>
+  </header>
+  <div id="main">
+    <section id="edwrap" class="pane">
+      <div id="edhead"><span>EDITOR</span><div class="pbtns"><button class="runbtn" id="run2">▶ Ausführen</button><button class="fsbtn" data-t="edwrap" title="Editor im Vollbild">⛶ Vollbild</button></div></div>
+      <div class="ed">
+        <pre id="nums">1</pre>
+        <div class="wrap">
+          <pre id="hl" aria-hidden="true"></pre>
+          <textarea id="code" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="# Python-Skript hier eingeben oder Datei laden&#10;print('Hallo Welt')"></textarea>
+        </div>
+      </div>
+    </section>
+    <div id="split" title="Ziehen zum Ändern der Größe (Doppelklick: zurücksetzen)"></div>
+    <section id="outwrap" class="pane">
+      <div id="outhead"><span>AUSGABE</span><div class="pbtns"><button id="clr">Leeren</button><button class="fsbtn" data-t="outwrap" title="Ausgabe im Vollbild">⛶ Vollbild</button></div></div>
+      <pre id="out"></pre>
+    </section>
+  </div>
+  <footer>
+    <span id="pos">Zeile 1, Spalte 1</span>
+    <span id="cnt">0 Zeichen</span>
+    <span id="state">gespeichert</span>
+    <span id="pystate">Python: nicht geladen</span>
+  </footer>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const code=$('code'),nums=$('nums'),hl=$('hl'),state=$('state'),out=$('out');
+let dirty=false;
+
+/* ---------- Syntax-Highlighting ---------- */
+const KW=new Set('False None True and as assert async await break class continue def del elif else except finally for from global if import in is lambda nonlocal not or pass raise return try while with yield match case'.split(' '));
+const BI=new Set('abs all any bin bool bytes callable chr dict dir divmod enumerate eval filter float format frozenset getattr hasattr hash hex id input int isinstance issubclass iter len list map max min next object oct open ord pow print range repr reversed round set setattr slice sorted str sum super tuple type vars zip self cls Exception ValueError TypeError KeyError IndexError'.split(' '));
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const TOK=/(#.*)|("""[\s\S]*?(?:"""|$)|'''[\s\S]*?(?:'''|$)|[rRbBfFuU]{0,2}"(?:\\.|[^"\\\n])*"?|[rRbBfFuU]{0,2}'(?:\\.|[^'\\\n])*'?)|(@[A-Za-z_][\w.]*)|\b(0[xXbBoO][\da-fA-F_]+|\d[\d_]*\.?\d*(?:[eE][+-]?\d+)?j?)\b|\b([A-Za-z_]\w*)\b/g;
+function highlight(src){
+  let res='',last=0,prev='',m;
+  TOK.lastIndex=0;
+  while((m=TOK.exec(src))){
+    res+=esc(src.slice(last,m.index));last=TOK.lastIndex;
+    const t=m[0],e=esc(t);
+    if(m[1])res+='<span class="c">'+e+'</span>';
+    else if(m[2])res+='<span class="s">'+e+'</span>';
+    else if(m[3])res+='<span class="d">'+e+'</span>';
+    else if(m[4])res+='<span class="n">'+e+'</span>';
+    else{
+      if(KW.has(t))res+='<span class="k">'+e+'</span>';
+      else if(prev==='def'||prev==='class')res+='<span class="f">'+e+'</span>';
+      else if(BI.has(t))res+='<span class="b">'+e+'</span>';
+      else res+=e;
+      prev=t;continue;
+    }
+    prev='';
+  }
+  return res+esc(src.slice(last))+'\n ';
+}
+
+function upd(){
+  const v=code.value,lines=v.split('\n').length;
+  let s='';for(let i=1;i<=lines;i++)s+=i+'\n';
+  nums.textContent=s;
+  hl.innerHTML=highlight(v);
+  syncScroll();
+  const before=v.slice(0,code.selectionStart).split('\n');
+  $('pos').textContent='Zeile '+before.length+', Spalte '+(before[before.length-1].length+1);
+  $('cnt').textContent=v.length+' Zeichen · '+lines+' Zeilen';
+}
+function syncScroll(){hl.scrollTop=code.scrollTop;hl.scrollLeft=code.scrollLeft;nums.scrollTop=code.scrollTop}
+function setDirty(d){dirty=d;state.textContent=d?'ungespeichert':'gespeichert';state.className=d?'dirty':''}
+
+code.addEventListener('input',()=>{upd();setDirty(true);try{localStorage.setItem('pyed',code.value)}catch(e){}});
+code.addEventListener('scroll',syncScroll);
+['keyup','click'].forEach(e=>code.addEventListener(e,upd));
+
+code.addEventListener('keydown',e=>{
+  const s=code.selectionStart,t=code.selectionEnd,v=code.value;
+  if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();run();return}
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();save();return}
+  if(e.key==='Tab'){
+    e.preventDefault();
+    if(e.shiftKey){
+      const ls=v.lastIndexOf('\n',s-1)+1;
+      if(v.startsWith('    ',ls)){code.setRangeText('',ls,ls+4,'preserve');code.selectionStart=Math.max(ls,s-4);code.selectionEnd=Math.max(ls,t-4)}
+    }else document.execCommand('insertText',false,'    ');
+    code.dispatchEvent(new Event('input'));
+  }else if(e.key==='Enter'){
+    const ls=v.lastIndexOf('\n',s-1)+1;
+    const line=v.slice(ls,s);
+    let ind=line.match(/^\s*/)[0];
+    if(line.trimEnd().endsWith(':'))ind+='    ';
+    e.preventDefault();
+    document.execCommand('insertText',false,'\n'+ind);
+  }
+});
+
+/* ---------- Datei ---------- */
+function save(){
+  let n=$('name').value.trim()||'skript.py';
+  if(!/\.\w+$/.test(n))n+='.py';
+  $('name').value=n;
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([code.value],{type:'text/x-python;charset=utf-8'}));
+  a.download=n;document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  setDirty(false);
+}
+function load(f){
+  if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{code.value=r.result;$('name').value=f.name;upd();setDirty(false);try{localStorage.setItem('pyed',code.value)}catch(e){}};
+  r.readAsText(f);
+}
+function fs(){
+  const el=document.documentElement;
+  if(!document.fullscreenElement)(el.requestFullscreen||el.webkitRequestFullscreen).call(el).catch(()=>{});
+  else document.exitFullscreen();
+}
+document.addEventListener('fullscreenchange',()=>{$('fs').textContent=document.fullscreenElement?'Vollbild beenden':'Vollbild'});
+
+/* ---------- Pyodide ---------- */
+const PYV='0.26.4',PYBASE='https://cdn.jsdelivr.net/npm/pyodide@'+PYV+'/';
+/* Pakete (numpy, matplotlib, …) liegen nur im vollständigen Pyodide-Verzeichnis, nicht im npm-Paket */
+const PYLIB='https://cdn.jsdelivr.net/pyodide/v'+PYV+'/full/';
+const SETUP=`
+import os, warnings
+os.environ['MPLBACKEND']='Agg'
+warnings.filterwarnings('ignore', message='.*non-interactive.*')
+def _grab_figs():
+    import sys, io, base64
+    if 'matplotlib.pyplot' not in sys.modules:
+        return []
+    plt = sys.modules['matplotlib.pyplot']
+    res = []
+    for n in plt.get_fignums():
+        b = io.BytesIO()
+        plt.figure(n).savefig(b, format='png', dpi=110, bbox_inches='tight')
+        res.append(base64.b64encode(b.getvalue()).decode())
+    plt.close('all')
+    return res
+
+import sys, types, io, base64
+def _pyscript_display(*values, target=None, append=True):
+    import js
+    for v in values:
+        if hasattr(v, 'savefig'):
+            b = io.BytesIO()
+            v.savefig(b, format='png', dpi=110, bbox_inches='tight')
+            js.__pyDisplay('png', base64.b64encode(b.getvalue()).decode())
+            plt = sys.modules.get('matplotlib.pyplot')
+            if plt:
+                try: plt.close(v)
+                except Exception: pass
+        elif hasattr(v, '_repr_png_') and v._repr_png_():
+            js.__pyDisplay('png', base64.b64encode(v._repr_png_()).decode())
+        elif hasattr(v, '_repr_html_') and v._repr_html_():
+            js.__pyDisplay('html', v._repr_html_())
+        else:
+            js.__pyDisplay('text', str(v))
+_ps = types.ModuleType('pyscript')
+_ps.display = _pyscript_display
+import js as _js
+_ps.window = _js
+_ps.document = _js.document
+sys.modules['pyscript'] = _ps
+`;
+let py=null,loading=null;
+function print(txt,cls){
+  const sp=document.createElement('span');
+  if(cls)sp.className=cls;
+  sp.textContent=txt+'\n';
+  out.appendChild(sp);out.scrollTop=out.scrollHeight;
+}
+window.__pyDisplay=(kind,data)=>{
+  if(kind==='png'){const im=new Image();im.src='data:image/png;base64,'+data;out.appendChild(im)}
+  else if(kind==='html'){const d=document.createElement('div');d.innerHTML=data;out.appendChild(d)}
+  else print(data);
+  out.scrollTop=out.scrollHeight;
+};
+function ensurePy(){
+  if(py)return Promise.resolve(py);
+  if(loading)return loading;
+  $('pystate').textContent='Python: lädt …';
+  print('Lade Pyodide '+PYV+' …','sys');
+  loading=new Promise((res,rej)=>{
+    const s=document.createElement('script');
+    s.src=PYBASE+'pyodide.js';
+    s.onload=res;s.onerror=()=>rej(new Error('pyodide.js konnte nicht geladen werden'));
+    document.head.appendChild(s);
+  }).then(()=>loadPyodide({indexURL:PYLIB})).then(p=>{
+    p.setStdout({batched:s=>print(s)});
+    p.setStderr({batched:s=>print(s,'err')});
+    p.setStdin({stdin:()=>{const r=prompt('Eingabe für input():');return r===null?undefined:r}});
+    p.runPython(SETUP);
+    py=p;$('pystate').textContent='Python: bereit (Pyodide '+p.version+')';
+    print('Pyodide '+p.version+' bereit.','sys');
+    return p;
+  }).catch(err=>{
+    loading=null;$('pystate').textContent='Python: Fehler';
+    print('Pyodide konnte nicht gestartet werden: '+err.message,'err');
+    print('Hinweis: Auf der gehosteten Seite können Netzwerk-Beschränkungen das Laden blockieren. Speichere die Datei und öffne sie lokal im Browser.','sys');
+    throw err;
+  });
+  return loading;
+}
+async function run(){
+  const btns=document.querySelectorAll('.runbtn');
+  if(btns[0].disabled)return;
+  btns.forEach(b=>b.disabled=true);
+  try{
+    const p=await ensurePy();
+    const src=code.value;
+    print('▶ '+($('name').value||'skript.py'),'sys');
+    const t0=performance.now();
+    await p.loadPackagesFromImports(src,{messageCallback:m=>print(m,'sys'),errorCallback:m=>print(m,'err')});
+    const g=p.runPython("{'__name__':'__main__'}");
+    try{await p.runPythonAsync(src,{globals:g});}
+    catch(e){print(String(e.message||e).trim(),'err')}
+    finally{g.destroy()}
+    try{
+      const imgs=p.globals.get('_grab_figs')().toJs();
+      for(const b64 of imgs){const im=new Image();im.src='data:image/png;base64,'+b64;out.appendChild(im)}
+      if(imgs.length)out.scrollTop=out.scrollHeight;
+    }catch(e){print('Diagramm-Ausgabe fehlgeschlagen: '+e.message,'err')}
+    print('✓ fertig in '+Math.round(performance.now()-t0)+' ms','sys');
+  }catch(e){/* bereits ausgegeben */}
+  btns.forEach(b=>b.disabled=false);
+}
+
+/* ---------- Größe ändern & Panel-Vollbild ---------- */
+const main=$('main'),split=$('split'),outwrap=$('outwrap');
+function resetSize(){outwrap.style.height='';outwrap.style.width=''}
+split.addEventListener('pointerdown',e=>{
+  e.preventDefault();split.setPointerCapture(e.pointerId);split.classList.add('drag');
+  document.body.style.userSelect='none';
+});
+split.addEventListener('pointermove',e=>{
+  if(!split.classList.contains('drag'))return;
+  const m=main.getBoundingClientRect(),o=outwrap.getBoundingClientRect();
+  if(main.classList.contains('row')){
+    const w=Math.min(Math.max(o.right-e.clientX-5,120),m.width-160);
+    outwrap.style.width=w+'px';
+  }else{
+    const h=Math.min(Math.max(o.bottom-e.clientY-5,60),m.height-120);
+    outwrap.style.height=h+'px';
+  }
+  upd();
+});
+const endDrag=e=>{split.classList.remove('drag');document.body.style.userSelect='';try{split.releasePointerCapture(e.pointerId)}catch(_){}};
+split.addEventListener('pointerup',endDrag);
+split.addEventListener('pointercancel',endDrag);
+split.addEventListener('dblclick',resetSize);
+$('lay').onclick=()=>{main.classList.toggle('row');resetSize();upd()};
+
+function togglePane(el){
+  if(document.fullscreenElement===el){document.exitFullscreen();return}
+  if(el.classList.contains('max')){el.classList.remove('max');syncFsBtns();return}
+  if(el.requestFullscreen)el.requestFullscreen().catch(()=>{el.classList.add('max');syncFsBtns()});
+  else{el.classList.add('max');syncFsBtns()}
+}
+function syncFsBtns(){
+  document.querySelectorAll('.fsbtn').forEach(b=>{
+    const el=$(b.dataset.t),on=document.fullscreenElement===el||el.classList.contains('max');
+    b.textContent=on?'✕ Schließen':'⛶ Vollbild';
+  });
+}
+document.querySelectorAll('.fsbtn').forEach(b=>b.onclick=()=>togglePane($(b.dataset.t)));
+document.addEventListener('fullscreenchange',()=>{syncFsBtns();upd()});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')document.querySelectorAll('.pane.max').forEach(el=>el.classList.remove('max'));
+  syncFsBtns();
+});
+
+/* ---------- Events ---------- */
+document.querySelectorAll('.runbtn').forEach(b=>b.onclick=run);
+$('save').onclick=save;
+$('load').onclick=()=>$('file').click();
+$('file').onchange=e=>{load(e.target.files[0]);e.target.value=''};
+$('fs').onclick=fs;
+$('clr').onclick=()=>{out.textContent=''};
+$('new').onclick=()=>{if(dirty&&!confirm('Ungespeicherte Änderungen verwerfen?'))return;code.value='';$('name').value='skript.py';upd();setDirty(false);try{localStorage.removeItem('pyed')}catch(e){}};
+window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue=''}});
+document.addEventListener('dragover',e=>e.preventDefault());
+document.addEventListener('drop',e=>{e.preventDefault();load(e.dataTransfer.files[0])});
+
+try{const s=localStorage.getItem('pyed');if(s){code.value=s;setDirty(true)}}catch(e){}
+upd();
+</script>
+</body>
+</html>

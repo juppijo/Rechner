@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Live-Editor & Plotter</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- PyScript 2024.1.1 Core CSS & JS -->
+  <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css" />
+  <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+
+  <!-- CodeMirror 5 CSS & Themes -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/dracula.min.css" />
+
+  <!-- CodeMirror JS Core, Python Mode & Addons (Klammern) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/closebrackets.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/matchbrackets.min.js"></script>
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <style>
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #181825; }
+    ::-webkit-scrollbar-thumb { background: #313244; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #45475a; }
+
+    .CodeMirror {
+      height: 100% !important;
+      font-family: 'Fira Code', Consolas, Monaco, 'Courier New', monospace;
+      font-size: 14px;
+      line-height: 1.5;
+      background-color: #181825 !important;
+    }
+    .CodeMirror-gutters { background: #181825 !important; border-right: 1px solid #313244 !important; }
+
+    .py-overlay { display: none !important; }
+    .no-select { user-select: none; -webkit-user-select: none; }
+
+    #resizer { touch-action: none; transition: background-color 0.2s ease; }
+    #resizer:hover, #resizer.dragging { background-color: #89b4fa; }
+
+    /* Platzhalter, solange keine Ausgabe vorhanden ist */
+    #plot-output:empty::before {
+      content: "Noch keine Ausgabe – mit Strg+Enter ausführen";
+      color: #9ca3af;
+      font-size: 0.875rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body class="bg-[#1e1e2e] text-[#cdd6f4] flex flex-col overflow-hidden font-sans" style="height:100vh;height:100dvh;">
+
+  <!-- Nur die nötigsten Pakete beim Start; scipy, pandas, sympy etc. werden bei Bedarf automatisch nachgeladen -->
+  <py-config>
+    packages = ["matplotlib", "numpy"]
+  </py-config>
+
+  <!-- Header Toolbar -->
+  <header class="bg-[#181825] border-b border-[#313244] px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 shadow-md z-20 shrink-0">
+    <div class="flex items-center space-x-3">
+      <div class="p-2 bg-[#89b4fa] text-[#11111b] rounded-lg shadow">
+        <i class="fa-solid font-bold fa-code text-lg"></i>
+      </div>
+      <div>
+        <h1 class="font-bold text-base md:text-lg text-[#cdd6f4] leading-tight">Python Live-Editor</h1>
+        <p class="text-xs text-[#a6adc8]">PyScript, Matplotlib & Resizable Panels</p>
+      </div>
+    </div>
+
+    <div class="flex items-center space-x-2">
+      <button id="run-btn" onclick="runCode()" disabled title="Ausführen (Strg+Enter)"
+        class="bg-[#a6e3a1] hover:bg-[#94e2d5] text-[#11111b] font-semibold px-4 py-2 rounded-lg transition-all flex items-center gap-2 shadow-sm active:scale-95 text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100">
+        <i id="run-icon" class="fa-solid fa-play"></i>
+        <span>Ausführen</span>
+      </button>
+
+      <div class="h-6 w-[1px] bg-[#313244] mx-1"></div>
+
+      <label for="file-input" class="bg-[#313244] hover:bg-[#45475a] text-[#cdd6f4] font-medium px-3 py-2 rounded-lg cursor-pointer transition-all flex items-center gap-2 text-sm shadow-sm active:scale-95">
+        <i class="fa-solid fa-folder-open text-[#89b4fa]"></i>
+        <span class="hidden sm:inline">Laden</span>
+      </label>
+      <input type="file" id="file-input" accept=".py,.txt" class="hidden" onchange="loadFile(event)" />
+
+      <button onclick="saveFile()" class="bg-[#313244] hover:bg-[#45475a] text-[#cdd6f4] font-medium px-3 py-2 rounded-lg transition-all flex items-center gap-2 text-sm shadow-sm active:scale-95">
+        <i class="fa-solid fa-floppy-disk text-[#f9e2af]"></i>
+        <span class="hidden sm:inline">Speichern</span>
+      </button>
+
+      <button onclick="toggleFullscreen(document.documentElement)" title="Gesamtes Fenster im Vollbild" class="bg-[#313244] hover:bg-[#45475a] text-[#cdd6f4] font-medium px-3 py-2 rounded-lg transition-all flex items-center gap-2 text-sm shadow-sm active:scale-95">
+        <i class="fa-solid fa-maximize text-[#cba6f7]"></i>
+        <span class="hidden sm:inline">Vollbild</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Workspace Container -->
+  <main id="workspace" class="flex-1 min-h-0 flex flex-col md:flex-row overflow-hidden relative">
+
+    <!-- Panel 1: Code Editor -->
+    <section id="editor-panel" class="flex-1 min-w-0 min-h-0 p-2 flex flex-col bg-[#1e1e2e] relative">
+      <div class="flex justify-between items-center mb-2 px-1">
+        <span class="text-xs font-semibold uppercase tracking-wider text-[#a6adc8] flex items-center gap-2">
+          <i class="fa-brands fa-python text-[#89b4fa]"></i> Code-Editor
+        </span>
+
+        <div class="flex items-center space-x-2">
+          <button onclick="resetPanelSizes()" title="Panel-Größen zurücksetzen" class="text-xs text-[#a6adc8] hover:text-[#89b4fa] transition-colors px-2 py-1 bg-[#313244] rounded">
+            <i class="fa-solid fa-arrows-left-right"></i> 50/50
+          </button>
+          <button onclick="toggleFullscreen(document.getElementById('editor-panel'))" title="Editor im Vollbild anzeigen" class="text-xs text-[#a6adc8] hover:text-[#cdd6f4] transition-colors p-1 bg-[#313244] hover:bg-[#45475a] rounded">
+            <i class="fa-solid fa-expand"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex-1 min-h-0 overflow-hidden rounded-lg border border-[#313244] shadow-inner">
+        <textarea id="code-editor"></textarea>
+      </div>
+    </section>
+
+    <!-- Resizer / Splitter Bar -->
+    <div id="resizer" class="w-full h-2 md:w-2 md:h-full bg-[#313244] cursor-row-resize md:cursor-col-resize flex items-center justify-center z-10 shrink-0">
+      <div class="w-6 h-1 md:w-1 md:h-6 bg-[#45475a] rounded-full"></div>
+    </div>
+
+    <!-- Panel 2: Output / Plot -->
+    <section id="output-panel" class="flex-1 min-w-0 min-h-0 p-2 flex flex-col bg-[#11111b] relative">
+      <div class="flex justify-between items-center mb-2 px-1">
+        <span class="text-xs font-semibold uppercase tracking-wider text-[#a6adc8] flex items-center gap-2">
+          <i class="fa-solid fa-chart-line text-[#a6e3a1]"></i> Plot & Ausgaben
+        </span>
+
+        <div class="flex items-center space-x-2">
+          <div id="status-badge" class="flex items-center gap-2 text-xs px-2.5 py-0.5 rounded-full bg-[#313244] text-[#a6adc8]">
+            <span id="status-dot" class="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></span>
+            <span id="status-text">Lade Python-Umgebung...</span>
+          </div>
+
+          <button onclick="clearOutput()" title="Ausgabe leeren" class="text-xs text-[#a6adc8] hover:text-[#f38ba8] transition-colors p-1 bg-[#313244] hover:bg-[#45475a] rounded">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+
+          <button onclick="toggleFullscreen(document.getElementById('output-panel'))" title="Plot im Vollbild anzeigen" class="text-xs text-[#a6adc8] hover:text-[#cdd6f4] transition-colors p-1 bg-[#313244] hover:bg-[#45475a] rounded">
+            <i class="fa-solid fa-expand"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Plot-Bereich (m-auto statt items-center: verhindert abgeschnittene Inhalte beim Scrollen) -->
+      <div class="flex-1 min-h-0 bg-white rounded-lg p-3 overflow-auto flex border border-[#313244] shadow-inner relative">
+        <div id="plot-output" class="m-auto w-full flex flex-col items-center gap-3 text-gray-800"></div>
+
+        <div id="loading-overlay" class="absolute inset-0 bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center z-10 transition-opacity duration-300 text-center px-4">
+          <i class="fa-solid fa-spinner fa-spin text-4xl text-indigo-600 mb-3"></i>
+          <p id="overlay-text" class="text-sm font-semibold text-gray-800">Lade Python-Umgebung...</p>
+          <p class="text-xs text-gray-500 mt-1">Matplotlib & NumPy werden im Browser vorbereitet.</p>
+        </div>
+      </div>
+
+      <!-- Konsole für print()-Ausgaben und Fehlermeldungen -->
+      <div id="console-wrap" class="hidden mt-2 rounded-lg border border-[#313244] bg-[#181825] max-h-48 overflow-auto shrink-0">
+        <pre id="console-output" class="p-3 text-xs whitespace-pre-wrap break-words" style="font-family:'Fira Code',Consolas,Monaco,monospace;"></pre>
+      </div>
+    </section>
+  </main>
+
+  <!-- PyScript: Laufzeit-Brücke zwischen Editor (JS) und Python -->
+  <script type="py">
+import asyncio
+import base64
+import contextlib
+import io
+import traceback
+
+import js
+import pyodide_js
+from pyodide.code import eval_code_async
+from pyodide.ffi import create_proxy
+
+import matplotlib
+matplotlib.use("agg")
+import matplotlib.pyplot as plt
+
+
+def render_figures():
+    """Alle offenen Matplotlib-Figuren als PNG im Ausgabefeld anzeigen."""
+    out = js.document.getElementById("plot-output")
+    for num in plt.get_fignums():
+        fig = plt.figure(num)
+        buf = io.BytesIO()
+        fig.savefig(buf, format="png", dpi=110, bbox_inches="tight")
+        img = js.document.createElement("img")
+        img.src = "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode("ascii")
+        img.className = "max-w-full h-auto"
+        out.appendChild(img)
+    plt.close("all")
+
+
+def _show(*args, **kwargs):
+    render_figures()
+
+
+plt.show = _show
+
+
+def clean_traceback():
+    """Nur die Zeilen des Nutzer-Codes anzeigen, nicht die PyScript-Interna."""
+    tb = traceback.format_exc()
+    i = tb.find('File "<exec>"')
+    if i != -1:
+        return "Traceback (most recent call last):\n  " + tb[i:]
+    return tb
+
+
+async def run_user_code(code):
+    out = js.document.getElementById("plot-output")
+    buf = io.StringIO()
+    error = ""
+    plt.close("all")
+    try:
+        js.setStatus("Prüfe Pakete ...", "loading")
+        await pyodide_js.loadPackagesFromImports(code)
+        js.setStatus("Führe Python-Code aus ...", "loading")
+        namespace = {"__name__": "__main__"}
+        with contextlib.redirect_stdout(buf), contextlib.redirect_stderr(buf):
+            await eval_code_async(code, namespace)
+        # Wurde nichts angezeigt, aber Figuren erstellt: automatisch ausgeben
+        if out.children.length == 0:
+            render_figures()
+    except BaseException:
+        error = clean_traceback()
+    js.finishRun(buf.getvalue(), error)
+
+
+def py_run(code):
+    asyncio.ensure_future(run_user_code(code))
+
+
+js.window.pyRun = create_proxy(py_run)
+js.onPythonReady()
+  </script>
+
+  <script>
+    const STORAGE_KEY = 'python-live-editor:code';
+
+    const initialCode = `import matplotlib.pyplot as plt
+import numpy as np
+
+# Gleichungssystem:
+# I:  x + y = 48       (Summe der Alter)
+# II: x - 2y = 3       (Mutter = 2 * Tochter + 3)
+A = np.array([[1, 1], [1, -2]])
+b = np.array([48, 3])
+x_intersect, y_intersect = np.linalg.solve(A, b)
+
+# Wertebereich für das Alter der Tochter (y)
+y = np.linspace(0, 25, 400)
+
+# Gleichungen nach x (Alter der Mutter) umgeformt
+x1 = 48 - y
+x2 = 2 * y + 3
+
+# Diagramm erstellen
+fig, ax = plt.subplots(figsize=(8, 5))
+ax.plot(y, x1, label='I: x + y = 48 (Summe)', color='#1e66f5', linewidth=2)
+ax.plot(y, x2, label='II: x = 2y + 3 (Verhältnis)', color='#40a02b', linewidth=2)
+
+# Schnittpunkt markieren
+ax.plot(y_intersect, x_intersect, 'ro', markersize=8,
+        label=f'Schnittpunkt ({y_intersect:.0f}, {x_intersect:.0f})')
+ax.annotate(
+    f'Schnittpunkt\\nTochter: {y_intersect:.0f} J.\\nMutter: {x_intersect:.0f} J.',
+    xy=(y_intersect, x_intersect),
+    xytext=(y_intersect - 6, x_intersect + 4),
+    arrowprops=dict(facecolor='black', shrink=0.05, width=1.5, headwidth=6),
+    fontsize=10,
+    bbox=dict(boxstyle="round,pad=0.3", fc="yellow", ec="b", lw=1, alpha=0.7)
+)
+
+ax.set_xlabel('Alter der Tochter (y)', fontsize=11)
+ax.set_ylabel('Alter der Mutter (x)', fontsize=11)
+ax.set_title('Grafische Lösung des Gleichungssystems', fontsize=13, fontweight='bold')
+ax.grid(True, linestyle='--', alpha=0.6)
+ax.legend(loc='upper right')
+plt.tight_layout()
+
+# Grafik anzeigen
+plt.show()
+`;
+
+    let editor;
+    let pythonReady = false;
+    let running = false;
+
+    /* ---------- Status & Overlay ---------- */
+    const BADGE_BASE = 'flex items-center gap-2 text-xs px-2.5 py-0.5 rounded-full ';
+    const STATES = {
+      loading: {
+        dot: 'w-2 h-2 rounded-full bg-yellow-500 animate-pulse',
+        badge: BADGE_BASE + 'bg-[#313244] text-[#a6adc8]'
+      },
+      success: {
+        dot: 'w-2 h-2 rounded-full bg-emerald-400',
+        badge: BADGE_BASE + 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/50'
+      },
+      error: {
+        dot: 'w-2 h-2 rounded-full bg-rose-500',
+        badge: BADGE_BASE + 'bg-rose-950/60 text-rose-300 border border-rose-800/50'
+      }
+    };
+
+    function setStatus(text, state = 'loading') {
+      const s = STATES[state] || STATES.loading;
+      document.getElementById('status-dot').className = s.dot;
+      document.getElementById('status-badge').className = s.badge;
+      document.getElementById('status-text').textContent = text;
+    }
+
+    function hideOverlay() {
+      const overlay = document.getElementById('loading-overlay');
+      overlay.style.opacity = '0';
+      overlay.style.pointerEvents = 'none';
+      setTimeout(() => overlay.classList.add('hidden'), 300);
+    }
+
+    function setRunning(state) {
+      running = state;
+      const btn = document.getElementById('run-btn');
+      const icon = document.getElementById('run-icon');
+      btn.disabled = state || !pythonReady;
+      icon.className = state ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-play';
+    }
+
+    /* ---------- Brücke zu Python ---------- */
+    function onPythonReady() {
+      pythonReady = true;
+      hideOverlay();
+      setRunning(false);
+      setStatus('Bereit zum Ausführen', 'success');
+    }
+
+    function finishRun(stdout, error) {
+      showConsole(stdout, error);
+      setRunning(false);
+      if (error) setStatus('Fehler im Code', 'error');
+      else setStatus('Ausführung fertig', 'success');
+    }
+
+    function showConsole(stdout, error) {
+      const wrap = document.getElementById('console-wrap');
+      const pre = document.getElementById('console-output');
+      pre.textContent = '';
+
+      if (stdout) {
+        const span = document.createElement('span');
+        span.style.color = '#cdd6f4';
+        span.textContent = stdout;
+        pre.appendChild(span);
+      }
+      if (error) {
+        const span = document.createElement('span');
+        span.style.color = '#f38ba8';
+        span.textContent = (stdout && !stdout.endsWith('\n') ? '\n' : '') + error;
+        pre.appendChild(span);
+      }
+      wrap.classList.toggle('hidden', !stdout && !error);
+    }
+
+    /* ---------- Aktionen ---------- */
+    function runCode() {
+      if (!pythonReady || running || !window.pyRun) return;
+      setRunning(true);
+      document.getElementById('plot-output').innerHTML = '';
+      showConsole('', '');
+      setStatus('Starte ...', 'loading');
+      window.pyRun(editor.getValue());
+    }
+
+    function clearOutput() {
+      document.getElementById('plot-output').innerHTML = '';
+      showConsole('', '');
+      if (pythonReady && !running) setStatus('Bereit', 'success');
+    }
+
+    function loadFile(event) {
+      const input = event.target;
+      const file = input.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = e => editor.setValue(e.target.result);
+      reader.readAsText(file);
+      input.value = ''; // gleiche Datei kann erneut geladen werden
+    }
+
+    function saveFile() {
+      const blob = new Blob([editor.getValue()], { type: 'text/x-python;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'script.py';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function toggleFullscreen(el) {
+      const active = document.fullscreenElement || document.webkitFullscreenElement;
+      if (active) {
+        (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+        return;
+      }
+      const request = el.requestFullscreen || el.webkitRequestFullscreen;
+      if (request) request.call(el);
+      else console.warn('Vollbild wird von diesem Browser nicht unterstützt.');
+    }
+
+    /* ---------- Resizer ---------- */
+    function initResizer() {
+      const resizer = document.getElementById('resizer');
+      const editorPanel = document.getElementById('editor-panel');
+      const outputPanel = document.getElementById('output-panel');
+      const workspace = document.getElementById('workspace');
+      let dragging = false;
+
+      resizer.addEventListener('pointerdown', e => {
+        dragging = true;
+        resizer.setPointerCapture(e.pointerId);
+        resizer.classList.add('dragging');
+        document.body.classList.add('no-select');
+      });
+
+      resizer.addEventListener('pointermove', e => {
+        if (!dragging) return;
+        const rect = workspace.getBoundingClientRect();
+        const desktop = window.matchMedia('(min-width: 768px)').matches;
+        const percent = desktop
+          ? ((e.clientX - rect.left) / rect.width) * 100
+          : ((e.clientY - rect.top) / rect.height) * 100;
+        const p = Math.min(85, Math.max(15, percent));
+        editorPanel.style.flex = `${p} 1 0%`;
+        outputPanel.style.flex = `${100 - p} 1 0%`;
+      });
+
+      const stop = () => {
+        dragging = false;
+        resizer.classList.remove('dragging');
+        document.body.classList.remove('no-select');
+      };
+      resizer.addEventListener('pointerup', stop);
+      resizer.addEventListener('pointercancel', stop);
+    }
+
+    function resetPanelSizes() {
+      document.getElementById('editor-panel').style.flex = '';
+      document.getElementById('output-panel').style.flex = '';
+    }
+
+    /* ---------- Start ---------- */
+    window.addEventListener('DOMContentLoaded', () => {
+      let saved = null;
+      try { saved = localStorage.getItem(STORAGE_KEY); } catch (e) {}
+
+      editor = CodeMirror.fromTextArea(document.getElementById('code-editor'), {
+        mode: 'python',
+        theme: 'dracula',
+        lineNumbers: true,
+        indentUnit: 4,
+        tabSize: 4,
+        indentWithTabs: false,
+        lineWrapping: true,
+        autoCloseBrackets: true,
+        matchBrackets: true,
+        extraKeys: {
+          'Tab': cm => cm.somethingSelected() ? cm.indentSelection('add') : cm.execCommand('insertSoftTab'),
+          'Shift-Tab': cm => cm.indentSelection('subtract'),
+          'Ctrl-Enter': () => runCode(),
+          'Cmd-Enter': () => runCode()
+        }
+      });
+
+      editor.setValue(saved !== null ? saved : initialCode);
+
+      // Automatisch speichern (leicht verzögert)
+      let saveTimer;
+      editor.on('change', () => {
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(() => {
+          try { localStorage.setItem(STORAGE_KEY, editor.getValue()); } catch (e) {}
+        }, 500);
+      });
+
+      initResizer();
+
+      // Editor bei jeder Größenänderung (Resizer, Fenster, Vollbild) neu zeichnen
+      new ResizeObserver(() => editor.refresh()).observe(document.getElementById('editor-panel'));
+
+      // Hinweis, falls das Laden ungewöhnlich lange dauert
+      setTimeout(() => {
+        if (!pythonReady) {
+          document.getElementById('overlay-text').textContent =
+            'Laden dauert ungewöhnlich lange – Internetverbindung prüfen oder Seite neu laden.';
+        }
+      }, 60000);
+    });
+  </script>
+</body>
+</html>

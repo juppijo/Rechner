@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Live-Editor & Plotter</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- PyScript 2024.1.1 Core CSS & JS -->
+  <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css" />
+  <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+
+  <!-- CodeMirror 5 CSS & Themes -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/dracula.min.css" />
+
+  <!-- CodeMirror JS Core & Python Mode -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js"></script>
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <style>
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #181825; }
+    ::-webkit-scrollbar-thumb { background: #313244; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #45475a; }
+    
+    .CodeMirror {
+        height: 100% !important;
+        font-family: 'Fira Code', Consolas, Monaco, 'Courier New', monospace;
+        font-size: 14px;
+        line-height: 1.5;
+        background-color: #181825 !important;
+    }
+    
+    .py-overlay { display: none !important; }
+    .no-select { user-select: none; -webkit-user-select: none; }
+    
+    #resizer { transition: background-color 0.2s ease; }
+    #resizer:hover, #resizer.dragging { background-color: #89b4fa; }
+  </style>
+</head>
+<body class="bg-[#1e1e2e] text-[#cdd6f4] h-screen flex flex-col overflow-hidden font-sans">
+
+  <!-- Configure PyScript Python Packages -->
+  <py-config>
+    packages = ["matplotlib", "numpy", "scipy", "pandas", "sympy"]
+  </py-config>
+
+  <!-- Header Toolbar -->
+  <header class="bg-[#181825] border-b border-[#313244] px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 shadow-md z-20">
+    <div class="flex items-center space-x-3">
+      <div class="p-2 bg-[#89b4fa] text-[#11111b] rounded-lg shadow">
+        <i class="fa-solid font-bold fa-code text-lg"></i>
+      </div>
+      <div>
+        <h1 class="font-bold text-base md:text-lg text-[#cdd6f4] leading-tight">Python Live-Editor</h1>
+        <p class="text-xs text-[#a6adc8]">PyScript, Matplotlib & Resizable Panels</p>
+      </div>
+    </div>
+
+    <!-- Action Toolbar Buttons -->
+    <div class="flex items-center space-x-2">
+      <button onclick="runCode()" class="bg-[#a6e3a1] hover:bg-[#94e2d5] text-[#11111b] font-semibold px-4 py-2 rounded-lg transition-all flex items-center gap-2 shadow-sm active:scale-95 text-sm">
+        <i class="fa-solid fa-play"></i>
+        <span>Ausführen</span>
+      </button>
+
+      <div class="h-6 w-[1px] bg-[#313244] mx-1"></div>
+
+      <label for="file-input" class="bg-[#313244] hover:bg-[#45475a] text-[#cdd6f4] font-medium px-3 py-2 rounded-lg cursor-pointer transition-all flex items-center gap-2 text-sm shadow-sm active:scale-95">
+        <i class="fa-solid fa-folder-open text-[#89b4fa]"></i>
+        <span class="hidden sm:inline">Laden</span>
+      </label>
+      <input type="file" id="file-input" accept=".py,.txt" class="hidden" onchange="loadFile(event)" />
+
+      <button onclick="saveFile()" class="bg-[#313244] hover:bg-[#45475a] text-[#cdd6f4] font-medium px-3 py-2 rounded-lg transition-all flex items-center gap-2 text-sm shadow-sm active:scale-95">
+        <i class="fa-solid fa-floppy-disk text-[#f9e2af]"></i>
+        <span class="hidden sm:inline">Speichern</span>
+      </button>
+
+      <button onclick="toggleGlobalFullscreen()" title="Gesamtes Fenster im Vollbild" class="bg-[#313244] hover:bg-[#45475a] text-[#cdd6f4] font-medium px-3 py-2 rounded-lg transition-all flex items-center gap-2 text-sm shadow-sm active:scale-95">
+        <i class="fa-solid fa-maximize text-[#cba6f7]"></i>
+        <span class="hidden sm:inline">Vollbild</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Workspace Container -->
+  <main id="workspace" class="flex-1 flex flex-col md:flex-row h-[calc(100vh-60px)] overflow-hidden relative">
+
+    <!-- Panel 1: Code Editor -->
+    <section id="editor-panel" class="w-full md:w-1/2 h-1/2 md:h-full p-2 flex flex-col bg-[#1e1e2e] min-w-[200px] min-h-[150px] relative transition-all duration-150">
+      <div class="flex justify-between items-center mb-2 px-1">
+        <span class="text-xs font-semibold uppercase tracking-wider text-[#a6adc8] flex items-center gap-2">
+          <i class="fa-brands fa-python text-[#89b4fa]"></i> Code-Editor
+        </span>
+
+        <div class="flex items-center space-x-2">
+          <button onclick="resetPanelSizes()" title="Panel-Größen zurücksetzen" class="text-xs text-[#a6adc8] hover:text-[#89b4fa] transition-colors px-2 py-1 bg-[#313244] rounded">
+            <i class="fa-solid fa-arrows-split-up-and-left"></i> 50/50
+          </button>
+          <button onclick="togglePanelFullscreen('editor-panel')" title="Editor im Vollbild anzeigen" class="text-xs text-[#a6adc8] hover:text-[#cdd6f4] transition-colors p-1 bg-[#313244] hover:bg-[#45475a] rounded">
+            <i class="fa-solid fa-expand"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-hidden rounded-lg border border-[#313244] shadow-inner">
+        <textarea id="code-editor"></textarea>
+      </div>
+    </section>
+
+    <!-- Resizer / Splitter Bar -->
+    <div id="resizer" class="w-full h-2 md:w-2 md:h-full bg-[#313244] hover:bg-[#89b4fa] cursor-row-resize md:cursor-col-resize flex items-center justify-center z-10 shrink-0">
+      <div class="w-6 h-1 md:w-1 md:h-6 bg-[#45475a] rounded-full"></div>
+    </div>
+
+    <!-- Panel 2: Output / Plot -->
+    <section id="output-panel" class="w-full md:w-1/2 h-1/2 md:h-full p-2 flex flex-col bg-[#11111b] min-w-[200px] min-h-[150px] relative transition-all duration-150">
+      <div class="flex justify-between items-center mb-2 px-1">
+        <span class="text-xs font-semibold uppercase tracking-wider text-[#a6adc8] flex items-center gap-2">
+          <i class="fa-solid fa-terminal text-[#a6e3a1]"></i> Plot & Konsolenausgabe
+        </span>
+
+        <div class="flex items-center space-x-2">
+          <div id="status-badge" class="flex items-center gap-2 text-xs px-2.5 py-0.5 rounded-full bg-[#313244] text-[#a6adc8]">
+            <span id="status-dot" class="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></span>
+            <span id="status-text">Lade Python-Umgebung...</span>
+          </div>
+
+          <button onclick="clearOutput()" title="Ausgabe leeren" class="text-xs text-[#a6adc8] hover:text-[#f38ba8] transition-colors p-1 bg-[#313244] hover:bg-[#45475a] rounded">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+
+          <button onclick="togglePanelFullscreen('output-panel')" title="Plot im Vollbild anzeigen" class="text-xs text-[#a6adc8] hover:text-[#cdd6f4] transition-colors p-1 bg-[#313244] hover:bg-[#45475a] rounded">
+            <i class="fa-solid fa-expand"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex-1 bg-white rounded-lg p-3 overflow-auto flex flex-col border border-[#313244] shadow-inner relative">
+        <div id="plot-output" class="w-full h-full flex flex-col justify-start items-stretch font-mono text-xs text-gray-900 whitespace-pre-wrap"></div>
+
+        <div id="loading-overlay" class="absolute inset-0 bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center z-10 transition-opacity duration-300">
+          <i class="fa-solid fa-spinner fa-spin text-4xl text-indigo-600 mb-3"></i>
+          <p id="overlay-text" class="text-sm font-semibold text-gray-800">Lade Python-Umgebung...</p>
+          <p class="text-xs text-gray-500 mt-1">SciPy, Matplotlib & Numpy werden geladen.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script type="py">
+import js
+js.setStatus('Bereit zum Ausführen', 'success')
+  </script>
+
+  <script>
+    const initialCode = `import scipy.constants as const
+
+# Naturkonstanten aus SciPy (NIST-Werte)
+hbar = const.hbar  # Reduziertes Plancksches Wirkungsquantum (J s)
+h = const.h        # Plancksches Wirkungsquantum (J s)
+m_e = const.m_e    # Elektronenmasse (kg)
+c = const.c        # Lichtgeschwindigkeit (m/s)
+e = const.e        # Elementarladung (C, für Umrechnung in eV)
+
+# 1. R_min Berechnung
+R_min = hbar / (2 * m_e * c)
+
+# 2. Kinetische Energie: E_kin = p^2 / (2 * m_e) mit p = hbar / R_min
+p = hbar / R_min
+E_kin_J = (p**2) / (2 * m_e)
+E_kin_eV = E_kin_J / e
+E_kin_MeV = E_kin_eV / 1e6
+
+# 3. Potentielle / Wellen-Energie über die Wellenlänge lambda
+lambda_c = 4 * const.pi * R_min
+lambda_bar = 2 * R_min
+
+E_pot_lambda_J = (h * c) / lambda_c
+E_pot_lambda_MeV = (E_pot_lambda_J / e) / 1e6
+
+E_pot_bar_J = (hbar * c) / lambda_bar
+E_pot_bar_MeV = (E_pot_bar_J / e) / 1e6
+
+E_pot_Rmin_J = (hbar * c) / R_min
+E_pot_Rmin_MeV = (E_pot_Rmin_J / e) / 1e6
+
+# Ruheenergie der 2-fachen Elektronenmasse: 2 * m_e * c^2
+E_ref_J = 2 * m_e * (c**2)
+E_ref_MeV = (E_ref_J / e) / 1e6
+
+print(f"R_min = {R_min:.6e} m")
+print(f"Referenz 2*m_e*c^2 = {E_ref_MeV:.6f} MeV ({E_ref_J:.6e} J)")
+print(f"E_kin = {E_kin_MeV:.6f} MeV")
+print(f"E_pot (lambda = R_min) = {E_pot_Rmin_MeV:.6f} MeV")
+print(f"E_pot (reduziert lambda_bar = 2*R_min) = {E_pot_bar_MeV:.6f} MeV")
+print(f"E_pot (voll lambda_c = 4*pi*R_min) = {E_pot_lambda_MeV:.6f} MeV")
+`;
+
+    let editor;
+
+    function setStatus(text, state = 'loading') {
+      const badge = document.getElementById('status-badge');
+      const dot = document.getElementById('status-dot');
+      const statusText = document.getElementById('status-text');
+      const overlay = document.getElementById('loading-overlay');
+      const overlayText = document.getElementById('overlay-text');
+
+      if (!statusText || !overlayText) return;
+
+      statusText.textContent = text;
+      overlayText.textContent = text;
+
+      if (state === 'loading') {
+        dot.className = "w-2 h-2 rounded-full bg-yellow-500 animate-pulse";
+        badge.className = "flex items-center gap-2 text-xs px-2.5 py-0.5 rounded-full bg-[#313244] text-[#a6adc8]";
+        overlay.classList.remove('hidden');
+        overlay.style.opacity = '1';
+      } else if (state === 'success') {
+        dot.className = "w-2 h-2 rounded-full bg-emerald-400";
+        badge.className = "flex items-center gap-2 text-xs px-2.5 py-0.5 rounded-full bg-emerald-950/60 text-emerald-300 border border-emerald-800/50";
+        overlay.style.opacity = '0';
+        setTimeout(() => overlay.classList.add('hidden'), 300);
+      } else if (state === 'error') {
+        dot.className = "w-2 h-2 rounded-full bg-rose-500";
+        badge.className = "flex items-center gap-2 text-xs px-2.5 py-0.5 rounded-full bg-rose-950/60 text-rose-300 border border-rose-800/50";
+        overlay.classList.add('hidden');
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      editor = CodeMirror.fromTextArea(document.getElementById('code-editor'), {
+        mode: 'python',
+        theme: 'dracula',
+        lineNumbers: true,
+        indentUnit: 4,
+        tabSize: 4,
+        indentWithTabs: false,
+        lineWrapping: true,
+        autoCloseBrackets: true,
+        matchBrackets: true,
+        extraKeys: {
+          "Tab": function(cm) { cm.replaceSelection("    ", "end"); }
+        }
+      });
+
+      editor.setValue(initialCode);
+      initResizer();
+
+      window.addEventListener('resize', () => {
+        if (editor) editor.refresh();
+      });
+    });
+
+    function runCode() {
+      const outputDiv = document.getElementById("plot-output");
+      outputDiv.innerHTML = "";
+      setStatus('Führe Python-Code aus...', 'loading');
+
+      const userCode = editor.getValue();
+
+      // stdout abfangen, damit print() im DOM landet
+      const wrappedCode = `
+import sys
+import io
+import traceback
+import matplotlib.pyplot as plt
+import js
+
+plt.close('all')
+
+class ElementOutput(io.StringIO):
+    def write(self, s):
+        if s:
+            target = js.document.getElementById("plot-output")
+            target.innerText += s
+        return super().write(s)
+
+sys.stdout = ElementOutput()
+
+try:
+${userCode.split('\n').map(line => '    ' + line).join('\n')}
+    js.setStatus('Ausführung fertig', 'success')
+except Exception as e:
+    js.setStatus('Fehler im Code', 'error')
+    print(traceback.format_exc(), file=sys.stderr)
+finally:
+    sys.stdout = sys.__stdout__
+`;
+
+      const existingScript = document.getElementById("dynamic-pyscript");
+      if (existingScript) existingScript.remove();
+
+      const pyScript = document.createElement("script");
+      pyScript.type = "py";
+      pyScript.id = "dynamic-pyscript";
+      pyScript.textContent = wrappedCode;
+
+      document.body.appendChild(pyScript);
+    }
+
+    function clearOutput() {
+      document.getElementById("plot-output").innerHTML = "";
+      setStatus('Bereit', 'success');
+    }
+
+    function loadFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) { editor.setValue(e.target.result); };
+      reader.readAsText(file);
+    }
+
+    function saveFile() {
+      const code = editor.getValue();
+      const blob = new Blob([code], { type: 'text/python;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'script.py';
+      link.click();
+      URL.revokeObjectURL(link.href);
+    }
+
+    function toggleGlobalFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+
+    function togglePanelFullscreen(panelId) {
+      const panel = document.getElementById(panelId);
+      if (!document.fullscreenElement) {
+        if (panel.requestFullscreen) panel.requestFullscreen();
+      } else if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+
+    function initResizer() {
+      const resizer = document.getElementById('resizer');
+      const editorPanel = document.getElementById('editor-panel');
+      const outputPanel = document.getElementById('output-panel');
+      const workspace = document.getElementById('workspace');
+
+      let isDragging = false;
+
+      resizer.addEventListener('mousedown', startResize);
+      resizer.addEventListener('touchstart', startResize, { passive: true });
+
+      function startResize() {
+        isDragging = true;
+        resizer.classList.add('dragging');
+        document.body.classList.add('no-select');
+
+        document.addEventListener('mousemove', handleResize);
+        document.addEventListener('touchmove', handleResize, { passive: true });
+        document.addEventListener('mouseup', stopResize);
+        document.addEventListener('touchend', stopResize);
+      }
+
+      function handleResize(e) {
+        if (!isDragging) return;
+
+        const isDesktop = window.innerWidth >= 768;
+        const rect = workspace.getBoundingClientRect();
+
+        if (isDesktop) {
+          const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+          const pointerX = clientX - rect.left;
+          const percentage = (pointerX / rect.width) * 100;
+
+          if (percentage > 15 && percentage < 85) {
+            editorPanel.style.width = `${percentage}%`;
+            outputPanel.style.width = `${100 - percentage}%`;
+            editorPanel.style.height = '100%';
+            outputPanel.style.height = '100%';
+          }
+        } else {
+          const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+          const pointerY = clientY - rect.top;
+          const percentage = (pointerY / rect.height) * 100;
+
+          if (percentage > 15 && percentage < 85) {
+            editorPanel.style.height = `${percentage}%`;
+            outputPanel.style.height = `${100 - percentage}%`;
+            editorPanel.style.width = '100%';
+            outputPanel.style.width = '100%';
+          }
+        }
+
+        if (editor) editor.refresh();
+      }
+
+      function stopResize() {
+        isDragging = false;
+        resizer.classList.remove('dragging');
+        document.body.classList.remove('no-select');
+
+        document.removeEventListener('mousemove', handleResize);
+        document.removeEventListener('touchmove', handleResize);
+        document.removeEventListener('mouseup', stopResize);
+        document.removeEventListener('touchend', stopResize);
+
+        if (editor) editor.refresh();
+      }
+    }
+
+    function resetPanelSizes() {
+      const editorPanel = document.getElementById('editor-panel');
+      const outputPanel = document.getElementById('output-panel');
+
+      editorPanel.style.width = '';
+      editorPanel.style.height = '';
+      outputPanel.style.width = '';
+      outputPanel.style.height = '';
+
+      if (editor) setTimeout(() => editor.refresh(), 100);
+    }
+  </script>
+</body>
+</html>

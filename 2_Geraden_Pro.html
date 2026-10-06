@@ -67,9 +67,7 @@
         .equation-row {
             display: flex;
             align-items: center;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 8px;
+            gap: 10px;
             margin-bottom: 12px;
             font-size: 16px;
             font-weight: 600;
@@ -79,23 +77,31 @@
             margin-bottom: 0;
         }
 
-        .g1-label { color: var(--accent-1); font-weight: bold; }
-        .g2-label { color: var(--accent-2); font-weight: bold; }
+        .g1-label { color: var(--accent-1); font-weight: bold; min-width: 65px; }
+        .g2-label { color: var(--accent-2); font-weight: bold; min-width: 65px; }
 
-        input[type="number"] {
-            width: 75px;
-            padding: 8px;
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
             border: 2px solid #cbd5e1;
             border-radius: 6px;
             font-size: 15px;
-            text-align: center;
+            font-family: 'Courier New', Courier, monospace;
             transition: border-color 0.2s, background-color 0.2s;
         }
 
-        input[type="number"]:focus {
+        input[type="text"]:focus {
             border-color: var(--primary-color);
             outline: none;
             background-color: #fff;
+        }
+
+        .parsed-info {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 4px;
+            margin-left: 75px;
+            font-family: 'Courier New', Courier, monospace;
         }
 
         .button-group {
@@ -142,6 +148,7 @@
         .case-1 { background-color: #e8f8f5; border-color: var(--success-color); color: #117a65; }
         .case-2 { background-color: #fdf2e9; border-color: var(--accent-1); color: #a04000; }
         .case-3 { background-color: #fef9e7; border-color: var(--warning-color); color: #7d6608; }
+        .case-error { background-color: #fde8e8; border-color: #e74c3c; color: #c0392b; }
 
         .result-card h3 { margin: 0 0 5px 0; font-size: 16px; }
         .result-card p { margin: 0; font-size: 17px; font-weight: bold; }
@@ -182,13 +189,8 @@
             transition: background 0.2s, transform 0.1s;
         }
 
-        .tool-btn:hover {
-            background: #f1f5f9;
-        }
-
-        .tool-btn:active {
-            transform: scale(0.95);
-        }
+        .tool-btn:hover { background: #f1f5f9; }
+        .tool-btn:active { transform: scale(0.95); }
 
         .canvas-hint {
             position: absolute;
@@ -211,21 +213,15 @@
             touch-action: none;
         }
 
-        svg:active {
-            cursor: grabbing;
-        }
+        svg:active { cursor: grabbing; }
 
-        /* SVG Element Drag Styling */
         .draggable-point {
             cursor: pointer;
             transition: r 0.2s, fill 0.2s;
         }
 
-        .draggable-point:hover {
-            r: 8;
-        }
+        .draggable-point:hover { r: 8; }
 
-        /* Methods section */
         .methods-section {
             border-top: 2px solid #e2e8f0;
             padding-top: 20px;
@@ -246,9 +242,9 @@
         }
 
         @media (max-width: 650px) {
-            .grid-methods {
-                grid-template-columns: 1fr;
-            }
+            .grid-methods { grid-template-columns: 1fr; }
+            .equation-row { flex-direction: column; align-items: stretch; }
+            .parsed-info { margin-left: 0; }
         }
 
         .method-card {
@@ -273,9 +269,7 @@
             padding-left: 16px;
         }
 
-        .method-steps li {
-            margin-bottom: 3px;
-        }
+        .method-steps li { margin-bottom: 3px; }
 
         .math-box {
             background: #fff;
@@ -295,9 +289,7 @@
             white-space: nowrap;
         }
 
-        .math-line:last-child {
-            margin-bottom: 0;
-        }
+        .math-line:last-child { margin-bottom: 0; }
 
         .line-label {
             font-weight: bold;
@@ -306,9 +298,7 @@
             flex-shrink: 0;
         }
 
-        .line-content {
-            flex-grow: 1;
-        }
+        .line-content { flex-grow: 1; }
 
         .math-hr {
             border: none;
@@ -332,25 +322,20 @@
 
 <div class="container">
     <h1>Interaktiver LGS-Rechner</h1>
-    <p class="description">Form: <b>a·x + b·y = c</b>. Ziehe die Punkte direkt in der Grafik oder verändere die Werte in den Feldern.</p>
+    <p class="description">Gib beliebige lineare Gleichungen ein (z. B. <code>10y + x - 9 = 10x + y</code>).</p>
 
     <div class="system-box">
         <div class="equation-row">
             <span class="g1-label">I. (G1)</span>
-            <input type="number" id="a1" value="1" step="any"> <span>x</span>
-            <span>+</span>
-            <input type="number" id="b1" value="1" step="any"> <span>y</span>
-            <span>=</span>
-            <input type="number" id="c1" value="5" step="any">
+            <input type="text" id="eq1" value="10y + x - 9 = 10x + y" placeholder="z. B. 10y + x - 9 = 10x + y">
         </div>
-        <div class="equation-row">
+        <div id="parsed1" class="parsed-info">Normalform: -9x + 9y = 9</div>
+
+        <div class="equation-row" style="margin-top: 15px;">
             <span class="g2-label">II. (G2)</span>
-            <input type="number" id="a2" value="1" step="any"> <span>x</span>
-            <span>+</span>
-            <input type="number" id="b2" value="-1" step="any"> <span>y</span>
-            <span>=</span>
-            <input type="number" id="c2" value="1" step="any">
+            <input type="text" id="eq2" value="x - y = 1" placeholder="z. B. x - y = 1">
         </div>
+        <div id="parsed2" class="parsed-info">Normalform: 1x - 1y = 1</div>
     </div>
 
     <div class="snap-toggle">
@@ -417,8 +402,13 @@
         dragStartY: 0
     };
 
-    // Point Dragging State
-    let activeDragPoint = null; // { lineIndex: 1|2, pointIndex: 0|1 }
+    // Current parsed coefficients for ax + by = c
+    let parsedEqs = {
+        a1: -9, b1: 9, c1: 9,
+        a2: 1, b2: -1, c2: 1
+    };
+
+    let activeDragPoint = null;
 
     // Helper formatting functions
     function fmt(num) {
@@ -431,96 +421,253 @@
         return showFirst ? `-${fmt(Math.abs(num))}` : `- ${fmt(Math.abs(num))}`;
     }
 
-    // Convert Screen (SVG) coordinates to Mathematical Coordinates
+    // Advanced Parser: Converts any linear expression to coefficient value (ax + by + c)
+    function parseLinearSide(exprStr) {
+        let str = exprStr.replace(/\s+/g, '').replace(/--/g, '+');
+        // Insert missing multiplication operators (e.g., 2(x+1) -> 2*(x+1), )x -> )*x)
+        str = str.replace(/(\d)(\()/g, '$1*($2')                  .replace(/(\))(\()/g, '$1*($2')                  .replace(/(\))([0-9x-yA-Za-z])/g, '$1*$2')
+                 .replace(/(\d)([xy])/gi, '$1*$2');
+
+        let xCoeff = 0, yCoeff = 0, constVal = 0;
+
+        function tokenize(s) {
+            let tokens = [];
+            let i = 0;
+            while (i < s.length) {
+                let c = s[i];
+                if ('+-*/()xy'.includes(c) || c === 'X' || c === 'Y') {
+                    tokens.push(c.toLowerCase());
+                    i++;
+                } else if (/[0-9.]/.test(c)) {
+                    let num = '';
+                    while (i < s.length && /[0-9.]/.test(s[i])) {
+                        num += s[i];
+                        i++;
+                    }
+                    tokens.push(parseFloat(num));
+                } else {
+                    i++; // skip unknown chars
+                }
+            }
+            return tokens;
+        }
+
+        // Polynomial linear form representation: { x: val, y: val, c: val }
+        function parseExpression(tokens) {
+            let terms = [];
+            let currentTerm = { x: 0, y: 0, c: 0 };
+            
+            // Evaluates linear expression recursively using Shunting-yard algorithm
+            let pos = 0;
+
+            function parsePrimary() {
+                if (pos >= tokens.length) return { x: 0, y: 0, c: 0 };
+
+                let tok = tokens[pos];
+
+                if (tok === '+') {
+                    pos++;
+                    return parsePrimary();
+                }
+                if (tok === '-') {
+                    pos++;
+                    let res = parsePrimary();
+                    return { x: -res.x, y: -res.y, c: -res.c };
+                }
+                if (tok === '(') {
+                    pos++;
+                    let res = parseAddSub();
+                    if (pos < tokens.length && tokens[pos] === ')') pos++;
+                    return res;
+                }
+                if (typeof tok === 'number') {
+                    pos++;
+                    return { x: 0, y: 0, c: tok };
+                }
+                if (tok === 'x') {
+                    pos++;
+                    return { x: 1, y: 0, c: 0 };
+                }
+                if (tok === 'y') {
+                    pos++;
+                    return { x: 0, y: 1, c: 0 };
+                }
+
+                return { x: 0, y: 0, c: 0 };
+            }
+
+            function parseMulDiv() {
+                let left = parsePrimary();
+
+                while (pos < tokens.length && (tokens[pos] === '*' || tokens[pos] === '/')) {
+                    let op = tokens[pos];
+                    pos++;
+                    let right = parsePrimary();
+
+                    if (op === '*') {
+                        // Multiplication with linear terms
+                        if (left.x === 0 && left.y === 0) {
+                            left = { x: left.c * right.x, y: left.c * right.y, c: left.c * right.c };
+                        } else if (right.x === 0 && right.y === 0) {
+                            left = { x: left.x * right.c, y: left.y * right.c, c: left.c * right.c };
+                        }
+                    } else if (op === '/') {
+                        if (right.x === 0 && right.y === 0 && right.c !== 0) {
+                            left = { x: left.x / right.c, y: left.y / right.c, c: left.c / right.c };
+                        }
+                    }
+                }
+                return left;
+            }
+
+            function parseAddSub() {
+                let left = parseMulDiv();
+
+                while (pos < tokens.length && (tokens[pos] === '+' || tokens[pos] === '-')) {
+                    let op = tokens[pos];
+                    pos++;
+                    let right = parseMulDiv();
+
+                    if (op === '+') {
+                        left = { x: left.x + right.x, y: left.y + right.y, c: left.c + right.c };
+                    } else {
+                        left = { x: left.x - right.x, y: left.y - right.y, c: left.c - right.c };
+                    }
+                }
+                return left;
+            }
+
+            return parseAddSub();
+        }
+
+        let tokens = tokenize(str);
+        return parseExpression(tokens);
+    }
+
+    // Parses complete equation string into standard ax + by = c form
+    function parseEquation(eqStr) {
+        if (!eqStr.includes('=')) {
+            eqStr = eqStr + " = 0";
+        }
+
+        let parts = eqStr.split('=');
+        let left = parseLinearSide(parts[0]);
+        let right = parseLinearSide(parts[1]);
+
+        // Bring all variables to left and constants to right:
+        // left.x * x + left.y * y + left.c = right.x * x + right.y * y + right.c
+        // => (left.x - right.x) x + (left.y - right.y) y = right.c - left.c
+        let a = left.x - right.x;
+        let b = left.y - right.y;
+        let c = right.c - left.c;
+
+        return { a, b, c };
+    }
+
+    function formatCanonicalEq(a, b, c) {
+        let str = "";
+        if (Math.abs(a) > 1e-6) str += `${fmt(a)}x `;
+        if (Math.abs(b) > 1e-6) str += `${str ? fmtSign(b) : fmt(b)}y `;
+        if (!str) str = "0 ";
+        str += `= ${fmt(c)}`;
+        return str;
+    }
+
+    // Coordinate conversion
     function svgToMath(svgX, svgY) {
-        const mathX = (svgX - view.centerX) / view.scale;
-        const mathY = (view.centerY - svgY) / view.scale;
-        return { x: mathX, y: mathY };
-    }
-
-    // Convert Mathematical coordinates to Screen (SVG) Coordinates
-    function mathToSvg(mathX, mathY) {
-        const svgX = view.centerX + mathX * view.scale;
-        const svgY = view.centerY - mathY * view.scale;
-        return { x: svgX, y: svgY };
-    }
-
-    // Get current line equations parameters from inputs
-    function getInputs() {
         return {
-            a1: parseFloat(document.getElementById('a1').value) || 0,
-            b1: parseFloat(document.getElementById('b1').value) || 0,
-            c1: parseFloat(document.getElementById('c1').value) || 0,
-            a2: parseFloat(document.getElementById('a2').value) || 0,
-            b2: parseFloat(document.getElementById('b2').value) || 0,
-            c2: parseFloat(document.getElementById('c2').value) || 0
+            x: (svgX - view.centerX) / view.scale,
+            y: (view.centerY - svgY) / view.scale
         };
     }
 
-    function setInputs(a1, b1, c1, a2, b2, c2) {
-        if (a1 !== null) document.getElementById('a1').value = fmt(a1);
-        if (b1 !== null) document.getElementById('b1').value = fmt(b1);
-        if (c1 !== null) document.getElementById('c1').value = fmt(c1);
-        if (a2 !== null) document.getElementById('a2').value = fmt(a2);
-        if (b2 !== null) document.getElementById('b2').value = fmt(b2);
-        if (c2 !== null) document.getElementById('c2').value = fmt(c2);
+    function mathToSvg(mathX, mathY) {
+        return {
+            x: view.centerX + mathX * view.scale,
+            y: view.centerY - mathY * view.scale
+        };
     }
 
     function updateAll() {
-        const { a1, b1, c1, a2, b2, c2 } = getInputs();
+        const eq1Str = document.getElementById('eq1').value;
+        const eq2Str = document.getElementById('eq2').value;
 
         const resultBox = document.getElementById('resultBox');
         const resultTitle = document.getElementById('resultTitle');
         const resultText = document.getElementById('resultText');
         const methodsSection = document.getElementById('methodsSection');
 
-        const D = a1 * b2 - b1 * a2;
-        const Dx = c1 * b2 - b1 * c2;
-        const Dy = a1 * c2 - c1 * a2;
+        try {
+            const eq1 = parseEquation(eq1Str);
+            const eq2 = parseEquation(eq2Str);
 
-        let solutionCase = 0; 
-        let x = 0, y = 0;
+            parsedEqs = {
+                a1: eq1.a, b1: eq1.b, c1: eq1.c,
+                a2: eq2.a, b2: eq2.b, c2: eq2.c
+            };
 
-        resultBox.className = "result-card";
+            document.getElementById('parsed1').innerText = `Normalform: ${formatCanonicalEq(eq1.a, eq1.b, eq1.c)}`;
+            document.getElementById('parsed2').innerText = `Normalform: ${formatCanonicalEq(eq2.a, eq2.b, eq2.c)}`;
 
-        if (Math.abs(D) > 1e-7) {
-            solutionCase = 1;
-            x = Dx / D;
-            y = Dy / D;
-            
-            resultBox.classList.add('case-1');
-            resultTitle.innerText = "1. Eindeutige Lösung (Geraden kreuzen sich)";
-            resultText.innerText = `Schnittpunkt S (${fmt(x)} | ${fmt(y)})`;
-            
-            generateMathPaths(a1, b1, c1, a2, b2, c2, x, y);
-            methodsSection.style.display = "block";
-        } else {
-            if (Math.abs(Dx) < 1e-7 && Math.abs(Dy) < 1e-7) {
-                solutionCase = 3;
-                resultBox.classList.add('case-3');
-                resultTitle.innerText = "3. Unendlich viele Lösungen (Identische Geraden)";
-                resultText.innerText = "Die Geraden liegen deckungsgleich aufeinander.";
-            } else {
-                solutionCase = 2;
-                resultBox.classList.add('case-2');
-                resultTitle.innerText = "2. Unlösbar (Echte Parallele)";
-                resultText.innerText = "Die Geraden verlaufen absolut parallel zueinander.";
+            const { a1, b1, c1, a2, b2, c2 } = parsedEqs;
+
+            if ((Math.abs(a1) < 1e-6 && Math.abs(b1) < 1e-6) || (Math.abs(a2) < 1e-6 && Math.abs(b2) < 1e-6)) {
+                throw new Error("Ungültige Gleichung (keine Variablen enthalten).");
             }
-            document.getElementById('substitutionMath').innerHTML = '<i>Kein eindeutiger Schnittpunkt berechenbar.</i>';
-            document.getElementById('additionMath').innerHTML = '<i>Kein eindeutiger Schnittpunkt berechenbar.</i>';
-            methodsSection.style.display = "block";
-        }
 
-        renderSVG(a1, b1, c1, a2, b2, c2, solutionCase, x, y);
+            const D = a1 * b2 - b1 * a2;
+            const Dx = c1 * b2 - b1 * c2;
+            const Dy = a1 * c2 - c1 * a2;
+
+            let solutionCase = 0;
+            let x = 0, y = 0;
+
+            resultBox.className = "result-card";
+
+            if (Math.abs(D) > 1e-7) {
+                solutionCase = 1;
+                x = Dx / D;
+                y = Dy / D;
+
+                resultBox.classList.add('case-1');
+                resultTitle.innerText = "1. Eindeutige Lösung (Geraden kreuzen sich)";
+                resultText.innerText = `Schnittpunkt S (${fmt(x)} | ${fmt(y)})`;
+
+                generateMathPaths(a1, b1, c1, a2, b2, c2, x, y);
+                methodsSection.style.display = "block";
+            } else {
+                if (Math.abs(Dx) < 1e-7 && Math.abs(Dy) < 1e-7) {
+                    solutionCase = 3;
+                    resultBox.classList.add('case-3');
+                    resultTitle.innerText = "3. Unendlich viele Lösungen (Identische Geraden)";
+                    resultText.innerText = "Die Geraden liegen deckungsgleich aufeinander.";
+                } else {
+                    solutionCase = 2;
+                    resultBox.classList.add('case-2');
+                    resultTitle.innerText = "2. Unlösbar (Echte Parallele)";
+                    resultText.innerText = "Die Geraden verlaufen absolut parallel zueinander.";
+                }
+                document.getElementById('substitutionMath').innerHTML = '<i>Kein eindeutiger Schnittpunkt berechenbar.</i>';
+                document.getElementById('additionMath').innerHTML = '<i>Kein eindeutiger Schnittpunkt berechenbar.</i>';
+                methodsSection.style.display = "block";
+            }
+
+            renderSVG(a1, b1, c1, a2, b2, c2, solutionCase, x, y);
+
+        } catch (err) {
+            resultBox.className = "result-card case-error";
+            resultTitle.innerText = "Eingabefehler";
+            resultText.innerText = err.message || "Gleichung konnte nicht gelesen werden.";
+            methodsSection.style.display = "none";
+        }
     }
 
-    // Generate detailed math steps
     function generateMathPaths(a1, b1, c1, a2, b2, c2, x, y) {
         let subHtml = '';
         subHtml += `<div class="math-line"><span class="line-label">I:</span><span class="line-content">${fmt(a1)}x ${fmtSign(b1)}y = ${fmt(c1)}</span></div>`;
         subHtml += `<div class="math-line"><span class="line-label">II:</span><span class="line-content">${fmt(a2)}x ${fmtSign(b2)}y = ${fmt(c2)}</span></div>`;
         subHtml += `<div class="math-hr"></div>`;
-        
+
         if (Math.abs(b1) > 1e-6) {
             let substX = -a1 / b1;
             let substC = c1 / b1;
@@ -542,36 +689,33 @@
         let addHtml = '';
         let m1 = a2;
         let m2 = a1;
-        
+
         addHtml += `<div class="math-line"><span class="line-label">I:</span><span class="line-content">${fmt(a1)}x ${fmtSign(b1)}y = ${fmt(c1)}  [&middot; ${fmt(m1)}]</span></div>`;
         addHtml += `<div class="math-line"><span class="line-label">II:</span><span class="line-content">${fmt(a2)}x ${fmtSign(b2)}y = ${fmt(c2)}  [&middot; ${fmt(m2)}]</span></div>`;
         addHtml += `<div class="math-hr"></div>`;
-        
+
         let newA1 = a1 * m1; let newB1 = b1 * m1; let newC1 = c1 * m1;
         let newA2 = a2 * m2; let newB2 = b2 * m2; let newC2 = c2 * m2;
-        
+
         addHtml += `<div class="math-line"><span class="line-label">I':</span><span class="line-content">${fmt(newA1)}x ${fmtSign(newB1)}y = ${fmt(newC1)}</span></div>`;
         addHtml += `<div class="math-line"><span class="line-label">II':</span><span class="line-content">${fmt(newA2)}x ${fmtSign(newB2)}y = ${fmt(newC2)}</span></div>`;
         addHtml += `<div class="math-hr"></div>`;
-        
+
         let finalB = newB1 - newB2;
         let finalC = newC1 - newC2;
-        
+
         addHtml += `<div class="math-line"><span class="line-label">I' - II':</span><span class="line-content">${fmt(finalB)}y = ${fmt(finalC)}</span></div>`;
         addHtml += `<div class="math-line"><span class="line-label">&rArr;</span><span class="line-content"><b>y = ${fmt(y)}</b></span></div>`;
         addHtml += `<div class="math-line"><span class="line-label">Einsetzen:</span><span class="line-content">&rArr; <b>x = ${fmt(x)}</b></span></div>`;
         document.getElementById('additionMath').innerHTML = addHtml;
     }
 
-    // Helper to calculate two distinct points on a line ax + by = c
     function getControlPointsForLine(a, b, c) {
         if (Math.abs(b) > 1e-6) {
-            // Line crosses y axis at x=0, and another point at x=3
             let y1 = c / b;
             let y2 = (c - a * 3) / b;
             return [{ x: 0, y: y1 }, { x: 3, y: y2 }];
         } else if (Math.abs(a) > 1e-6) {
-            // Vertical line x = c/a
             let xVal = c / a;
             return [{ x: xVal, y: 0 }, { x: xVal, y: 3 }];
         }
@@ -587,14 +731,13 @@
         const minMathY = (view.centerY - view.height) / view.scale;
         const maxMathY = (view.centerY - 0) / view.scale;
 
-        // Dynamic Grid spacing based on zoom
         let step = 1;
         if (view.scale < 15) step = 5;
         if (view.scale < 8) step = 10;
         if (view.scale > 60) step = 0.5;
 
         let gridHtml = '<g class="grid-layer">';
-        
+
         const startX = Math.floor(minMathX / step) * step;
         const endX = Math.ceil(maxMathX / step) * step;
         for (let x = startX; x <= endX; x += step) {
@@ -615,14 +758,12 @@
             }
         }
 
-        // Axes
         gridHtml += `<line x1="0" y1="${view.centerY}" x2="${view.width}" y2="${view.centerY}" stroke="#64748b" stroke-width="1.5" />`;
         gridHtml += `<line x1="${view.centerX}" y1="0" x2="${view.centerX}" y2="${view.height}" stroke="#64748b" stroke-width="1.5" />`;
         gridHtml += `<text x="${view.width - 15}" y="${view.centerY - 8}" font-size="12" font-weight="bold" fill="#64748b">x</text>`;
         gridHtml += `<text x="${view.centerX + 10}" y="15" font-size="12" font-weight="bold" fill="#64748b">y</text>`;
         gridHtml += '</g>';
 
-        // Helper to project line endpoints outside canvas bounds
         function getExtendedLinePoints(a, b, c) {
             let pts = [];
             if (Math.abs(b) > 1e-6) {
@@ -639,14 +780,12 @@
         }
 
         let linesHtml = '<g class="lines-layer">';
-        
-        // Line 1
+
         let pts1 = getExtendedLinePoints(a1, b1, c1);
         if (pts1.length === 2) {
             linesHtml += `<line x1="${pts1[0].x}" y1="${pts1[0].y}" x2="${pts1[1].x}" y2="${pts1[1].y}" stroke="var(--accent-1)" stroke-width="3" />`;
         }
 
-        // Line 2
         let pts2 = getExtendedLinePoints(a2, b2, c2);
         if (pts2.length === 2) {
             let dash = (solutionCase === 3) ? 'stroke-dasharray="6,6"' : '';
@@ -654,25 +793,21 @@
         }
         linesHtml += '</g>';
 
-        // Draggable Control Points for Line 1 and Line 2
         let ctrlPoints1 = getControlPointsForLine(a1, b1, c1);
         let ctrlPoints2 = getControlPointsForLine(a2, b2, c2);
 
         let handlesHtml = '<g class="handles-layer">';
-        
-        // Line 1 Points (Red)
+
         ctrlPoints1.forEach((p, idx) => {
             let svgP = mathToSvg(p.x, p.y);
             handlesHtml += `<circle cx="${svgP.x}" cy="${svgP.y}" r="6" fill="var(--accent-1)" stroke="white" stroke-width="2" class="draggable-point" data-line="1" data-point="${idx}" />`;
         });
 
-        // Line 2 Points (Blue)
         ctrlPoints2.forEach((p, idx) => {
             let svgP = mathToSvg(p.x, p.y);
             handlesHtml += `<circle cx="${svgP.x}" cy="${svgP.y}" r="6" fill="var(--accent-2)" stroke="white" stroke-width="2" class="draggable-point" data-line="2" data-point="${idx}" />`;
         });
 
-        // Intersection Point (Green)
         if (solutionCase === 1) {
             let pSvg = mathToSvg(solX, solY);
             if (pSvg.x >= -20 && pSvg.x <= view.width + 20 && pSvg.y >= -20 && pSvg.y <= view.height + 20) {
@@ -692,7 +827,7 @@
 
         points.forEach(pt => {
             pt.addEventListener('pointerdown', (e) => {
-                e.stopPropagation(); // prevent panning view
+                e.stopPropagation();
                 const lineIdx = parseInt(pt.getAttribute('data-line'));
                 const pointIdx = parseInt(pt.getAttribute('data-point'));
                 activeDragPoint = { lineIndex: lineIdx, pointIndex: pointIdx };
@@ -701,31 +836,26 @@
         });
     }
 
-    // Line Dragging Calculation logic
     function handlePointDrag(svgX, svgY) {
         let mathP = svgToMath(svgX, svgY);
-        
-        // Grid Snap if checked
+
         if (document.getElementById('snapToGrid').checked) {
             mathP.x = Math.round(mathP.x);
             mathP.y = Math.round(mathP.y);
         }
 
-        const { a1, b1, c1, a2, b2, c2 } = getInputs();
+        const { a1, b1, c1, a2, b2, c2 } = parsedEqs;
 
         if (activeDragPoint.lineIndex === 1) {
             let ctrl = getControlPointsForLine(a1, b1, c1);
             ctrl[activeDragPoint.pointIndex] = mathP;
-            // Prevent points from overlapping
             if (ctrl[0].x === ctrl[1].x && ctrl[0].y === ctrl[1].y) return;
-            
-            // Calculate new line equation ax + by = c from ctrl[0] and ctrl[1]
-            // (y2 - y1)*x - (x2 - x1)*y = x1*y2 - x2*y1
+
             let newA = ctrl[1].y - ctrl[0].y;
             let newB = -(ctrl[1].x - ctrl[0].x);
             let newC = ctrl[0].x * ctrl[1].y - ctrl[1].x * ctrl[0].y;
-            
-            setInputs(newA, newB, newC, null, null, null);
+
+            document.getElementById('eq1').value = formatCanonicalEq(newA, newB, newC);
         } else if (activeDragPoint.lineIndex === 2) {
             let ctrl = getControlPointsForLine(a2, b2, c2);
             ctrl[activeDragPoint.pointIndex] = mathP;
@@ -735,12 +865,11 @@
             let newB = -(ctrl[1].x - ctrl[0].x);
             let newC = ctrl[0].x * ctrl[1].y - ctrl[1].x * ctrl[0].y;
 
-            setInputs(null, null, null, newA, newB, newC);
+            document.getElementById('eq2').value = formatCanonicalEq(newA, newB, newC);
         }
         updateAll();
     }
 
-    // Zoom and View Pan Controls
     function zoomView(factor) {
         view.scale *= factor;
         updateAll();
@@ -754,11 +883,11 @@
     }
 
     function resetAll() {
-        setInputs(1, 1, 5, 1, -1, 1);
+        document.getElementById('eq1').value = "10y + x - 9 = 10x + y";
+        document.getElementById('eq2').value = "x - y = 1";
         resetView();
     }
 
-    // Setup Canvas Pan/Zoom Global Pointer Handlers
     function setupCanvasInteractions() {
         const svg = document.getElementById('coordSvg');
 
@@ -795,13 +924,11 @@
             zoomView(zoomFactor);
         }, { passive: false });
 
-        // Add Input Change Event Listeners for real-time recalculation
-        ['a1', 'b1', 'c1', 'a2', 'b2', 'c2'].forEach(id => {
+        ['eq1', 'eq2'].forEach(id => {
             document.getElementById(id).addEventListener('input', updateAll);
         });
     }
 
-    // Initialize Application
     window.onload = function() {
         setupCanvasInteractions();
         updateAll();

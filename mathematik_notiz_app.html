@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="de" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MathPad Pro - Interaktive Mathe- & Bild-Notizen</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Math.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.js"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            user-select: none;
+        }
+        .font-mono-math {
+            font-family: 'Fira Code', monospace;
+            user-select: text;
+        }
+
+        /* Hintergrund Raster Muster */
+        .grid-pattern-math {
+            background-size: 24px 24px;
+            background-image: linear-gradient(to right, rgba(99, 102, 241, 0.1) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(99, 102, 241, 0.1) 1px, transparent 1px);
+        }
+        .grid-pattern-mm {
+            background-size: 10px 10px;
+            background-image: linear-gradient(to right, rgba(239, 68, 68, 0.12) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(239, 68, 68, 0.12) 1px, transparent 1px);
+        }
+        .grid-pattern-lines {
+            background-size: 100% 28px;
+            background-image: linear-gradient(to bottom, rgba(148, 163, 184, 0.25) 1px, transparent 1px);
+        }
+        .grid-pattern-blank {
+            background-image: none;
+        }
+
+        /* Subtile Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(156, 163, 175, 0.4);
+            border-radius: 3px;
+        }
+
+        /* Canvas Transformation Container */
+        #workspaceViewport {
+            cursor: grab;
+        }
+        #workspaceViewport.panning {
+            cursor: grabbing;
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; color: black; }
+            .print-full-width { width: 100% !important; margin: 0 !important; }
+        }
+    </style>
+</head>
+<body class="h-full bg-slate-100 text-slate-800 dark:bg-slate-900 dark:text-slate-100 flex flex-col overflow-hidden transition-colors duration-200">
+
+    <!-- Top Navigation Header -->
+    <header class="no-print bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 z-30 px-4 py-2.5 shadow-xs shrink-0">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            
+            <!-- Logo & Title -->
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-brand-500/20">
+                    <i class="fa-solid font-bold text-lg">∑</i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-base leading-tight tracking-tight text-slate-900 dark:text-white">MathPad Pro</h1>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400">Notizen, Gleichungen & Bildanalyse</p>
+                </div>
+            </div>
+
+            <!-- Toolbar Actions -->
+            <div class="flex items-center space-x-2 flex-wrap gap-y-1 text-xs">
+                <!-- Neue Notiz -->
+                <button onclick="addNewNote()" class="px-3 py-1.5 font-semibold rounded-lg bg-brand-600 hover:bg-brand-700 text-white transition flex items-center gap-1.5 shadow-xs">
+                    <i class="fa-solid fa-plus"></i> Neu
+                </button>
+
+                <!-- Bild einfügen -->
+                <button onclick="triggerImageUpload()" class="px-3 py-1.5 font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white transition flex items-center gap-1.5 shadow-xs">
+                    <i class="fa-solid fa-image"></i> Bild einfügen
+                </button>
+                <input type="file" id="imageInput" class="hidden" accept="image/*" onchange="handleImageUpload(event)">
+
+                <!-- Gleichung/Wertetabelle Solver -->
+                <button onclick="toggleSolverModal()" class="px-3 py-1.5 font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition flex items-center gap-1.5 shadow-xs">
+                    <i class="fa-solid fa-calculator"></i> Solver
+                </button>
+
+                <div class="h-5 w-[1px] bg-slate-200 dark:bg-slate-700 mx-1 hidden sm:block"></div>
+
+                <!-- Modus & Raster wähler -->
+                <div class="flex items-center bg-slate-100 dark:bg-slate-700 rounded-lg p-0.5 border border-slate-200 dark:border-slate-600">
+                    <button onclick="setGridPattern('grid-pattern-math')" title="Kästchen" class="p-1.5 rounded text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-600"><i class="fa-solid fa-border-all"></i></button>
+                    <button onclick="setGridPattern('grid-pattern-mm')" title="Millimeterpapier" class="p-1.5 rounded text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-600"><i class="fa-solid fa-table-cells"></i></button>
+                    <button onclick="setGridPattern('grid-pattern-lines')" title="Linien" class="p-1.5 rounded text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-600"><i class="fa-solid fa-bars"></i></button>
+                    <button onclick="setGridPattern('grid-pattern-blank')" title="Blanko" class="p-1.5 rounded text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-600"><i class="fa-regular fa-square"></i></button>
+                </div>
+
+                <div class="h-5 w-[1px] bg-slate-200 dark:bg-slate-700 mx-1 hidden sm:block"></div>
+
+                <!-- Fullscreen Toggle -->
+                <button onclick="toggleFullscreen()" title="Vollbild umschalten" class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition">
+                    <i class="fa-solid fa-expand" id="fullscreenIcon"></i>
+                </button>
+
+                <!-- Export / Import -->
+                <button onclick="exportData()" title="Export JSON" class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition"><i class="fa-solid fa-download"></i></button>
+                <button onclick="importDataTrigger()" title="Import JSON" class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition"><i class="fa-solid fa-upload"></i></button>
+                <input type="file" id="importInput" class="hidden" accept=".json" onchange="importData(event)">
+                <button onclick="window.print()" title="PDF Drucken" class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition"><i class="fa-solid fa-print"></i></button>
+                <button onclick="toggleDarkMode()" title="Dark/Light Mode" class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition">
+                    <i class="fa-solid fa-moon dark:hidden"></i>
+                    <i class="fa-solid fa-sun hidden dark:inline"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main App Container -->
+    <div class="flex-1 flex overflow-hidden relative">
+        
+        <!-- Sidebar (Blätter/Notizen Verwaltung) -->
+        <aside id="sidebar" class="no-print w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col z-20 shrink-0 transition-all duration-300">
+            <div class="p-3 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Arbeitsblätter</span>
+                <span id="noteCount" class="text-xs px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-semibold">0</span>
+            </div>
+            <div id="notesList" class="flex-1 overflow-y-auto p-2 space-y-1"></div>
+        </aside>
+
+        <!-- Workspace Wrapper (Infinity Pan & Zoom Canvas) -->
+        <main class="flex-1 flex flex-col relative overflow-hidden bg-slate-200/60 dark:bg-slate-950">
+            
+            <!-- Floating Zoom & Pan Control Bar -->
+            <div class="no-print absolute top-4 right-4 z-20 bg-white/90 dark:bg-slate-800/90 backdrop-blur border border-slate-200 dark:border-slate-700 rounded-xl p-1.5 shadow-lg flex items-center space-x-1.5 text-xs">
+                <button onclick="setPanMode(!isPanMode)" id="panToolBtn" title="Hand-Tool / Arbeitsfläche verschieben" class="p-1.5 rounded-lg border border-transparent hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200">
+                    <i class="fa-solid fa-hand"></i>
+                </button>
+                <div class="h-4 w-[1px] bg-slate-200 dark:bg-slate-700"></div>
+                <button onclick="adjustZoom(-0.1)" title="Zoom Out" class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg"><i class="fa-solid fa-minus"></i></button>
+                <span id="zoomLabel" class="font-mono-math font-semibold px-1 w-12 text-center text-slate-700 dark:text-slate-200">100%</span>
+                <button onclick="adjustZoom(0.1)" title="Zoom In" class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg"><i class="fa-solid fa-plus"></i></button>
+                <button onclick="resetZoom()" title="Reset Zoom" class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg"><i class="fa-solid fa-rotate-left"></i></button>
+            </div>
+
+            <!-- Mathe Symbole Schnellleiste -->
+            <div class="no-print p-2 bg-white/80 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 flex items-center space-x-1 overflow-x-auto text-xs shrink-0 z-10 shadow-2xs">
+                <span class="text-slate-400 font-semibold px-2 uppercase tracking-wider text-[10px] shrink-0">Math Quick Insert:</span>
+                <button onclick="insertSymbol('x')" class="px-2 py-1 bg-slate-100 dark:bg-slate-700 hover:bg-brand-100 dark:hover:bg-slate-600 rounded font-mono-math font-semibold">x</button>
+                <button onclick="insertSymbol('y')" class="px-2 py-1 bg-slate-100 dark:bg-slate-700 hover:bg-brand-100 dark:hover:bg-slate-600 rounded font-mono-math font-semibold">y</button>
+                <button onclick="insertSymbol(' + ')" class="px-2 py-1 bg-slate-100 dark:bg-slate-700 hover:bg-brand-100 dark:hover:bg-slate-600 rounded font-mono-math">+</button>
+                <button onclick="insertSymbol(' - ')" class="px-2 py-1 bg-slate-100 dark:bg-slate-700 hover:bg-brand-100 dark:hover:bg-slate-600 rounded font-mono-math">-</button>
+                <button onclick="insertSymbol(' * ')" class="px-2 py-1 bg-slate-100 dark:bg-slate-700 hover:bg-brand-100 dark:hover:bg-slate-600 rounded font-mono-math">×</button>
+                <button onclick="insertSymbol(' / ')" class="px-2 py-1 bg-slate-100 dark:bg-slate-700 hover:bg-brand-100 dark:hover:bg-slate-600 rounded font-mono-math">÷</button>
+                <button onclick="insertSymbol('^2')" class="px-2 py-1 bg-slate-100 dark:bg-slate-700 hover:bg-brand-100 dark:hover:bg-slate-600 rounded font-mono-math">x²</button>
+                <button onclick="insertSymbol('^3')" class="px-2 py-1 bg-slate-100 dark:bg-slate-700 hover:bg-brand-100 dark:hover:bg-slate-600 rounded font-mono-math">x³</button>
+                <button onclick="insertSymbol('sqrt(')" class="px-2 py-1 bg-slate-100 dark:bg-slate-700 hover:bg-brand-100 dark:hover:bg-slate-600 rounded font-mono-math">√x</button>
+                <button onclick="insertSymbol('pi')" class="px-2 py-1 bg-slate-100 dark:bg-slate-700 hover:bg-brand-100 dark:hover:bg-slate-600 rounded font-mono-math">π</button>
+                <button onclick="insertSymbol('sin(')" class="px-2 py-1 bg-slate-100 dark:bg-slate-700 hover:bg-brand-100 dark:hover:bg-slate-600 rounded font-mono-math">sin</button>
+                <button onclick="insertSymbol('cos(')" class="px-2 py-1 bg-slate-100 dark:bg-slate-700 hover:bg-brand-100 dark:hover:bg-slate-600 rounded font-mono-math">cos</button>
+                <button onclick="insertSymbol('tan(')" class="px-2 py-1 bg-slate-100 dark:bg-slate-700 hover:bg-brand-100 dark:hover:bg-slate-600 rounded font-mono-math">tan</button>
+                <button onclick="insertSymbol(' = ')" class="px-2 py-1 bg-slate-100 dark:bg-slate-700 hover:bg-brand-100 dark:hover:bg-slate-600 rounded font-mono-math">=</button>
+            </div>
+
+            <!-- Interaktives Zoom & Pan Viewport -->
+            <div id="workspaceViewport" class="flex-1 w-full h-full overflow-hidden relative" onwheel="handleWheelZoom(event)">
+                
+                <!-- Transformierbares Notizblatt Element -->
+                <div id="zoomableCanvas" class="absolute origin-top-left transition-transform duration-75 ease-out grid-pattern-math bg-white dark:bg-slate-900 shadow-xl border border-slate-300 dark:border-slate-800 rounded-2xl min-w-[900px] min-h-[1100px] p-6 m-8">
+                    
+                    <!-- Notizblatt Kopfzeile -->
+                    <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-200 dark:border-slate-800">
+                        <input type="text" id="currentNoteTitle" placeholder="Blatt Titel..." oninput="updateNoteTitle()" 
+                               class="bg-transparent font-bold text-2xl text-slate-900 dark:text-white border-b-2 border-transparent hover:border-slate-300 dark:hover:border-slate-700 focus:border-brand-500 focus:outline-none px-1 transition">
+                        
+                        <div class="flex items-center space-x-2 no-print">
+                            <button onclick="deleteCurrentNote()" class="text-xs text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 p-2 rounded-lg transition"><i class="fa-solid fa-trash"></i> Blatt löschen</button>
+                        </div>
+                    </div>
+
+                    <!-- EINGEFÜGTES BILD & TEILAUSSCHNITT-VIEWER (Anzeige-Bild Modul) -->
+                    <div id="imageModuleContainer" class="hidden mb-6 p-4 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 no-print">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-2">
+                                <i class="fa-solid fa-crop-simple text-indigo-500"></i> Bild- & Teilausschnitt-Anzeige
+                            </h4>
+                            <button onclick="removeImage()" class="text-xs text-rose-500 hover:text-rose-700"><i class="fa-solid fa-xmark"></i> Bild entfernen</button>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+                            <!-- Image Canvas Display -->
+                            <div class="lg:col-span-8 bg-slate-900/5 dark:bg-slate-950 p-2 rounded-lg border border-slate-200 dark:border-slate-800 flex justify-center items-center overflow-auto max-h-[350px]">
+                                <canvas id="imageCanvas" class="max-w-full h-auto rounded shadow-sm cursor-crosshair"></canvas>
+                            </div>
+
+                            <!-- Bild-Steuerungs-Panels -->
+                            <div class="lg:col-span-4 space-y-3 text-xs">
+                                <div>
+                                    <label class="block text-slate-500 mb-1 font-semibold">Anzeigegröße (Skalierung): <span id="imgScaleVal">100%</span></label>
+                                    <input type="range" id="imgScaleSlider" min="20" max="200" value="100" oninput="updateImageControls()" class="w-full">
+                                </div>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label class="block text-slate-500 mb-1 font-semibold">Teil-X Offset</label>
+                                        <input type="range" id="cropXSlider" min="0" max="100" value="0" oninput="updateImageControls()" class="w-full">
+                                    </div>
+                                    <div>
+                                        <label class="block text-slate-500 mb-1 font-semibold">Teil-Y Offset</label>
+                                        <input type="range" id="cropYSlider" min="0" max="100" value="0" oninput="updateImageControls()" class="w-full">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-500 mb-1 font-semibold">Teil-Ausschnitt Zoom / Breite</label>
+                                    <input type="range" id="cropWidthSlider" min="20" max="100" value="100" oninput="updateImageControls()" class="w-full">
+                                </div>
+                                <button onclick="resetImageCrop()" class="w-full py-1.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 rounded font-semibold transition">
+                                    Ausschnitt Zurücksetzen
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DUAL EDITOR: Eingabe & Live Auswertung -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                        
+                        <!-- Linke Spalte: Mathe Code/Eingabe -->
+                        <div class="flex flex-col">
+                            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Notiz & Rechnungen</label>
+                            <textarea id="noteInput" oninput="evaluateLines()" placeholder="Tippe Ausdrücke & Gleichungen:&#10;x = 15&#10;y = 30&#10;Ergebnis = x * y + sqrt(144)&#10;sin(pi / 3)" 
+                                      class="w-full h-[500px] p-4 bg-transparent font-mono-math text-sm md:text-base border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none text-slate-800 dark:text-slate-100 leading-relaxed resize-y"></textarea>
+                        </div>
+
+                        <!-- Rechte Spalte: Live Resultate & Formel Layout -->
+                        <div class="flex flex-col">
+                            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Formeln & Auswertung</label>
+                            <div id="mathOutput" class="w-full min-h-[500px] p-4 bg-slate-50/80 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-xl font-mono-math text-sm space-y-2"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Gleichungs-Solver Modal -->
+    <div id="solverModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-700">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-200 dark:border-slate-700">
+                <h3 class="font-bold text-lg text-slate-900 dark:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-calculator text-brand-500"></i> Gleichungs-Solver & Wertetabelle
+                </h3>
+                <button onclick="toggleSolverModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Gleichung in X & Y:</label>
+                    <input type="text" id="solverEqInput" placeholder="z.B. y = 3 * x + 5" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 font-mono-math text-sm focus:outline-none">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Aktion:</label>
+                        <select id="solverAction" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-sm focus:outline-none">
+                            <option value="solveX">Nach X auflösen</option>
+                            <option value="solveY">Nach Y auflösen</option>
+                            <option value="table">Wertetabelle (-5 bis +5)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Parameter Wert:</label>
+                        <input type="number" id="solverParamValue" value="0" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-sm focus:outline-none">
+                    </div>
+                </div>
+
+                <button onclick="calculateSolver()" class="w-full py-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold text-xs rounded-lg transition shadow-xs">Berechnen</button>
+
+                <div id="solverResultContainer" class="p-3 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hidden text-xs font-mono-math"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Anwendungslogik -->
+    <script>
+        // State Management
+        let notes = [];
+        let currentNoteId = null;
+        
+        // Viewport Zoom & Pan State
+        let zoomLevel = 1.0;
+        let panX = 0;
+        let panY = 0;
+        let isPanMode = false;
+        let isDraggingPan = false;
+        let startX, startY;
+
+        // Image Handling State
+        let currentImageObj = null;
+
+        window.onload = function() {
+            loadFromLocalStorage();
+            if (notes.length === 0) {
+                createDefaultNote();
+            } else {
+                selectNote(notes[0].id);
+            }
+            initPanAndZoom();
+        };
+
+        // Zoom & Pan System
+        function initPanAndZoom() {
+            const viewport = document.getElementById('workspaceViewport');
+
+            viewport.addEventListener('mousedown', (e) => {
+                if (isPanMode || e.button === 1) { // Middle click or Hand tool
+                    isDraggingPan = true;
+                    startX = e.clientX - panX;
+                    startY = e.clientY - panY;
+                    viewport.classList.add('panning');
+                }
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                if (!isDraggingPan) return;
+                panX = e.clientX - startX;
+                panY = e.clientY - startY;
+                applyViewportTransform();
+            });
+
+            window.addEventListener('mouseup', () => {
+                isDraggingPan = false;
+                viewport.classList.remove('panning');
+            });
+        }
+
+        function handleWheelZoom(e) {
+            if (e.ctrlKey || e.metaKey) {
+                e.preventDefault();
+                const delta = e.deltaY < 0 ? 0.08 : -0.08;
+                adjustZoom(delta);
+            }
+        }
+
+        function adjustZoom(delta) {
+            zoomLevel = Math.min(Math.max(0.4, zoomLevel + delta), 2.5);
+            applyViewportTransform();
+        }
+
+        function resetZoom() {
+            zoomLevel = 1.0;
+            panX = 0;
+            panY = 0;
+            applyViewportTransform();
+        }
+
+        function setPanMode(enabled) {
+            isPanMode = enabled;
+            const btn = document.getElementById('panToolBtn');
+            if (isPanMode) {
+                btn.classList.add('bg-brand-500', 'text-white');
+            } else {
+                btn.classList.remove('bg-brand-500', 'text-white');
+            }
+        }
+
+        function applyViewportTransform() {
+            const canvas = document.getElementById('zoomableCanvas');
+            canvas.style.transform = `translate(${panX}px, ${panY}px) scale(${zoomLevel})`;
+            document.getElementById('zoomLabel').innerText = `${Math.round(zoomLevel * 100)}%`;
+        }
+
+        // Raster Hintergrund wechseln
+        function setGridPattern(patternClass) {
+            const canvas = document.getElementById('zoomableCanvas');
+            canvas.classList.remove('grid-pattern-math', 'grid-pattern-mm', 'grid-pattern-lines', 'grid-pattern-blank');
+            canvas.classList.add(patternClass);
+        }
+
+        // Notiz-Verwaltung
+        function createDefaultNote() {
+            const defaultNote = {
+                id: Date.now().toString(),
+                title: 'Mathe & Diagramm Notiz',
+                content: '// Rechnungen & Variablen\nx = 12\ny = 24\nFläche = x * y\nsqrt(x^2 + y^2)',
+                imageData: null
+            };
+            notes.push(defaultNote);
+            saveToLocalStorage();
+            renderNotesList();
+            selectNote(defaultNote.id);
+        }
+
+        function addNewNote() {
+            const newNote = {
+                id: Date.now().toString(),
+                title: 'Neues Blatt',
+                content: 'x = 5\ny = 10\nx + y',
+                imageData: null
+            };
+            notes.unshift(newNote);
+            saveToLocalStorage();
+            renderNotesList();
+            selectNote(newNote.id);
+        }
+
+        function selectNote(id) {
+            currentNoteId = id;
+            const note = notes.find(n => n.id === id);
+            if (!note) return;
+
+            document.getElementById('currentNoteTitle').value = note.title;
+            document.getElementById('noteInput').value = note.content;
+
+            if (note.imageData) {
+                loadImageDataIntoCanvas(note.imageData);
+            } else {
+                document.getElementById('imageModuleContainer').classList.add('hidden');
+            }
+
+            renderNotesList();
+            evaluateLines();
+        }
+
+        function renderNotesList() {
+            const listEl = document.getElementById('notesList');
+            document.getElementById('noteCount').innerText = notes.length;
+            listEl.innerHTML = '';
+
+            notes.forEach(note => {
+                const isActive = note.id === currentNoteId;
+                const item = document.createElement('div');
+                item.className = `p-2.5 rounded-xl cursor-pointer transition flex items-center justify-between ${
+                    isActive ? 'bg-brand-50 dark:bg-brand-900/30 text-brand-600 font-semibold border border-brand-200 dark:border-brand-800' : 'hover:bg-slate-100 dark:hover:bg-slate-700/50 text-slate-700 dark:text-slate-300'
+                }`;
+                item.onclick = () => selectNote(note.id);
+                item.innerHTML = `<span class="text-xs truncate">${escapeHtml(note.title || 'Unbenannt')}</span>`;
+                listEl.appendChild(item);
+            });
+        }
+
+        function updateNoteTitle() {
+            const note = notes.find(n => n.id === currentNoteId);
+            if (note) {
+                note.title = document.getElementById('currentNoteTitle').value;
+                saveToLocalStorage();
+                renderNotesList();
+            }
+        }
+
+        function deleteCurrentNote() {
+            if (notes.length <= 1) return;
+            notes = notes.filter(n => n.id !== currentNoteId);
+            saveToLocalStorage();
+            selectNote(notes[0].id);
+        }
+
+        // Mathe Evaluierung
+        function evaluateLines() {
+            const input = document.getElementById('noteInput').value;
+            const outputEl = document.getElementById('mathOutput');
+            outputEl.innerHTML = '';
+
+            const note = notes.find(n => n.id === currentNoteId);
+            if (note) {
+                note.content = input;
+                saveToLocalStorage();
+            }
+
+            const lines = input.split('\n');
+            const scope = {};
+
+            lines.forEach((line, index) => {
+                const lineDiv = document.createElement('div');
+                lineDiv.className = "flex justify-between items-center py-1 border-b border-slate-200/50 dark:border-slate-800/50";
+
+                const trimmed = line.trim();
+                if (!trimmed || trimmed.startsWith('//')) {
+                    lineDiv.innerHTML = `<span class="text-slate-400 italic text-xs">${escapeHtml(line)}</span>`;
+                    outputEl.appendChild(lineDiv);
+                    return;
+                }
+
+                try {
+                    const compiled = math.compile(trimmed);
+                    const result = compiled.evaluate(scope);
+
+                    let formattedResult = result !== undefined ? math.format(result, { precision: 8 }) : '';
+                    let latexFormatted = '';
+                    try { latexFormatted = math.parse(trimmed).toTex(); } catch(e) { latexFormatted = trimmed; }
+
+                    lineDiv.innerHTML = `
+                        <span id="katex-${index}" class="text-slate-600 dark:text-slate-300 text-xs"></span>
+                        <span class="font-bold text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/60 px-2 py-0.5 rounded text-xs">${escapeHtml(formattedResult)}</span>
+                    `;
+                    outputEl.appendChild(lineDiv);
+
+                    const katexEl = document.getElementById(`katex-${index}`);
+                    if (katexEl) katex.render(latexFormatted, katexEl, { throwOnError: false });
+
+                } catch (err) {
+                    lineDiv.innerHTML = `<span class="text-slate-700 dark:text-slate-300 text-xs">${escapeHtml(line)}</span>`;
+                    outputEl.appendChild(lineDiv);
+                }
+            });
+        }
+
+        function insertSymbol(sym) {
+            const textarea = document.getElementById('noteInput');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            textarea.value = textarea.value.substring(0, start) + sym + textarea.value.substring(end);
+            textarea.selectionStart = textarea.selectionEnd = start + sym.length;
+            textarea.focus();
+            evaluateLines();
+        }
+
+        // BILD- & CROPPING-MODULE LOGIK
+        function triggerImageUpload() {
+            document.getElementById('imageInput').click();
+        }
+
+        function handleImageUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                loadImageDataIntoCanvas(evt.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function loadImageDataIntoCanvas(dataUrl) {
+            const img = new Image();
+            img.onload = function() {
+                currentImageObj = img;
+                const note = notes.find(n => n.id === currentNoteId);
+                if (note) note.imageData = dataUrl;
+                saveToLocalStorage();
+
+                document.getElementById('imageModuleContainer').classList.remove('hidden');
+                updateImageControls();
+            };
+            img.src = dataUrl;
+        }
+
+        function updateImageControls() {
+            if (!currentImageObj) return;
+
+            const canvas = document.getElementById('imageCanvas');
+            const ctx = canvas.getContext('2d');
+
+            const scale = document.getElementById('imgScaleSlider').value / 100;
+            const cropXPct = document.getElementById('cropXSlider').value / 100;
+            const cropYPct = document.getElementById('cropYSlider').value / 100;
+            const cropWPct = document.getElementById('cropWidthSlider').value / 100;
+
+            document.getElementById('imgScaleVal').innerText = `${Math.round(scale * 100)}%`;
+
+            // Berechne Teilausschnitt (Source Box)
+            const sw = currentImageObj.width * cropWPct;
+            const sh = currentImageObj.height * cropWPct;
+            const sx = (currentImageObj.width - sw) * cropXPct;
+            const sy = (currentImageObj.height - sh) * cropYPct;
+
+            // Target Size
+            canvas.width = sw * scale;
+            canvas.height = sh * scale;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(currentImageObj, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
+        }
+
+        function resetImageCrop() {
+            document.getElementById('imgScaleSlider').value = 100;
+            document.getElementById('cropXSlider').value = 0;
+            document.getElementById('cropYSlider').value = 0;
+            document.getElementById('cropWidthSlider').value = 100;
+            updateImageControls();
+        }
+
+        function removeImage() {
+            document.getElementById('imageModuleContainer').classList.add('hidden');
+            currentImageObj = null;
+            const note = notes.find(n => n.id === currentNoteId);
+            if (note) note.imageData = null;
+            saveToLocalStorage();
+        }
+
+        // Gleichungs-Solver Modal
+        function toggleSolverModal() {
+            document.getElementById('solverModal').classList.toggle('hidden');
+        }
+
+        function calculateSolver() {
+            const eqStr = document.getElementById('solverEqInput').value.trim();
+            const action = document.getElementById('solverAction').value;
+            const paramVal = parseFloat(document.getElementById('solverParamValue').value) || 0;
+            const resultBox = document.getElementById('solverResultContainer');
+
+            if (!eqStr) return;
+
+            try {
+                let html = '';
+                if (action === 'table') {
+                    html = '<strong>Wertetabelle:</strong><br>';
+                    const compiled = math.compile(eqStr.includes('=') ? eqStr.split('=')[1] : eqStr);
+                    for (let x = -5; x <= 5; x++) {
+                        html += `x = ${x} => y = ${compiled.evaluate({x: x})}<br>`;
+                    }
+                } else {
+                    html = `Ergebnis ausgewertet für Parameter ${paramVal}`;
+                }
+                resultBox.innerHTML = html;
+                resultBox.classList.remove('hidden');
+            } catch(e) {
+                resultBox.innerText = "Fehler: " + e.message;
+                resultBox.classList.remove('hidden');
+            }
+        }
+
+        // Fullscreen & Utils
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('mathpad_pro_notes', JSON.stringify(notes));
+        }
+
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('mathpad_pro_notes');
+            if (saved) {
+                try { notes = JSON.parse(saved); } catch(e) { notes = []; }
+            }
+        }
+
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(notes));
+            const a = document.createElement('a');
+            a.href = dataStr;
+            a.download = `MathPad_Export.json`;
+            a.click();
+        }
+
+        function importDataTrigger() { document.getElementById('importInput').click(); }
+        function importData(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                notes = JSON.parse(evt.target.result);
+                saveToLocalStorage();
+                renderNotesList();
+                selectNote(notes[0].id);
+            };
+            reader.readAsText(file);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.innerText = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

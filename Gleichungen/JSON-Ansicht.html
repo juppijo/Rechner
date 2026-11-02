@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="gold">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>JSON-Ansicht</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#14110c;--panel:#1d1810;--ink:#efe6d2;--mute:#9c917b;--accent:#d4a537;--on:#14110c;--line:#3a3022;--sel:#2a2214;
+ box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root[data-theme=tafel]{--bg:#0f1a15;--panel:#16251d;--ink:#e6efe6;--mute:#8aa595;--accent:#9fd8a8;--on:#0f1a15;--line:#2b4437;--sel:#1d3528}
+:root[data-theme=papier]{--bg:#f4efe4;--panel:#fffdf7;--ink:#2a2418;--mute:#7a705c;--accent:#8a5a12;--on:#fffdf7;--line:#d9ccb0;--sel:#f3e6c6}
+:root[data-theme=nacht]{--bg:#0d1220;--panel:#141b30;--ink:#e3e8f7;--mute:#8793b5;--accent:#6fb3ff;--on:#0d1220;--line:#27314f;--sel:#1b2748}
+:root[data-theme=rubin]{--bg:#1a0f14;--panel:#24161d;--ink:#f3e3e8;--mute:#a58892;--accent:#ff6b8a;--on:#1a0f14;--line:#46262f;--sel:#341a24}
+*,*::before,*::after{box-sizing:inherit}
+[hidden]{display:none!important}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:400 16px/1.55 Barlow,system-ui,sans-serif}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:30}
+button,select,input{font:inherit;color:inherit}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line);padding:14px clamp(14px,4vw,40px) 12px}
+.top{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
+h1{font:400 clamp(26px,4.5vw,44px)/1 "Bebas Neue",Impact,sans-serif;letter-spacing:.03em;margin:0;color:var(--accent)}
+.sub{color:var(--mute);font-size:14px;margin-top:4px}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btn{background:transparent;border:1px solid var(--line);border-radius:6px;padding:7px 14px;cursor:pointer;transition:background .15s,border-color .15s}
+.btn:hover{border-color:var(--accent)}
+.btn.main{background:var(--accent);color:var(--on);border-color:var(--accent);font-weight:600}
+.btn:focus-visible,input:focus-visible,select:focus-visible,.card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;align-items:center}
+.tools input[type=search],.tools select{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:7px 10px;min-width:0}
+.tools input[type=search]{flex:1 1 200px}
+.tools select{max-width:100%}
+.tog{display:flex;gap:6px;align-items:center;color:var(--mute);cursor:pointer;font-size:15px}
+.tog input{accent-color:var(--accent);width:17px;height:17px}
+.count{margin-left:auto;color:var(--mute);font-size:14px}
+main{padding:18px clamp(14px,4vw,40px) 110px;max-width:1500px;margin:0 auto}
+.gh{display:flex;align-items:baseline;gap:14px;margin:26px 0 12px;border-bottom:1px solid var(--line);padding-bottom:6px;flex-wrap:wrap}
+.gh:first-child{margin-top:4px}
+.gh h2{font:400 26px/1.1 "Bebas Neue",Impact,sans-serif;letter-spacing:.03em;margin:0}
+.gh .n{color:var(--mute);font-size:14px}
+.gh button{margin-left:auto;background:none;border:0;color:var(--accent);cursor:pointer;padding:4px 0;text-decoration:underline;text-underline-offset:3px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),1fr));gap:14px}
+.card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px 16px 14px 62px;cursor:pointer;min-width:0}
+.card.on{background:var(--sel);border-color:var(--accent)}
+.card .num{position:absolute;left:14px;top:8px;font:400 34px/1 "Bebas Neue",Impact,sans-serif;color:var(--accent);width:36px;text-align:center}
+.card .pick{position:absolute;left:20px;bottom:14px;width:24px;height:24px;accent-color:var(--accent);cursor:pointer}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.chip{font-size:12.5px;color:var(--mute);border:1px solid var(--line);border-radius:99px;padding:0 9px}
+.txt{margin:0 0 6px;max-width:68ch;overflow-wrap:anywhere}
+.card ol{margin:6px 0 6px;padding-left:1.4em;list-style:lower-alpha}
+.card ol li{margin:2px 0;overflow-wrap:anywhere}
+.card li::marker{color:var(--accent)}
+.note{margin:8px 0 0;padding:6px 10px;border-left:3px solid var(--accent);color:var(--mute);font-size:15px;overflow-wrap:anywhere}
+.bar{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translate(-50%,160%);background:var(--panel);border:1px solid var(--accent);border-radius:10px;padding:10px 14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center;width:max-content;max-width:calc(100% - 24px);z-index:25;transition:transform .2s}
+.bar.show{transform:translate(-50%,0)}
+.empty{text-align:center;padding:12vh 16px;color:var(--mute)}
+.empty h2{font:400 34px "Bebas Neue",Impact,sans-serif;color:var(--ink);margin:0 0 8px;letter-spacing:.03em}
+.drop{outline:3px dashed var(--accent);outline-offset:-12px}
+.err{color:#ff8a7a;margin-top:10px}
+.menu{position:absolute;right:0;top:calc(100% + 6px);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px;display:none;z-index:40;min-width:170px}
+.menu.open{display:block}
+.menu button{display:flex;gap:10px;align-items:center;width:100%;text-align:left;background:none;border:0;border-radius:5px;padding:7px 10px;cursor:pointer}
+.menu button:hover,.menu button[aria-checked=true]{background:var(--sel)}
+.menu i{width:14px;height:14px;border-radius:50%;border:1px solid var(--line)}
+.rel{position:relative}
+.sol{margin:8px 0 2px;cursor:default}.srow{display:flex;gap:6px;flex-wrap:wrap}.btn.sm{padding:3px 10px;font-size:14px}
+.calc,.muster{margin-top:8px;padding:8px 10px;border:1px dashed var(--line);border-radius:6px;font-size:15px}
+.calc input{display:block;width:100%;margin:0 0 6px;background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:5px 8px}
+.muster p{margin:4px 0}.erg{color:var(--accent)}.steps div{margin:2px 0}.out{margin-top:8px}.ok{color:var(--accent);margin-top:4px}.bad{color:#ff8a7a;margin-top:4px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+ <div class="top">
+  <div><h1 id="title">JSON-Ansicht</h1><div class="sub" id="sub">Lade eine JSON-Datei, um sie anzuzeigen.</div></div>
+  <div class="btns">
+   <button class="btn main" id="load">JSON laden</button>
+   <div class="rel"><button class="btn" id="styles" aria-haspopup="true" aria-expanded="false">Styles</button><div class="menu" id="menu" role="menu"></div></div>
+   <button class="btn" id="fs">Vollbild</button>
+  </div>
+ </div>
+ <div class="tools" id="tools" hidden>
+  <input type="search" id="q" placeholder="Suchen …" aria-label="Suchen">
+  <select id="fg" aria-label="Gruppe"></select>
+  <select id="fp" aria-label="Seite"></select>
+  <label class="tog"><input type="checkbox" id="only"> nur Auswahl</label>
+  <button class="btn" id="all">Alle sichtbaren wählen</button>
+  <span class="count" id="count"></span>
+ </div>
+</header>
+<main id="main"></main>
+<div class="bar" id="bar">
+ <b id="selN"></b>
+ <button class="btn" id="sols">Lösungen ein/aus</button>
+ <label class="tog"><input type="checkbox" id="wl"> beim Kopieren mit Lösung</label>
+ <button class="btn" id="copy">Kopieren</button>
+ <button class="btn main" id="dl">Als JSON speichern</button>
+ <button class="btn" id="clr">Auswahl aufheben</button>
+</div>
+<input type="file" id="file" accept=".json,application/json" hidden>
+<script>
+const $=id=>document.getElementById(id);
+const THEMES=[["gold","Gold & Nacht","#d4a537"],["tafel","Tafelgrün","#9fd8a8"],["nacht","Mitternachtsblau","#6fb3ff"],["rubin","Rubin","#ff6b8a"],["papier","Papier","#8a5a12"]];
+let root=null,items=[],C={},sel=new Set(),fileName="auswahl";
+
+/* ---------- Styles ---------- */
+function setTheme(t){document.documentElement.dataset.theme=t;try{localStorage.setItem("jsonansicht-theme",t)}catch(e){}
+ $("menu").querySelectorAll("button").forEach(b=>b.setAttribute("aria-checked",b.dataset.t===t))}
+$("menu").innerHTML=THEMES.map(t=>`<button role="menuitemradio" data-t="${t[0]}"><i style="background:${t[2]}"></i>${t[1]}</button>`).join("");
+$("menu").addEventListener("click",e=>{const b=e.target.closest("button");if(b){setTheme(b.dataset.t);$("menu").classList.remove("open")}});
+$("styles").onclick=e=>{e.stopPropagation();const o=$("menu").classList.toggle("open");$("styles").setAttribute("aria-expanded",o)};
+document.addEventListener("click",()=>$("menu").classList.remove("open"));
+try{setTheme(localStorage.getItem("jsonansicht-theme")||"gold")}catch(e){setTheme("gold")}
+
+/* ---------- Vollbild ---------- */
+function fsUpdate(){$("fs").textContent=document.fullscreenElement?"Vollbild beenden":"Vollbild"}
+$("fs").onclick=async()=>{try{document.fullscreenElement?await document.exitFullscreen():await document.documentElement.requestFullscreen()}catch(e){$("fs").textContent="Vollbild nicht möglich";setTimeout(fsUpdate,2000)}};
+document.addEventListener("fullscreenchange",fsUpdate);
+
+/* ---------- Laden ---------- */
+$("load").onclick=()=>$("file").click();
+$("file").onchange=e=>{const f=e.target.files[0];if(f)readFile(f);e.target.value=""};
+["dragover","dragenter"].forEach(n=>document.addEventListener(n,e=>{e.preventDefault();document.body.classList.add("drop")}));
+["dragleave","drop"].forEach(n=>document.addEventListener(n,e=>{e.preventDefault();document.body.classList.remove("drop")}));
+document.addEventListener("drop",e=>{const f=e.dataTransfer.files[0];if(f)readFile(f)});
+function readFile(f){const r=new FileReader();r.onload=()=>{try{init(JSON.parse(r.result),f.name.replace(/\.json$/i,""))}catch(err){showErr("Die Datei ist kein gültiges JSON: "+err.message)}};r.readAsText(f)}
+function showErr(m){$("main").innerHTML=`<div class="empty"><h2>Das hat nicht geklappt</h2><div class="err"></div></div>`;$("main").querySelector(".err").textContent=m}
+function empty(){$("main").innerHTML=`<div class="empty"><h2>Noch keine Datei</h2><p>Klicke auf „JSON laden“ oder ziehe eine .json-Datei in dieses Fenster.</p></div>`}
+empty();
+
+/* ---------- Struktur erkennen ---------- */
+const isP=v=>v===null||["string","number","boolean"].includes(typeof v);
+const cap=s=>s.charAt(0).toUpperCase()+s.slice(1).replace(/_/g," ");
+function init(json,name){
+ root=json;fileName=name||"auswahl";sel=new Set();for(const k in SS)delete SS[k];
+ let arr=null,arrKey=null;
+ if(Array.isArray(json))arr=json;
+ else for(const k in json){if(Array.isArray(json[k])&&json[k].length&&typeof json[k][0]==="object"){arr=json[k];arrKey=k;break}}
+ if(!arr){showErr("In der Datei wurde keine Liste von Einträgen gefunden.");$("tools").hidden=true;return}
+ items=arr.map(x=>typeof x==="object"&&x?x:{wert:x});C={arrKey};
+ const keys=[...new Set(items.flatMap(o=>Object.keys(o)))];
+ C.id=keys.includes("id")?"id":null;
+ C.num=["nummer","nr","number"].find(k=>keys.includes(k))||null;
+ const strLen=k=>{const v=items.map(o=>o[k]).filter(x=>typeof x==="string");return v.length?v.reduce((a,b)=>a+b.length,0)/v.length:0};
+ C.txt=keys.includes("aufgabe")?"aufgabe":keys.filter(k=>strLen(k)>0).sort((a,b)=>strLen(b)-strLen(a))[0]||null;
+ C.grp=["abschnitt","kategorie","gruppe","thema"].find(k=>keys.includes(k))||keys.find(k=>{if(k===C.txt)return false;const v=items.map(o=>o[k]);if(!v.every(x=>typeof x==="string"))return false;const n=new Set(v).size;return n>1&&n<=items.length/2&&strLen(k)<60})||null;
+ C.page=["seite","page"].find(k=>keys.includes(k))||null;
+ C.keys=keys;
+ items.forEach((o,i)=>o.__i=i);
+ const title=!Array.isArray(json)&&(json.dokument||json.titel||json.title)||fileName;
+ $("title").textContent=title;document.title=title;
+ const meta=[];if(!Array.isArray(json))for(const k in json)if(k!==arrKey&&isP(json[k])&&json[k]!==title)meta.push(cap(k)+": "+json[k]);
+ meta.push(items.length+" Einträge");$("sub").textContent=meta.join("  ·  ");
+ $("tools").hidden=false;$("q").value="";$("only").checked=false;
+ const opt=(a,l)=>`<option value="">${l}</option>`+a.map(v=>`<option>${esc(v)}</option>`).join("");
+ $("fg").hidden=!C.grp;$("fp").hidden=!C.page;
+ if(C.grp)$("fg").innerHTML=opt([...new Set(items.map(o=>o[C.grp]))],"Alle Gruppen");
+ if(C.page)$("fp").innerHTML=opt([...new Set(items.map(o=>o[C.page]))].sort((a,b)=>a-b),"Alle Seiten");
+ render()}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+const sub=v=>typeof v==="object"&&v?(v.text!=null?String(v.text):Object.values(v).join(" ")):String(v);
+
+/* ---------- Anzeigen ---------- */
+function visible(){const q=$("q").value.trim().toLowerCase(),g=$("fg").value,p=$("fp").value,o=$("only").checked;
+ return items.filter(it=>(!g||it[C.grp]===g)&&(!p||String(it[C.page])===p)&&(!o||sel.has(it.__i))&&(!q||JSON.stringify(it).toLowerCase().includes(q)))}
+function card(it){
+ const chips=[],notes=[],lists=[];
+ for(const k of C.keys){if([C.id,C.num,C.txt,C.grp,"__i","loesung"].includes(k)||it[k]==null)continue;const v=it[k];
+  if(Array.isArray(v))lists.push(v);
+  else if(typeof v==="string"&&v.length>40)notes.push([k,v]);
+  else if(isP(v))chips.push(k===C.page?"Seite "+v:(typeof v==="number"?cap(k)+" "+v:v));
+  else notes.push([k,JSON.stringify(v)])}
+ const on=sel.has(it.__i);
+ return `<article class="card${on?" on":""}" data-i="${it.__i}" tabindex="0" aria-pressed="${on}">
+ ${C.num&&it[C.num]!=null?`<div class="num">${esc(it[C.num])}</div>`:""}
+ ${chips.length?`<div class="chips">${chips.map(c=>`<span class="chip">${esc(c)}</span>`).join("")}</div>`:""}
+ ${C.txt&&it[C.txt]!=null?`<p class="txt">${esc(it[C.txt])}</p>`:""}
+ ${lists.map(l=>`<ol>${l.map((x,j)=>`<li>${esc(sub(x))}${blk(it.__i+"|"+j,x&&x.loesung)}</li>`).join("")}</ol>`).join("")}${blk(it.__i+"|-",it.loesung)}
+ ${notes.map(n=>`<p class="note">${n[0].toLowerCase()==="hinweis"?"<b>Hinweis:</b> ":"<b>"+esc(cap(n[0]))+":</b> "}${esc(n[1])}</p>`).join("")}
+ <input class="pick" type="checkbox" ${on?"checked":""} aria-label="Auswählen"></article>`}
+function render(){
+ const v=visible(),m=new Map();
+ v.forEach(it=>{const g=C.grp?it[C.grp]:"";if(!m.has(g))m.set(g,[]);m.get(g).push(it)});
+ let h="";
+ if(!v.length)h=`<div class="empty"><h2>Nichts gefunden</h2><p>Ändere Suche oder Filter.</p></div>`;
+ m.forEach((a,g)=>{h+=(C.grp?`<div class="gh"><h2>${esc(g)}</h2><span class="n">${a.length} Einträge</span><button data-g="${esc(g)}">Gruppe wählen</button></div>`:"")+`<div class="grid">${a.map(card).join("")}</div>`});
+ $("main").innerHTML=h;
+ $("count").textContent=`${v.length} von ${items.length} angezeigt · ${sel.size} gewählt`;
+ $("selN").textContent=sel.size+" gewählt";$("bar").classList.toggle("show",sel.size>0)}
+["input","change"].forEach(n=>{$("q").addEventListener(n,render);$("fg").addEventListener(n,render);$("fp").addEventListener(n,render);$("only").addEventListener(n,render)});
+
+/* ---------- Auswahl ---------- */
+function toggle(i){sel.has(i)?sel.delete(i):sel.add(i);render()}
+$("main").addEventListener("click",e=>{
+ if(e.target.closest(".sol")){solClick(e);return}
+ const gb=e.target.closest("[data-g]");
+ if(gb){const a=visible().filter(it=>it[C.grp]===gb.dataset.g),all=a.every(it=>sel.has(it.__i));a.forEach(it=>all?sel.delete(it.__i):sel.add(it.__i));render();return}
+ const c=e.target.closest(".card");if(!c)return;
+ if(e.target.matches(".pick")){e.preventDefault()}
+ const y=scrollY;toggle(+c.dataset.i);scrollTo(0,y)});
+$("main").addEventListener("keydown",e=>{if((e.key===" "||e.key==="Enter")&&e.target.matches(".card")){e.preventDefault();const y=scrollY,i=e.target.dataset.i;toggle(+i);scrollTo(0,y);const n=document.querySelector(`.card[data-i="${i}"]`);n&&n.focus({preventScroll:true})}});
+$("all").onclick=()=>{const v=visible(),all=v.every(it=>sel.has(it.__i));v.forEach(it=>all?sel.delete(it.__i):sel.add(it.__i));render()};
+$("clr").onclick=()=>{sel.clear();render()};
+
+/* ---------- Lösungen & Rechner ---------- */
+const SS={};
+const gcd=(a,b)=>b?gcd(b,a%b):Math.abs(a),lcm=(a,b)=>a/gcd(a,b)*b;
+const fr=(n,d=1)=>{if(d<0){n=-n;d=-d}const g=gcd(n,d)||1;return{n:n/g,d:d/g}};
+const add=(a,b)=>fr(a.n*b.d+b.n*a.d,a.d*b.d),sb=(a,b)=>fr(a.n*b.d-b.n*a.d,a.d*b.d),ml=(a,b)=>fr(a.n*b.n,a.d*b.d),dv=(a,b)=>fr(a.n*b.d,a.d*b.n);
+const Z0=fr(0),isZ=a=>a.n===0,eqf=(a,b)=>a.n===b.n&&a.d===b.d;
+function fmt(a){let s;if(a.d===1)s=String(a.n);else{let d=a.d;while(d%2===0)d/=2;while(d%5===0)d/=5;const v=a.n/a.d;s=d===1?String(+v.toFixed(8)):a.n+"/"+a.d+" (≈ "+(+v.toFixed(4))+")"}return s.replace(/\./g,",").replace(/-/g,"−")}
+const lin=a=>!isZ(a.x)||!isZ(a.y),aA=(a,b,s)=>{const f=s>0?add:sb;return{c:f(a.c,b.c),x:f(a.x,b.x),y:f(a.y,b.y)}},sc=(a,k)=>({c:ml(a.c,k),x:ml(a.x,k),y:ml(a.y,k)});
+function side(str){
+ const s=str.replace(/−/g,"-").replace(/[·×]/g,"*").replace(/:/g,"/").replace(/(\d+)\s+(\d+)\s*\/\s*(\d+)/g,"($1+$2/$3)");
+ const re=/\d+(?:[.,]\d+)?|[xy]|[-+*\/()]/gi,T=s.match(re)||[],rest=s.replace(re,"").trim();
+ if(rest)throw Error("Unbekanntes Zeichen: „"+rest[0]+"“");
+ let p=0;
+ const E=()=>{let a=Tm();while(T[p]==="+"||T[p]==="-"){const o=T[p++],b=Tm();a=aA(a,b,o==="+"?1:-1)}return a},
+ Tm=()=>{let a=U();for(;;){const k=T[p];if(k==="*"){p++;a=mu(a,U())}else if(k==="/"){p++;const b=U();if(lin(b)||isZ(b.c))throw Error("Division nicht möglich");a=sc(a,dv(fr(1),b.c))}else if(k!==undefined&&/^[\dxy(]/i.test(k))a=mu(a,U());else return a}},
+ mu=(a,b)=>{if(lin(a)&&lin(b))throw Error("Die Gleichung ist nicht linear");return lin(a)?sc(a,b.c):sc(b,a.c)},
+ U=()=>{if(T[p]==="-"){p++;return sc(U(),fr(-1))}if(T[p]==="+"){p++;return U()}return Fc()},
+ Fc=()=>{const k=T[p++];if(k===undefined)throw Error("Ausdruck unvollständig");if(k==="("){const v=E();if(T[p++]!==")")throw Error("Klammer fehlt");return v}if(/^[xy]$/i.test(k))return/x/i.test(k)?{c:Z0,x:fr(1),y:Z0}:{c:Z0,x:Z0,y:fr(1)};if(/^\d/.test(k)){const[i,f=""]=k.replace(",",".").split(".");return{c:fr(+(i+f),10**f.length),x:Z0,y:Z0}}throw Error("Unerwartet: „"+k+"“")};
+ const v=E();if(p<T.length)throw Error("Nicht verständlich bei „"+T[p]+"“");return v}
+function eqn(str){const p=str.split("=");if(p.length!==2||!p[0].trim()||!p[1].trim())throw Error("Jede Gleichung braucht genau ein „=“ mit Termen auf beiden Seiten.");const L=side(p[0]),R=side(p[1]);return{A:sb(L.x,R.x),B:sb(L.y,R.y),C:sb(R.c,L.c),L,R}}
+function nf(A,B,C){const t=(v,n,first)=>{if(isZ(v))return"";const ng=v.n<0,a=ng?fr(-v.n,v.d):v,m=(a.n===1&&a.d===1?"":fmt(a))+n;return first?(ng?"−":"")+m:(ng?" − ":" + ")+m};let s=t(A,"x",1);s+=t(B,"y",!s);return(s||"0")+" = "+fmt(C)}
+function solveSys(es){
+ if(es.length!==2)throw Error("Bitte zwei Gleichungen eingeben.");
+ const o=[],R=["I","II"],e=es.map(eqn).map((r,i)=>{const m=fr(lcm(lcm(r.A.d,r.B.d),r.C.d)),t={A:ml(r.A,m),B:ml(r.B,m),C:ml(r.C,m),L:r.L,R:r.R};o.push(R[i]+": "+nf(t.A,t.B,t.C)+(m.n>1?"   (mit "+m.n+" multipliziert)":""));return t});
+ const[a1,b1,c1]=[e[0].A,e[0].B,e[0].C],[a2,b2,c2]=[e[1].A,e[1].B,e[1].C],D=sb(ml(a1,b2),ml(a2,b1));
+ if(isZ(D)){const same=isZ(sb(ml(a1,c2),ml(a2,c1)))&&isZ(sb(ml(b1,c2),ml(b2,c1)))&&!(isZ(a1)&&isZ(b1));o.push(same?"Die Gleichungen sind gleichwertig: unendlich viele Lösungen.":"Die Geraden sind parallel: keine Lösung.");return{o,res:null}}
+ const x=dv(sb(ml(c1,b2),ml(c2,b1)),D),y=dv(sb(ml(a1,c2),ml(a2,c1)),D);
+ if(!isZ(b1)&&!isZ(b2)){o.push("Additionsverfahren: y eliminieren","I · "+fmt(b2)+": "+nf(ml(a1,b2),ml(b1,b2),ml(c1,b2)),"II · "+fmt(b1)+": "+nf(ml(a2,b1),ml(b2,b1),ml(c2,b1)),"Subtrahieren: "+nf(D,Z0,sb(ml(c1,b2),ml(c2,b1))),"x = "+fmt(x),"x in I einsetzen: "+nf(Z0,b1,sb(c1,ml(a1,x))))}
+ else if(!isZ(a1)&&!isZ(a2)){o.push("Additionsverfahren: x eliminieren","I · "+fmt(a2)+": "+nf(ml(a1,a2),ml(b1,a2),ml(c1,a2)),"II · "+fmt(a1)+": "+nf(ml(a2,a1),ml(b2,a1),ml(c2,a1)),"Subtrahieren: "+nf(Z0,ml(D,fr(-1)),sb(ml(c1,a2),ml(c2,a1))),"y = "+fmt(y),"y in I einsetzen: "+nf(a1,Z0,sb(c1,ml(b1,y))))}
+ else o.push("Eine Gleichung enthält nur eine Variable und lässt sich direkt auflösen.");
+ o.push("Lösung: x = "+fmt(x)+", y = "+fmt(y));
+ [0,1].forEach(i=>{const v=s=>add(add(s.c,ml(s.x,x)),ml(s.y,y)),l=v(e[i].L),r=v(e[i].R);o.push("Probe "+R[i]+": "+fmt(l)+" = "+fmt(r)+(eqf(l,r)?" ✓":" ✗"))});
+ return{o,res:{x,y}}}
+const lines=o=>o.map(l=>`<div>${esc(l)}</div>`).join(""),gS=k=>SS[k]||(SS[k]={m:0,s:0,a:"",b:"",o:""});
+function blk(k,L){if(!L)return"";gS(k);return`<div class="sol" data-k="${k}">${solH(k,L)}</div>`}
+function getL(k){const[i,j]=k.split("|"),it=items[+i];if(j==="-")return it.loesung;const a=Object.values(it).find(Array.isArray);return a&&a[+j]&&a[+j].loesung}
+function solH(k,L){const s=gS(k);let h=`<div class="srow"><button class="btn sm" data-a="m">${s.m?"Lösung ausblenden":"Musterlösung"}</button><button class="btn sm" data-a="s">${s.s?"Rechner schließen":"Selbst rechnen"}</button></div>`;
+ if(s.s)h+=`<div class="calc"><input data-f="a" value="${esc(s.a)}" placeholder="Gleichung I, z. B. x + y = 412" aria-label="Gleichung I"><input data-f="b" value="${esc(s.b)}" placeholder="Gleichung II, z. B. x - y = 118" aria-label="Gleichung II"><div class="srow"><button class="btn sm main" data-a="r">Rechnen</button>${L.system?`<button class="btn sm" data-a="t">Muster-System einsetzen</button>`:""}</div>${s.o}</div>`;
+ if(s.m){let r="";if(L.system)try{r=`<div class="steps"><b>Rechenweg:</b>${lines(solveSys(L.system).o)}</div>`}catch(e){}
+  h+=`<div class="muster">${L.variablen?`<p><b>Festlegung:</b> ${esc(L.variablen)}</p>`:""}${L.system?`<p><b>Gleichungssystem:</b><br>${L.system.map((e,i)=>["I","II"][i]+": "+esc(e)).join("<br>")}</p>`:""}${r}${(L.weg||[]).map(w=>`<p>${esc(w)}</p>`).join("")}${L.ergebnis?`<p class="erg"><b>${esc(L.ergebnis)}</b></p>`:""}${L.probe?`<p>Probe: ${esc(L.probe)}</p>`:""}${L.hinweis?`<p class="note">${esc(L.hinweis)}</p>`:""}</div>`}
+ return h}
+function runCalc(k,L,el){const s=gS(k);el.querySelectorAll("input[data-f]").forEach(i=>s[i.dataset.f]=i.value);
+ try{const r=solveSys([s.a,s.b]);let m="";if(L.system&&r.res)try{const t=solveSys(L.system).res;m=t&&eqf(t.x,r.res.x)&&eqf(t.y,r.res.y)?`<div class="ok">✓ Das Ergebnis stimmt mit der Musterlösung überein.</div>`:`<div class="bad">Das Ergebnis weicht von der Musterlösung ab. Prüfe dein System oder deine Variablenwahl.</div>`}catch(e){}
+  s.o=`<div class="out steps">${lines(r.o)}${m}</div>`}catch(e){s.o=`<div class="out bad">${esc(e.message)}</div>`}}
+function solClick(e){const b=e.target.closest("button[data-a]");if(!b)return;const el=b.closest(".sol"),k=el.dataset.k,L=getL(k),s=gS(k),a=b.dataset.a;
+ if(a==="m")s.m^=1;else if(a==="s")s.s^=1;else if(a==="t"){[s.a,s.b]=L.system;s.o=""}else if(a==="r")runCalc(k,L,el);
+ el.innerHTML=solH(k,L)}
+$("main").addEventListener("input",e=>{const i=e.target.closest("input[data-f]");if(i)gS(i.closest(".sol").dataset.k)[i.dataset.f]=i.value});
+$("main").addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.matches("input[data-f]")){const el=e.target.closest(".sol"),k=el.dataset.k;runCalc(k,getL(k),el);el.innerHTML=solH(k,getL(k))}});
+$("sols").onclick=()=>{const ks=[];chosen().forEach(it=>{if(it.loesung)ks.push(it.__i+"|-");const a=Object.values(it).find(Array.isArray);a&&a.forEach((x,j)=>x&&x.loesung&&ks.push(it.__i+"|"+j))});const on=!ks.every(k=>gS(k).m);ks.forEach(k=>gS(k).m=on?1:0);render()};
+
+/* ---------- Export ---------- */
+const chosen=()=>items.filter(it=>sel.has(it.__i));
+const clean=it=>{const o={...it};delete o.__i;return o};
+function asText(){return chosen().map(it=>{let s=(C.num&&it[C.num]!=null?it[C.num]+". ":"")+(C.txt?it[C.txt]:"");
+ const wl=$("wl").checked,lt=L=>wl&&L?"\n     Lösung: "+(L.system?L.system.join("; ")+" → ":"")+(L.ergebnis||(L.weg||[]).join(" ")):"";
+ C.keys.forEach(k=>{if(Array.isArray(it[k]))it[k].forEach((x,j)=>s+="\n  "+String.fromCharCode(97+j)+") "+sub(x)+lt(x&&x.loesung))});s+=lt(it.loesung);
+ if(it.hinweis)s+="\n  Hinweis: "+it.hinweis;return s}).join("\n\n")}
+$("copy").onclick=async()=>{const b=$("copy");try{await navigator.clipboard.writeText(asText());b.textContent="Kopiert ✓"}catch(e){b.textContent="Nicht möglich"}setTimeout(()=>b.textContent="Kopieren",1800)};
+$("dl").onclick=()=>{const a=chosen().map(clean);let out;
+ if(C.arrKey){out={};for(const k in root)out[k]=k===C.arrKey?a:root[k];if("anzahl_aufgaben" in out)out.anzahl_aufgaben=a.length}else out=a;
+ const u=URL.createObjectURL(new Blob([JSON.stringify(out,null,2)],{type:"application/json"}));
+ const l=document.createElement("a");l.href=u;l.download=fileName+"_auswahl.json";l.click();setTimeout(()=>URL.revokeObjectURL(u),1000)};
+</script>
+</body>
+</html>

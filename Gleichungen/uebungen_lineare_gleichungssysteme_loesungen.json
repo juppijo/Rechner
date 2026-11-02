@@ -1,0 +1,1506 @@
+{
+  "dokument": "Mathematik – Lineare Gleichungssysteme (Arithmetik und Algebra, Autonome Hochschule Ostbelgien)",
+  "seiten": "14–22",
+  "anzahl_aufgaben": 54,
+  "aufgaben": [
+    {
+      "id": "s14-1",
+      "seite": 14,
+      "abschnitt": "Rätsel lösen – Übungen",
+      "nummer": 1,
+      "aufgabe": "Eine Zahl ist 8-mal so groß wie die Summe ihrer Ziffern. Die Zehnerziffer ist um 5 größer als die Einerziffer. Wie heißt die Zahl?",
+      "loesung": {
+        "variablen": "x = Zehnerziffer, y = Einerziffer",
+        "system": [
+          "10x + y = 8(x + y)",
+          "x - y = 5"
+        ],
+        "ergebnis": "Die Zahl heißt 72.",
+        "probe": "72 = 8 · (7 + 2) ✓ und 7 − 2 = 5 ✓"
+      }
+    },
+    {
+      "id": "s14-2",
+      "seite": 14,
+      "abschnitt": "Rätsel lösen – Übungen",
+      "nummer": 2,
+      "aufgabe": "Gegeben ist eine zweiziffrige Zahl. Bildet man die Summe der zwei Ziffern, ergibt das 11. Wenn man die beiden Ziffern der Zahl vertauscht, wächst die Zahl um 45. Wie heißt die ursprüngliche Zahl?",
+      "loesung": {
+        "variablen": "x = Zehnerziffer, y = Einerziffer",
+        "system": [
+          "x + y = 11",
+          "10y + x = 10x + y + 45"
+        ],
+        "ergebnis": "Die Zahl heißt 38.",
+        "probe": "83 − 38 = 45 ✓"
+      }
+    },
+    {
+      "id": "s14-3",
+      "seite": 14,
+      "abschnitt": "Rätsel lösen – Übungen",
+      "nummer": 3,
+      "aufgabe": "Die Summe von zwei Zahlen beträgt 412, ihre Differenz ist 118. Wie heißen die beiden Zahlen?",
+      "loesung": {
+        "variablen": "x und y sind die beiden Zahlen",
+        "system": [
+          "x + y = 412",
+          "x - y = 118"
+        ],
+        "ergebnis": "Die Zahlen sind 265 und 147."
+      }
+    },
+    {
+      "id": "s14-4",
+      "seite": 14,
+      "abschnitt": "Rätsel lösen – Übungen",
+      "nummer": 4,
+      "aufgabe": "Wenn man bei einer Zahl, die mit zwei Ziffern geschrieben wird, die beiden Ziffern vertauscht, erhält man eine um 27 kleinere Zahl. Die Summe der Ziffern ist 11. Wie heißt die Zahl?",
+      "loesung": {
+        "variablen": "x = Zehnerziffer, y = Einerziffer",
+        "system": [
+          "x + y = 11",
+          "10y + x = 10x + y - 27"
+        ],
+        "ergebnis": "Die Zahl heißt 74.",
+        "probe": "47 = 74 − 27 ✓"
+      }
+    },
+    {
+      "id": "s15-5",
+      "seite": 15,
+      "abschnitt": "Rätsel lösen – Übungen",
+      "nummer": 5,
+      "aufgabe": "Die Summe von zwei Zahlen ist 205, ihre Differenz beträgt 31. Wie heißen die beiden Zahlen?",
+      "loesung": {
+        "variablen": "x und y sind die beiden Zahlen",
+        "system": [
+          "x + y = 205",
+          "x - y = 31"
+        ],
+        "ergebnis": "Die Zahlen sind 118 und 87."
+      }
+    },
+    {
+      "id": "s15-6",
+      "seite": 15,
+      "abschnitt": "Rätsel lösen – Übungen",
+      "nummer": 6,
+      "aufgabe": "Die Summe von zwei Zahlen beträgt 85. Von den beiden Summanden ist der erste um 13 größer als der zweite. Bestimme die beiden Summanden.",
+      "loesung": {
+        "variablen": "x = erster, y = zweiter Summand",
+        "system": [
+          "x + y = 85",
+          "x = y + 13"
+        ],
+        "ergebnis": "Die Summanden sind 49 und 36."
+      }
+    },
+    {
+      "id": "s15-7",
+      "seite": 15,
+      "abschnitt": "Rätsel lösen – Übungen",
+      "nummer": 7,
+      "aufgabe": "Die Summe von zwei Zahlen ist 64. Das Doppelte der kleineren Zahl ist um 10 kleiner als die größere Zahl. Bestimme die beiden Zahlen.",
+      "loesung": {
+        "variablen": "x = größere, y = kleinere Zahl",
+        "system": [
+          "x + y = 64",
+          "2y = x - 10"
+        ],
+        "ergebnis": "Die Zahlen sind 46 und 18.",
+        "probe": "2 · 18 = 36 = 46 − 10 ✓"
+      }
+    },
+    {
+      "id": "s15-8",
+      "seite": 15,
+      "abschnitt": "Rätsel lösen – Übungen",
+      "nummer": 8,
+      "aufgabe": "Die Differenz zweier Zahlen ist 59. Die Hälfte der größeren Zahl ist um 103 kleiner als die kleinere Zahl. Berechne beide Zahlen.",
+      "loesung": {
+        "variablen": "x = größere, y = kleinere Zahl",
+        "system": [
+          "x - y = 59",
+          "x/2 = y - 103"
+        ],
+        "ergebnis": "Die Zahlen sind 324 und 265.",
+        "probe": "324 : 2 = 162 = 265 − 103 ✓"
+      }
+    },
+    {
+      "id": "s15-9",
+      "seite": 15,
+      "abschnitt": "Rätsel lösen – Übungen",
+      "nummer": 9,
+      "aufgabe": "Die Summe zweier Zahlen ist 38. Das Vierfache der kleineren Zahl ist um 12 größer als das Dreifache der größeren Zahl. Nenne die beiden Zahlen.",
+      "loesung": {
+        "variablen": "x = größere, y = kleinere Zahl",
+        "system": [
+          "x + y = 38",
+          "4y = 3x + 12"
+        ],
+        "ergebnis": "Die Zahlen sind 20 und 18.",
+        "probe": "4 · 18 = 72 = 3 · 20 + 12 ✓"
+      }
+    },
+    {
+      "id": "s15-10",
+      "seite": 15,
+      "abschnitt": "Rätsel lösen – Übungen",
+      "nummer": 10,
+      "aufgabe": "Die Summe zweier Zahlen ist dreimal so groß wie deren Differenz. Sie unterscheiden sich um 15. Welche Zahlen sind es?",
+      "loesung": {
+        "variablen": "x = größere, y = kleinere Zahl",
+        "system": [
+          "x + y = 3(x - y)",
+          "x - y = 15"
+        ],
+        "ergebnis": "Die Zahlen sind 30 und 15.",
+        "probe": "Summe 45 = 3 · 15 ✓"
+      }
+    },
+    {
+      "id": "s15-11",
+      "seite": 15,
+      "abschnitt": "Rätsel lösen – Übungen",
+      "nummer": 11,
+      "aufgabe": "Die Differenz aus dem Fünffachen einer Zahl und dem Dreifachen der anderen Zahl ist 35. Die Summe aus dem Dreifachen der ersten Zahl und dem Doppelten der zweiten Zahl beträgt 40. Welche Zahlen sind gesucht?",
+      "loesung": {
+        "variablen": "x = erste, y = zweite Zahl",
+        "system": [
+          "5x - 3y = 35",
+          "3x + 2y = 40"
+        ],
+        "ergebnis": "Die Zahlen sind 10 und 5.",
+        "probe": "50 − 15 = 35 ✓ und 30 + 10 = 40 ✓"
+      }
+    },
+    {
+      "id": "s15-12",
+      "seite": 15,
+      "abschnitt": "Rätsel lösen – Übungen",
+      "nummer": 12,
+      "aufgabe": "Die Quersumme einer zweiziffrigen Zahl ist 12. Stellt man die Ziffern um, so ist die neue Zahl das 1 3/4-fache der ursprünglichen Zahl. Wie heißt diese Zahl?",
+      "loesung": {
+        "variablen": "x = Zehnerziffer, y = Einerziffer",
+        "system": [
+          "x + y = 12",
+          "10y + x = 7/4 (10x + y)"
+        ],
+        "ergebnis": "Die Zahl heißt 48.",
+        "probe": "84 = 1 3/4 · 48 ✓"
+      }
+    },
+    {
+      "id": "s15-13",
+      "seite": 15,
+      "abschnitt": "Rätsel lösen – Übungen",
+      "nummer": 13,
+      "aufgabe": "Eine zweistellige Zahl ist gleich dem Siebenfachen ihrer Quersumme. Subtrahiert man von ihr 27, so erhält man eine Zahl, welche die umgekehrte Ziffernfolge hat. Wie heißt diese Ausgangszahl?",
+      "loesung": {
+        "variablen": "x = Zehnerziffer, y = Einerziffer",
+        "system": [
+          "10x + y = 7(x + y)",
+          "10x + y - 27 = 10y + x"
+        ],
+        "ergebnis": "Die Ausgangszahl heißt 63.",
+        "probe": "63 = 7 · 9 ✓ und 63 − 27 = 36 ✓"
+      }
+    },
+    {
+      "id": "s15-14",
+      "seite": 15,
+      "abschnitt": "Rätsel lösen – Übungen",
+      "nummer": 14,
+      "aufgabe": "Wie müsste das Rätsel aus dem Infokasten heute formuliert werden? „Pud“ ist ein russisches Gewichtsmaß (1 Pud = 16,38 kg). Löse das Rätsel.",
+      "hinweis": "Bezieht sich auf den Infokasten auf Seite 15 (Euler-Rätsel vom Maul-Esel und dem Esel).",
+      "loesung": {
+        "variablen": "x = Maulesel, y = Esel (Last in Pud)",
+        "system": [
+          "x + 1 = 2(y - 1)",
+          "x - 1 = y + 1"
+        ],
+        "weg": [
+          "Heute formuliert (in kg): „Gib mir 16,38 kg von deiner Last ab, dann trage ich doppelt so viel wie du. Nehme ich dir 16,38 kg ab, tragen wir gleich viel.“"
+        ],
+        "ergebnis": "Maulesel: 7 Pud (≈ 114,66 kg), Esel: 5 Pud (≈ 81,9 kg).",
+        "hinweis": "Der Infokasten liegt mir nicht vor. Ich habe die bekannte Fassung des Euler-Rätsels angenommen (genau wie Aufgabe 15)."
+      }
+    },
+    {
+      "id": "s15-15",
+      "seite": 15,
+      "abschnitt": "Rätsel lösen – Übungen",
+      "nummer": 15,
+      "aufgabe": "Schwer bepackt geht ein Eselchen und dessen Mutter. Die Eselin seufzt, da fragt der Sohn: „Mutter, was klagst und stöhnst du?“ „Gib ein Pfund mir ab, so trag ich doppelte Bürde. Nimmst du es aber von mir, dann haben wir gleich viel.“ Wie viel trägt jeder?",
+      "loesung": {
+        "variablen": "x = Mutter, y = Sohn (Last in Pfund)",
+        "system": [
+          "x + 1 = 2(y - 1)",
+          "x - 1 = y + 1"
+        ],
+        "ergebnis": "Die Mutter trägt 7 Pfund, der Sohn 5 Pfund.",
+        "probe": "8 = 2 · 4 ✓ und 6 = 6 ✓"
+      }
+    },
+    {
+      "id": "s15-16",
+      "seite": 15,
+      "abschnitt": "Rätsel lösen – Übungen",
+      "nummer": 16,
+      "aufgabe": "Auf die Frage, wie viele Kühe und wie viele Gänse auf ihrem Hof sind, antwortet eine Bäuerin: „Im Augenblick sind alle Kühe und Gänse auf der Wiese am Bach. Dort laufen 61 Köpfe mit 152 Beinen herum.“",
+      "loesung": {
+        "variablen": "x = Kühe, y = Gänse",
+        "system": [
+          "x + y = 61",
+          "4x + 2y = 152"
+        ],
+        "ergebnis": "Es sind 15 Kühe und 46 Gänse."
+      }
+    },
+    {
+      "id": "s15-17",
+      "seite": 15,
+      "abschnitt": "Rätsel lösen – Übungen",
+      "nummer": 17,
+      "aufgabe": "Im Stall eines Bauernhofs sind Hühner und Kaninchen untergebracht. Sie haben zusammen 38 Köpfe und 100 Beine. Wie viele Hühner und wie viele Kaninchen befinden sich in diesem Stall?",
+      "loesung": {
+        "variablen": "x = Hühner, y = Kaninchen",
+        "system": [
+          "x + y = 38",
+          "2x + 4y = 100"
+        ],
+        "ergebnis": "Es sind 26 Hühner und 12 Kaninchen."
+      }
+    },
+    {
+      "id": "s15-18",
+      "seite": 15,
+      "abschnitt": "Rätsel lösen – Übungen",
+      "nummer": 18,
+      "aufgabe": "An einem Abfallcontainer wurden Käfer und Spinnen gezählt, und zwar 20 Insekten mit insgesamt 138 Beinen. Wie viele Käfer (6 Beine) und wie viele Spinnen (8 Beine) sind das?",
+      "loesung": {
+        "variablen": "x = Käfer, y = Spinnen",
+        "system": [
+          "x + y = 20",
+          "6x + 8y = 138"
+        ],
+        "ergebnis": "Es sind 11 Käfer und 9 Spinnen."
+      }
+    },
+    {
+      "id": "s17-1",
+      "seite": 17,
+      "abschnitt": "Kosten und Erlös vergleichen – Übungen",
+      "nummer": 1,
+      "aufgabe": "Weil der Verlag glaubt, die Verkaufszahlen steigern zu können, entschließt er sich, zusätzlich noch 30 000 € für eine Werbekampagne zu investieren.",
+      "hinweis": "Verwende in den Aufgaben 1 und 2 die Angaben von Seite 36.",
+      "teilaufgaben": [
+        {
+          "teil": "a",
+          "text": "Zeichne ein entsprechendes Diagramm auf Millimeterpapier. Wie viele Exemplare müssen mindestens verkauft werden, damit die Kosten ausgeglichen werden?"
+        },
+        {
+          "teil": "b",
+          "text": "Mit welcher Steigerung der Verkaufszahlen rechnet der Verlag mindestens?"
+        }
+      ],
+      "loesung": {
+        "weg": [
+          "x = Anzahl verkaufter Exemplare, K(x) = Fixkosten + 30 000 + Druckkosten pro Exemplar · x, E(x) = Preis pro Exemplar · x.",
+          "a) Kostendeckung bei K(x) = E(x), also x = (Fixkosten + 30 000) : (Preis − Druckkosten pro Exemplar). Im Diagramm ist das der Schnittpunkt beider Geraden.",
+          "b) Die Steigerung ergibt sich aus dem Vergleich dieses x mit den bisherigen Verkaufszahlen (Break-even ohne Werbung)."
+        ],
+        "hinweis": "Die Angaben von Seite 36 liegen nicht vor. Mit den Zahlen setzt du sie in die Formeln ein."
+      }
+    },
+    {
+      "id": "s17-2",
+      "seite": 17,
+      "abschnitt": "Kosten und Erlös vergleichen – Übungen",
+      "nummer": 2,
+      "aufgabe": "Eine 30 000 € kostende Werbekampagne wurde gestartet. Allerdings lagen die Druckkosten durch eine Papierverteuerung bei diesem Buch pro Exemplar bei 5,20 €.",
+      "hinweis": "Verwende in den Aufgaben 1 und 2 die Angaben von Seite 36.",
+      "teilaufgaben": [
+        {
+          "teil": "a",
+          "text": "Berechne die Anzahl der Exemplare, die nun verkauft werden müssen, um die Kosten zu decken."
+        },
+        {
+          "teil": "b",
+          "text": "Wie hoch muss der Erlös sein, um die Kosten zu decken?"
+        }
+      ],
+      "loesung": {
+        "weg": [
+          "Druckkosten jetzt 5,20 € pro Exemplar: K(x) = Fixkosten + 30 000 + 5,20 · x, E(x) = Preis · x.",
+          "a) x = (Fixkosten + 30 000) : (Preis − 5,20).",
+          "b) Der Erlös an der Kostendeckung ist E = Preis · x (er ist gleich den Kosten K(x))."
+        ],
+        "hinweis": "Die Angaben von Seite 36 liegen nicht vor."
+      }
+    },
+    {
+      "id": "s17-3",
+      "seite": 17,
+      "abschnitt": "Kosten und Erlös vergleichen – Übungen",
+      "nummer": 3,
+      "aufgabe": "Bei der Sparkasse wurden für eine Kontoführung monatlich 3,25 € erhoben und jede Buchung mit 20 Cent in Rechnung gestellt. Bei der VR-Bank betrugen bei einem entsprechenden Konto die Grundgebühren monatlich 2,75 €, jede Buchung kostete 30 Cent.",
+      "teilaufgaben": [
+        {
+          "teil": "a",
+          "text": "Vergleiche beide Kontoführungsgebühren mithilfe eines Diagramms und gib an, welche Bank bei welchen zu erwartenden Buchungen die bessere Wahl wäre.",
+          "loesung": {
+            "weg": [
+              "Sparkasse: K = 3,25 + 0,20x, VR-Bank: K = 2,75 + 0,30x (x = Buchungen pro Monat).",
+              "Schnittpunkt bei x = 5. Bei weniger als 5 Buchungen ist die VR-Bank günstiger, bei mehr als 5 die Sparkasse."
+            ]
+          }
+        },
+        {
+          "teil": "b",
+          "text": "Berechne die Buchungssituation, bei der beide Geldinstitute gleiche Monatsgebühren erheben würden.",
+          "loesung": {
+            "variablen": "x = Buchungen pro Monat, y = Gebühr in €",
+            "system": [
+              "y = 0,2x + 3,25",
+              "y = 0,3x + 2,75"
+            ],
+            "ergebnis": "Bei 5 Buchungen pro Monat zahlt man bei beiden 4,25 €."
+          }
+        },
+        {
+          "teil": "c",
+          "text": "Die Sparkasse bot auch ein „Komfortkonto“ an, das monatlich 7,25 € kostete und keine weiteren Zusatzkosten entstanden. • Ab wie vielen monatlichen Buchungen würde dieses Kontoführungsmodell günstiger sein als das oben beschriebene Modell der Sparkasse? • Vergleiche dieses Modell auch mit dem oben beschriebenen Modell der VR-Bank.",
+          "loesung": {
+            "weg": [
+              "Komfortkonto: K = 7,25 €. Sparkasse: 3,25 + 0,2x < 7,25 gilt für x < 20, also ist das Komfortkonto ab 21 Buchungen günstiger (bei 20 gleich teuer).",
+              "VR-Bank: 2,75 + 0,3x = 7,25 bei x = 15, also ist das Komfortkonto ab 16 Buchungen günstiger."
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "s17-4",
+      "seite": 17,
+      "abschnitt": "Kosten und Erlös vergleichen – Übungen",
+      "nummer": 4,
+      "aufgabe": "Ein Busunternehmen kaufte einen Reisebus für 375 000 €. Der Unternehmer rechnet pro Kilometer mit 0,27 € Betriebskosten. Er erzielt im Durchschnitt für jeden gefahrenen Kilometer 1,10 € Erlös. Nach welcher Fahrstrecke haben sich Kosten und Erlös ausgeglichen und welche Kosten sind bis dahin entstanden?",
+      "loesung": {
+        "variablen": "x = Fahrstrecke in km, y = Betrag in €",
+        "system": [
+          "y = 375000 + 0,27x",
+          "y = 1,10x"
+        ],
+        "ergebnis": "Nach etwa 451 807 km sind Kosten und Erlös gleich. Bis dahin sind etwa 496 988 € Kosten entstanden.",
+        "probe": "1,10 · 451 807,23 ≈ 496 987,95 ✓"
+      }
+    },
+    {
+      "id": "s17-5",
+      "seite": 17,
+      "abschnitt": "Kosten und Erlös vergleichen – Übungen",
+      "nummer": 5,
+      "aufgabe": "Die neunten Klassen einer Schule in Wuppertal planen für 30 Personen eine Tagestour nach Brüssel. Es liegen von zwei Busunternehmen Preisangebote vor (Angebot 1 / Angebot 2: Wuppertal–Brüssel und zurück pro Person 9,20 € / 9,30 €; Sonderfahrt pro km 1,43 € / 1,32 €). Mit dem Einverständnis der Eltern wurde beschlossen, auch die alte belgische Stadt Brügge und ihren Seehafen Zeebrügge zu besuchen.",
+      "teilaufgaben": [
+        {
+          "teil": "a",
+          "text": "Bestimme mithilfe der Karte, wie viele Kilometer der Bus insgesamt auf dem Ausflug nach Brügge und Zeebrügge fährt. Berechne die zusätzlichen Kosten pro Person, die jedes Unternehmen für diese Sonderfahrt anrechnet.",
+          "loesung": {
+            "weg": [
+              "s = Länge der Sonderfahrt in km (aus der Karte abzulesen und zu addieren).",
+              "Zusätzliche Kosten pro Person: Angebot 1: 1,43 · s : 30, Angebot 2: 1,32 · s : 30."
+            ],
+            "hinweis": "Die Karte liegt mir nicht vor, deshalb fehlt die Kilometerzahl."
+          }
+        },
+        {
+          "teil": "b",
+          "text": "Welches Angebot ist günstiger?",
+          "loesung": {
+            "variablen": "x = Sonderfahrt in km, y = Gesamtkosten in €",
+            "system": [
+              "y = 276 + 1,43x",
+              "y = 279 + 1,32x"
+            ],
+            "weg": [
+              "Grundpreis: 30 · 9,20 € = 276 € bzw. 30 · 9,30 € = 279 €."
+            ],
+            "ergebnis": "Beide Angebote kosten bei s ≈ 27,3 km gleich viel (315 €). Bei längerer Sonderfahrt ist Angebot 2 günstiger, bei kürzerer Angebot 1. Brügge und Zeebrügge liegen deutlich weiter als 27 km entfernt, also ist Angebot 2 günstiger."
+          }
+        },
+        {
+          "teil": "c",
+          "text": "Ist es nötig, zum Vergleich der Angebote ein Gleichungssystem aus den Gleichungen für die Kosten zu lösen? Begründe.",
+          "loesung": {
+            "ergebnis": "Nein. Man berechnet beide Gesamtkosten für die bekannte Kilometerzahl und vergleicht sie. Das Gleichungssystem zeigt nur, ab welcher Kilometerzahl (≈ 27,3 km) welches Angebot günstiger ist."
+          }
+        }
+      ]
+    },
+    {
+      "id": "s18-1",
+      "seite": 18,
+      "abschnitt": "Bewegungsprobleme",
+      "nummer": 1,
+      "aufgabe": "Erläutere die Darstellung im Diagramm und die hier sehr kurz dargestellte Lösung.",
+      "loesung": {
+        "weg": [
+          "Jede Gerade im Diagramm gehört zu einer Gleichung. Der Schnittpunkt liegt auf beiden Geraden, seine Koordinaten erfüllen also beide Gleichungen. Das ist die Lösung des Gleichungssystems.",
+          "Rechnerisch: Man setzt die beiden Terme gleich (Gleichsetzungsverfahren), löst nach x auf und setzt x in eine Gleichung ein."
+        ],
+        "hinweis": "Das Diagramm liegt mir nicht vor, daher nur die allgemeine Erläuterung."
+      }
+    },
+    {
+      "id": "s19-2",
+      "seite": 19,
+      "abschnitt": "Bewegungsprobleme – Übungen",
+      "nummer": 2,
+      "aufgabe": "Im Diagramm ist diese Situation dargestellt: Ein Rollerfahrer startet um elf Uhr und fährt durchschnittlich 40 km/h. Ein Motorradfahrer fährt 1 1/2 h später den gleichen Weg mit durchschnittlich 60 km/h.",
+      "teilaufgaben": [
+        {
+          "teil": "a",
+          "text": "Wann holt der Motorradfahrer den Rollerfahrer ein?",
+          "loesung": {
+            "variablen": "x = Stunden seit 11 Uhr, y = Weg in km",
+            "system": [
+              "y = 40x",
+              "y = 60(x - 1,5)"
+            ],
+            "ergebnis": "Der Motorradfahrer holt den Rollerfahrer nach 4,5 h ein, also um 15:30 Uhr.",
+            "probe": "40 · 4,5 = 180 und 60 · 3 = 180 ✓"
+          }
+        },
+        {
+          "teil": "b",
+          "text": "Wie viel Kilometer hat am Treffpunkt T jeder Fahrer zurückgelegt?",
+          "loesung": {
+            "ergebnis": "Beide haben am Treffpunkt 180 km zurückgelegt."
+          }
+        },
+        {
+          "teil": "c",
+          "text": "Wie viel Kilometer hat der Motorradfahrer um 14:30 Uhr zurückgelegt?",
+          "loesung": {
+            "weg": [
+              "Der Motorradfahrer ist seit 12:30 Uhr unterwegs, um 14:30 Uhr also 2 h: 2 · 60 km = 120 km."
+            ],
+            "ergebnis": "120 km"
+          }
+        },
+        {
+          "teil": "d",
+          "text": "Wie weit sind der Rollerfahrer und der Motorradfahrer um 14:30 Uhr noch voneinander entfernt?",
+          "loesung": {
+            "weg": [
+              "Roller: 3,5 h · 40 km/h = 140 km. Abstand: 140 km − 120 km."
+            ],
+            "ergebnis": "Sie sind noch 20 km voneinander entfernt."
+          }
+        }
+      ]
+    },
+    {
+      "id": "s19-3",
+      "seite": 19,
+      "abschnitt": "Bewegungsprobleme – Übungen",
+      "nummer": 3,
+      "aufgabe": "Erfinde zu der folgenden Darstellung eine Aufgabe, in der es um ein Treffen geht, und löse sie. Präsentiere die Aufgabe in deiner Klasse.",
+      "hinweis": "Darstellung: Anja (Start 10:00 Uhr, 8 km/h) und Gabi (Start 10:15 Uhr, 12 km/h), Gesamtstrecke 37 km, Treffpunkt. Danach folgt die Anweisung: „Löse die folgenden Aufgaben, wie du es für geeignet hältst, mithilfe eines Diagramms oder eines Gleichungssystems.“",
+      "loesung": {
+        "variablen": "x = Stunden seit 10 Uhr, y = Weg von Anjas Start in km",
+        "system": [
+          "y = 8x",
+          "y = 37 - 12(x - 0,25)"
+        ],
+        "ergebnis": "Beispielaufgabe: Anja und Gabi wohnen 37 km voneinander entfernt und gehen einander entgegen. Anja startet um 10:00 Uhr mit 8 km/h, Gabi um 10:15 Uhr mit 12 km/h. Wann treffen sie sich? Sie treffen sich um 12:00 Uhr. Anja hat dann 16 km, Gabi 21 km zurückgelegt.",
+        "probe": "16 + 21 = 37 ✓",
+        "hinweis": "Annahme: Die beiden gehen einander entgegen, das passt zur Gesamtstrecke von 37 km."
+      }
+    },
+    {
+      "id": "s19-4",
+      "seite": 19,
+      "abschnitt": "Bewegungsprobleme – Übungen",
+      "nummer": 4,
+      "aufgabe": "Michael und Thomas wohnen 39 km voneinander entfernt. Um 9 Uhr laufen sie einander entgegen. Michael legt in der Stunde im Schnitt 3 km zurück, Thomas 3,5 km. Wann werden sie sich treffen und wie viele Kilometer hat dann jeder Junge zurückgelegt?",
+      "loesung": {
+        "variablen": "x = Stunden seit 9 Uhr, y = Weg von Michaels Start in km",
+        "system": [
+          "y = 3x",
+          "y = 39 - 3,5x"
+        ],
+        "ergebnis": "Sie treffen sich nach 6 Stunden, also um 15:00 Uhr. Michael ist 18 km gegangen, Thomas 21 km.",
+        "probe": "18 + 21 = 39 ✓"
+      }
+    },
+    {
+      "id": "s19-5",
+      "seite": 19,
+      "abschnitt": "Bewegungsprobleme – Übungen",
+      "nummer": 5,
+      "aufgabe": "Aufgabe zu einem Diagramm (Weg in m über Zeit in min, Geraden I und II).",
+      "teilaufgaben": [
+        {
+          "teil": "a",
+          "text": "Erfinde zu dem Diagramm eine „Verfolgungsgeschichte“.",
+          "loesung": {
+            "weg": [
+              "Beispiel: Ein Kind (II) läuft los, ein Freund (I) startet später und läuft schneller hinterher. Im Diagramm schneiden sich die Geraden dort, wo er das Kind einholt."
+            ],
+            "hinweis": "Das Diagramm liegt mir nicht vor."
+          }
+        },
+        {
+          "teil": "b",
+          "text": "Welche Geschwindigkeit müsste der „Verfolger“ I haben, um II bereits nach vier Minuten einzuholen?",
+          "loesung": {
+            "weg": [
+              "Vorsprung d (in m), Geschwindigkeit von II: v₂ (in m/min). Einholen nach 4 min: v₁ · 4 = d + v₂ · 4, also v₁ = v₂ + d : 4."
+            ],
+            "hinweis": "Ohne die Werte aus dem Diagramm nur als Formel."
+          }
+        },
+        {
+          "teil": "c",
+          "text": "Löse die Verfolgungsaufgabe, wenn der Verfolgte nur 10 m Vorsprung hat, aber gleich schnell ist.",
+          "loesung": {
+            "weg": [
+              "Gleiche Geschwindigkeit bedeutet: Der Abstand von 10 m bleibt immer gleich. Die Geraden sind parallel, der Verfolger holt den Verfolgten nie ein."
+            ],
+            "ergebnis": "Es gibt keine Lösung."
+          }
+        }
+      ]
+    },
+    {
+      "id": "s19-6",
+      "seite": 19,
+      "abschnitt": "Bewegungsprobleme – Übungen",
+      "nummer": 6,
+      "aufgabe": "Einer Wanderin, die 4 km in der Stunde zurücklegt, wird 5 h später ein Radfahrer nachgeschickt, der in der Stunde 14 km fährt. Nach wie vielen Stunden und Kilometern hat der Radfahrer die Wanderin eingeholt?",
+      "loesung": {
+        "variablen": "x = Stunden seit Start der Wanderin, y = Weg in km",
+        "system": [
+          "y = 4x",
+          "y = 14(x - 5)"
+        ],
+        "ergebnis": "Der Radfahrer holt die Wanderin nach 2 Stunden und 28 km ein. Die Wanderin ist dann 7 Stunden unterwegs.",
+        "probe": "4 · 7 = 28 und 14 · 2 = 28 ✓"
+      }
+    },
+    {
+      "id": "s19-7",
+      "seite": 19,
+      "abschnitt": "Bewegungsprobleme – Übungen",
+      "nummer": 7,
+      "aufgabe": "Zwei Züge fahren aus Fulda und Marburg gleichzeitig ab. Beide Städte haben 104 km Entfernung. Nach 45 Minuten treffen sie sich. Wäre der erste Zug 33 Minuten vor dem zweiten Zug abgefahren, würden sie eine Stunde nach Abfahrt des ersten Zugs noch 2 km voneinander entfernt sein. Wie viele Kilometer legt jeder der zwei Züge in der Minute zurück?",
+      "loesung": {
+        "variablen": "x = km pro Minute des Zuges aus Fulda, y = km pro Minute des Zuges aus Marburg",
+        "system": [
+          "45x + 45y = 104",
+          "60x + 27y = 102"
+        ],
+        "ergebnis": "Der Zug aus Fulda fährt 1,2 km pro Minute, der Zug aus Marburg 10/9 ≈ 1,11 km pro Minute.",
+        "probe": "Zweiter Fall: 60 · 1,2 + 27 · 10/9 = 72 + 30 = 102 = 104 − 2 ✓",
+        "hinweis": "Beim zweiten Fall ist der erste Zug 60 min, der zweite 27 min unterwegs."
+      }
+    },
+    {
+      "id": "s19-8",
+      "seite": 19,
+      "abschnitt": "Bewegungsprobleme – Übungen",
+      "nummer": 8,
+      "aufgabe": "Ein Motorboot fährt 48,27 km in 3 h den Strom abwärts. Für den Rückweg braucht es bei gleicher Eigengeschwindigkeit 5 h. Wie schnell würde das Boot im stillen Wasser fahren und welche Strömungsgeschwindigkeit hat der Fluss?",
+      "loesung": {
+        "variablen": "x = Eigengeschwindigkeit, y = Strömung (in km/h)",
+        "system": [
+          "3(x + y) = 48,27",
+          "5(x - y) = 48,27"
+        ],
+        "ergebnis": "Im stillen Wasser fährt das Boot 12,872 km/h, die Strömung beträgt 3,218 km/h."
+      }
+    },
+    {
+      "id": "s19-9",
+      "seite": 19,
+      "abschnitt": "Bewegungsprobleme – Übungen",
+      "nummer": 9,
+      "aufgabe": "Ein Sportflugzeug brauchte für eine Strecke von 579,24 km mit dem Wind 2 h. Für den Rückflug gegen den Wind, dessen Stärke gleich geblieben ist, brauchte es bei gleicher Eigengeschwindigkeit 3 h 36 min. Mit welcher Geschwindigkeit blies der Wind und mit welcher Eigengeschwindigkeit flog das Flugzeug durchschnittlich?",
+      "loesung": {
+        "variablen": "x = Eigengeschwindigkeit, y = Wind (in km/h)",
+        "system": [
+          "2(x + y) = 579,24",
+          "3,6(x - y) = 579,24"
+        ],
+        "ergebnis": "Das Flugzeug fliegt 225,26 km/h, der Wind bläst mit 64,36 km/h.",
+        "hinweis": "3 h 36 min = 3,6 h."
+      }
+    },
+    {
+      "id": "s20-1",
+      "seite": 20,
+      "abschnitt": "Zusammenfassung und Training – Training",
+      "nummer": 1,
+      "aufgabe": "Wie viele Marken jeder Sorte wurden gekauft?",
+      "teilaufgaben": [
+        {
+          "teil": "a",
+          "text": "Heike kauft Wertmarken zu 0,55 € und 1 €. Sie bezahlt für 15 Marken insgesamt 10,95 €.",
+          "loesung": {
+            "variablen": "x = Marken zu 0,55 €, y = Marken zu 1 €",
+            "system": [
+              "x + y = 15",
+              "0,55x + y = 10,95"
+            ],
+            "ergebnis": "Heike kaufte 9 Marken zu 0,55 € und 6 Marken zu 1 €.",
+            "probe": "4,95 + 6 = 10,95 ✓"
+          }
+        },
+        {
+          "teil": "b",
+          "text": "Uli kauft Briefmarken zu 0,55 € und 1,44 €. Er bezahlt für 12 Marken insgesamt 10,16 €.",
+          "loesung": {
+            "variablen": "x = Marken zu 0,55 €, y = Marken zu 1,44 €",
+            "system": [
+              "x + y = 12",
+              "0,55x + 1,44y = 10,16"
+            ],
+            "ergebnis": "Uli kaufte 8 Marken zu 0,55 € und 4 Marken zu 1,44 €.",
+            "probe": "4,40 + 5,76 = 10,16 ✓"
+          }
+        }
+      ]
+    },
+    {
+      "id": "s20-2",
+      "seite": 20,
+      "abschnitt": "Zusammenfassung und Training – Training",
+      "nummer": 2,
+      "aufgabe": "Zeichne die Geraden in ein Koordinatensystem und bestimme aus der Zeichnung die Koordinaten ihres Schnittpunktes.",
+      "teilaufgaben": [
+        {
+          "teil": "a",
+          "text": "y = 1,5x + 3 und y = −0,5x − 1",
+          "loesung": {
+            "variablen": "x, y = Koordinaten des Schnittpunkts",
+            "system": [
+              "y = 1,5x + 3",
+              "y = -0,5x - 1"
+            ],
+            "weg": [
+              "Zeichnen: y-Achsenabschnitt 3, Steigung 1,5, bzw. −1 und −0,5."
+            ],
+            "ergebnis": "S(−2 | 0)"
+          }
+        },
+        {
+          "teil": "b",
+          "text": "y = 0,5x + 0,5 und y = −0,5x − 1,5",
+          "loesung": {
+            "variablen": "x, y = Koordinaten des Schnittpunkts",
+            "system": [
+              "y = 0,5x + 0,5",
+              "y = -0,5x - 1,5"
+            ],
+            "ergebnis": "S(−2 | −0,5)"
+          }
+        },
+        {
+          "teil": "c",
+          "text": "y = −3x − 2,5 und y = 2x − 1,5",
+          "loesung": {
+            "variablen": "x, y = Koordinaten des Schnittpunkts",
+            "system": [
+              "y = -3x - 2,5",
+              "y = 2x - 1,5"
+            ],
+            "ergebnis": "S(−0,2 | −1,9)"
+          }
+        },
+        {
+          "teil": "d",
+          "text": "y = 3x − 4 und y = −4x + 3",
+          "loesung": {
+            "variablen": "x, y = Koordinaten des Schnittpunkts",
+            "system": [
+              "y = 3x - 4",
+              "y = -4x + 3"
+            ],
+            "ergebnis": "S(1 | −1)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "s20-3",
+      "seite": 20,
+      "abschnitt": "Zusammenfassung und Training – Training",
+      "nummer": 3,
+      "aufgabe": "In welchem Punkt schneiden sich die zugehörigen Geraden im Koordinatensystem. y = x − 1 und y = −1/2 x + 2.",
+      "loesung": {
+        "variablen": "x, y = Koordinaten des Schnittpunkts",
+        "system": [
+          "y = x - 1",
+          "y = -1/2 x + 2"
+        ],
+        "ergebnis": "Die Geraden schneiden sich in S(2 | 1)."
+      }
+    },
+    {
+      "id": "s20-4",
+      "seite": 20,
+      "abschnitt": "Zusammenfassung und Training – Training",
+      "nummer": 4,
+      "aufgabe": "Zeichne die Gerade mit der Gleichung y = 2x − 1 in ein Koordinatensystem. Außerdem ist die folgende Gleichung einer zweiten Geraden gegeben. Welche Lösung hat das zugehörige lineare Gleichungssystem?",
+      "teilaufgaben": [
+        {
+          "teil": "a",
+          "text": "y = x − 3",
+          "loesung": {
+            "variablen": "Schnittpunkt mit y = 2x − 1",
+            "system": [
+              "y = 2x - 1",
+              "y = x - 3"
+            ],
+            "ergebnis": "Lösung: x = −2, y = −5"
+          }
+        },
+        {
+          "teil": "b",
+          "text": "y = −x + 2",
+          "loesung": {
+            "variablen": "Schnittpunkt mit y = 2x − 1",
+            "system": [
+              "y = 2x - 1",
+              "y = -x + 2"
+            ],
+            "ergebnis": "Lösung: x = 1, y = 1"
+          }
+        },
+        {
+          "teil": "c",
+          "text": "y = 4x − 5",
+          "loesung": {
+            "variablen": "Schnittpunkt mit y = 2x − 1",
+            "system": [
+              "y = 2x - 1",
+              "y = 4x - 5"
+            ],
+            "ergebnis": "Lösung: x = 2, y = 3"
+          }
+        },
+        {
+          "teil": "d",
+          "text": "y = −0,5x + 6,5",
+          "loesung": {
+            "variablen": "Schnittpunkt mit y = 2x − 1",
+            "system": [
+              "y = 2x - 1",
+              "y = -0,5x + 6,5"
+            ],
+            "ergebnis": "Lösung: x = 3, y = 5"
+          }
+        },
+        {
+          "teil": "e",
+          "text": "y = 0,5x − 2,5",
+          "loesung": {
+            "variablen": "Schnittpunkt mit y = 2x − 1",
+            "system": [
+              "y = 2x - 1",
+              "y = 0,5x - 2,5"
+            ],
+            "ergebnis": "Lösung: x = −1, y = −3"
+          }
+        },
+        {
+          "teil": "f",
+          "text": "y = −4x − 1",
+          "loesung": {
+            "variablen": "Schnittpunkt mit y = 2x − 1",
+            "system": [
+              "y = 2x - 1",
+              "y = -4x - 1"
+            ],
+            "ergebnis": "Lösung: x = 0, y = −1"
+          }
+        }
+      ]
+    },
+    {
+      "id": "s20-5",
+      "seite": 20,
+      "abschnitt": "Zusammenfassung und Training – Training",
+      "nummer": 5,
+      "aufgabe": "Zeichne in ein Koordinatensystem durch die Punkte P (1 | 5) und Q (−1 | 1) eine Gerade und auch durch die Punkte R (1 | −2) und S (−1 | −4).",
+      "teilaufgaben": [
+        {
+          "teil": "a",
+          "text": "Bestimme die Schnittpunktkoordinaten.",
+          "loesung": {
+            "weg": [
+              "Gerade PQ: Steigung (5 − 1) : (1 + 1) = 2, also y = 2x + 3. Gerade RS: Steigung (−2 + 4) : (1 + 1) = 1, also y = x − 3."
+            ],
+            "ergebnis": "Schnittpunkt S(−6 | −9)"
+          }
+        },
+        {
+          "teil": "b",
+          "text": "Bestimme Gleichungen für das zugehörige Gleichungssystem und berechne die Lösung.",
+          "loesung": {
+            "variablen": "x, y = Koordinaten des Schnittpunkts",
+            "system": [
+              "y = 2x + 3",
+              "y = x - 3"
+            ],
+            "ergebnis": "Lösung: x = −6, y = −9."
+          }
+        },
+        {
+          "teil": "c",
+          "text": "Welche y-Koordinate muss der Punkt R haben, damit das zugehörige Gleichungssystem die Lösung x = −3 und y = −3 hat?",
+          "loesung": {
+            "weg": [
+              "Der Punkt (−3 | −3) liegt auf PQ (2 · (−3) + 3 = −3). Die Gerade RS muss durch (−3 | −3) und S(−1 | −4) gehen: Steigung −1/2, also y = −0,5x − 4,5.",
+              "Für R mit x = 1: y = −0,5 − 4,5 = −5."
+            ],
+            "ergebnis": "R muss die y-Koordinate −5 haben."
+          }
+        }
+      ]
+    },
+    {
+      "id": "s21-6",
+      "seite": 21,
+      "abschnitt": "Zusammenfassung und Training – Training",
+      "nummer": 6,
+      "aufgabe": "Löse das Gleichungssystem rechnerisch mit einem Verfahren, das dir geeignet erscheint.",
+      "teilaufgaben": [
+        {
+          "teil": "a",
+          "text": "x = 16 − 2y; x = 25 − 5y",
+          "loesung": {
+            "variablen": "Lösung des Systems",
+            "system": [
+              "x = 16 - 2y",
+              "x = 25 - 5y"
+            ],
+            "ergebnis": "x = 10, y = 3"
+          }
+        },
+        {
+          "teil": "b",
+          "text": "5y = −3x + 1; 5y = −6x − 8",
+          "loesung": {
+            "variablen": "Lösung des Systems",
+            "system": [
+              "5y = -3x + 1",
+              "5y = -6x - 8"
+            ],
+            "ergebnis": "x = −3, y = 2"
+          }
+        },
+        {
+          "teil": "c",
+          "text": "5x − y = 110; 3x − y = 60",
+          "loesung": {
+            "variablen": "Lösung des Systems",
+            "system": [
+              "5x - y = 110",
+              "3x - y = 60"
+            ],
+            "ergebnis": "x = 25, y = 15"
+          }
+        },
+        {
+          "teil": "d",
+          "text": "2y + 25x = 79; 5x − 11y = −7",
+          "loesung": {
+            "variablen": "Lösung des Systems",
+            "system": [
+              "2y + 25x = 79",
+              "5x - 11y = -7"
+            ],
+            "ergebnis": "x = 3, y = 2"
+          }
+        },
+        {
+          "teil": "e",
+          "text": "x + 3y = 11; x = 9 − 2y",
+          "loesung": {
+            "variablen": "Lösung des Systems",
+            "system": [
+              "x + 3y = 11",
+              "x = 9 - 2y"
+            ],
+            "ergebnis": "x = 5, y = 2"
+          }
+        },
+        {
+          "teil": "f",
+          "text": "7x − 3y = 13; 6y = 50 − 5x",
+          "loesung": {
+            "variablen": "Lösung des Systems",
+            "system": [
+              "7x - 3y = 13",
+              "6y = 50 - 5x"
+            ],
+            "ergebnis": "x = 4, y = 5"
+          }
+        },
+        {
+          "teil": "g",
+          "text": "5y = 3x − 2; 4x − 5y = 11",
+          "loesung": {
+            "variablen": "Lösung des Systems",
+            "system": [
+              "5y = 3x - 2",
+              "4x - 5y = 11"
+            ],
+            "ergebnis": "x = 9, y = 5"
+          }
+        },
+        {
+          "teil": "h",
+          "text": "4x + y = 31; 2x − y = 11",
+          "loesung": {
+            "variablen": "Lösung des Systems",
+            "system": [
+              "4x + y = 31",
+              "2x - y = 11"
+            ],
+            "ergebnis": "x = 7, y = 3"
+          }
+        }
+      ]
+    },
+    {
+      "id": "s21-7",
+      "seite": 21,
+      "abschnitt": "Zusammenfassung und Training – Training",
+      "nummer": 7,
+      "aufgabe": "Löse das Gleichungssystem.",
+      "teilaufgaben": [
+        {
+          "teil": "a",
+          "text": "3y = 6x − 6; −3y = 15x − 57",
+          "loesung": {
+            "variablen": "Lösung des Systems",
+            "system": [
+              "3y = 6x - 6",
+              "-3y = 15x - 57"
+            ],
+            "ergebnis": "x = 3, y = 4"
+          }
+        },
+        {
+          "teil": "b",
+          "text": "−x = 6y − 10; x = −y",
+          "loesung": {
+            "variablen": "Lösung des Systems",
+            "system": [
+              "-x = 6y - 10",
+              "x = -y"
+            ],
+            "ergebnis": "x = −2, y = 2"
+          }
+        },
+        {
+          "teil": "c",
+          "text": "8x + y = −18; −9x + y = −1",
+          "loesung": {
+            "variablen": "Lösung des Systems",
+            "system": [
+              "8x + y = -18",
+              "-9x + y = -1"
+            ],
+            "ergebnis": "x = −1, y = −10"
+          }
+        },
+        {
+          "teil": "d",
+          "text": "y = 3x + 21; y = −2x − 14",
+          "loesung": {
+            "variablen": "Lösung des Systems",
+            "system": [
+              "y = 3x + 21",
+              "y = -2x - 14"
+            ],
+            "ergebnis": "x = −7, y = 0"
+          }
+        },
+        {
+          "teil": "e",
+          "text": "2 − 18y = −4x; y = 5 − x",
+          "loesung": {
+            "variablen": "Lösung des Systems",
+            "system": [
+              "2 - 18y = -4x",
+              "y = 5 - x"
+            ],
+            "ergebnis": "x = 4, y = 1"
+          }
+        },
+        {
+          "teil": "f",
+          "text": "3x + y = 9; 5x + y = 19",
+          "loesung": {
+            "variablen": "Lösung des Systems",
+            "system": [
+              "3x + y = 9",
+              "5x + y = 19"
+            ],
+            "ergebnis": "x = 5, y = −6"
+          }
+        },
+        {
+          "teil": "g",
+          "text": "2y = 2x + 39; 2y = −x + 3",
+          "loesung": {
+            "variablen": "Lösung des Systems",
+            "system": [
+              "2y = 2x + 39",
+              "2y = -x + 3"
+            ],
+            "ergebnis": "x = −12, y = 7,5"
+          }
+        },
+        {
+          "teil": "h",
+          "text": "10y − 0,4x = 8,8; x = 2,9 + 0,1y",
+          "loesung": {
+            "variablen": "Lösung des Systems",
+            "system": [
+              "10y - 0,4x = 8,8",
+              "x = 2,9 + 0,1y"
+            ],
+            "ergebnis": "x = 3, y = 1"
+          }
+        }
+      ]
+    },
+    {
+      "id": "s21-8",
+      "seite": 21,
+      "abschnitt": "Zusammenfassung und Training – Training",
+      "nummer": 8,
+      "aufgabe": "Textaufgaben zu Zahlen:",
+      "teilaufgaben": [
+        {
+          "teil": "a",
+          "text": "Die Summe zweier Zahlen beträgt 64, ihre Differenz ist 14. Wie heißen die Zahlen?",
+          "loesung": {
+            "variablen": "x und y sind die Zahlen",
+            "system": [
+              "x + y = 64",
+              "x - y = 14"
+            ],
+            "ergebnis": "Die Zahlen sind 39 und 25."
+          }
+        },
+        {
+          "teil": "b",
+          "text": "Die Differenz aus dem Achtfachen einer Zahl und dem Fünffachen der zweiten Zahl beträgt 49. Addiert man zum Siebenfachen der ersten Zahl das Fünfzehnfache der zweiten Zahl, erhält man 101. Wie heißen diese Zahlen?",
+          "loesung": {
+            "variablen": "x = erste, y = zweite Zahl",
+            "system": [
+              "8x - 5y = 49",
+              "7x + 15y = 101"
+            ],
+            "ergebnis": "Die Zahlen sind 8 und 3.",
+            "probe": "56 + 45 = 101 ✓"
+          }
+        },
+        {
+          "teil": "c",
+          "text": "Die Summe der Ziffern einer zweistelligen Zahl beträgt 15. Werden die Ziffern der Zahl vertauscht, erhält man eine um 27 kleinere Zahl. Wie heißt die ursprüngliche Zahl?",
+          "loesung": {
+            "variablen": "x = Zehnerziffer, y = Einerziffer",
+            "system": [
+              "x + y = 15",
+              "10y + x = 10x + y - 27"
+            ],
+            "ergebnis": "Die Zahl heißt 96.",
+            "probe": "69 = 96 − 27 ✓"
+          }
+        },
+        {
+          "teil": "d",
+          "text": "Die Quersumme einer zweistelligen Zahl beträgt 9. Vertauscht man beide Ziffern der Zahl, ist die neue Zahl um 9 größer als die ursprüngliche Zahl. Bestimme diese Zahl.",
+          "loesung": {
+            "variablen": "x = Zehnerziffer, y = Einerziffer",
+            "system": [
+              "x + y = 9",
+              "10y + x = 10x + y + 9"
+            ],
+            "ergebnis": "Die Zahl heißt 45.",
+            "probe": "54 = 45 + 9 ✓"
+          }
+        }
+      ]
+    },
+    {
+      "id": "s21-9",
+      "seite": 21,
+      "abschnitt": "Zusammenfassung und Training – Training",
+      "nummer": 9,
+      "aufgabe": "Ein Hotel kann in 24 Zimmern Gäste unterbringen. In den Einzel- und Doppelzimmern stehen insgesamt 40 Betten. Wie viele Einzel- und Doppelzimmer hat dieses Hotel?",
+      "loesung": {
+        "variablen": "x = Einzelzimmer, y = Doppelzimmer",
+        "system": [
+          "x + y = 24",
+          "x + 2y = 40"
+        ],
+        "ergebnis": "Das Hotel hat 8 Einzel- und 16 Doppelzimmer."
+      }
+    },
+    {
+      "id": "s21-10",
+      "seite": 21,
+      "abschnitt": "Zusammenfassung und Training – Vertiefen und Anwenden",
+      "nummer": 10,
+      "aufgabe": "Der Umfang eines Rechtecks beträgt 100 cm. Eine Seite des Rechtecks ist 20 cm länger als die andere.",
+      "teilaufgaben": [
+        {
+          "teil": "a",
+          "text": "Welchen Flächeninhalt hat das Rechteck?",
+          "loesung": {
+            "variablen": "x = kürzere, y = längere Seite (in cm)",
+            "system": [
+              "x + y = 50",
+              "y = x + 20"
+            ],
+            "ergebnis": "Seiten 15 cm und 35 cm, Flächeninhalt 525 cm²."
+          }
+        },
+        {
+          "teil": "b",
+          "text": "Welche Seitenlängen hat das Rechteck mit diesem Umfang, jedoch mit dem größtmöglichen Flächeninhalt?",
+          "loesung": {
+            "weg": [
+              "Bei festem Umfang ist das Quadrat das Rechteck mit der größten Fläche: 100 : 4 = 25."
+            ],
+            "ergebnis": "25 cm × 25 cm, Flächeninhalt 625 cm²."
+          }
+        }
+      ]
+    },
+    {
+      "id": "s21-11",
+      "seite": 21,
+      "abschnitt": "Zusammenfassung und Training – Vertiefen und Anwenden",
+      "nummer": 11,
+      "aufgabe": "Der Flächeninhalt eines Rechtecks beträgt 525 cm². Verlängert man die kürzere und verkürzt man die längere Seite jeweils um 5 cm, so erhält man ein Rechteck mit einem um 75 cm² größeren Flächeninhalt.",
+      "teilaufgaben": [
+        {
+          "teil": "a",
+          "text": "Welche Seitenlängen hat das ursprüngliche Rechteck?",
+          "loesung": {
+            "variablen": "x = kürzere, y = längere Seite",
+            "weg": [
+              "I: x · y = 525. II: (x + 5)(y − 5) = 600, ausmultipliziert: xy − 5x + 5y − 25 = 600.",
+              "Mit I: −5x + 5y = 100, also y = x + 20.",
+              "In I: x(x + 20) = 525, x² + 20x − 525 = 0, x = −10 + 25 = 15 (die negative Lösung entfällt)."
+            ],
+            "ergebnis": "Die Seiten sind 15 cm und 35 cm.",
+            "probe": "15 · 35 = 525 ✓ und 20 · 30 = 600 ✓"
+          }
+        },
+        {
+          "teil": "b",
+          "text": "Vergleiche die Umfänge der beiden beschriebenen Rechtecke.",
+          "loesung": {
+            "weg": [
+              "Ursprünglich: 2 · (15 + 35) = 100 cm. Neu: 2 · (20 + 30) = 100 cm."
+            ],
+            "ergebnis": "Beide Rechtecke haben denselben Umfang, 100 cm."
+          }
+        }
+      ]
+    },
+    {
+      "id": "s21-12",
+      "seite": 21,
+      "abschnitt": "Zusammenfassung und Training – Vertiefen und Anwenden",
+      "nummer": 12,
+      "aufgabe": "Aus einem 18 cm langen Messingdraht wird eine Rechteckform so gebogen, dass die kürzere Seite halb so lang ist wie die längere. Welche Besonderheit besteht zwischen dem Umfang und dem Flächeninhalt dieses Rechtecks?",
+      "loesung": {
+        "variablen": "x = längere, y = kürzere Seite (in cm)",
+        "system": [
+          "x + y = 9",
+          "x = 2y"
+        ],
+        "ergebnis": "Die Seiten sind 6 cm und 3 cm. Der Umfang (18 cm) und der Flächeninhalt (18 cm²) haben denselben Zahlenwert.",
+        "hinweis": "Der halbe Umfang ist 9 cm."
+      }
+    },
+    {
+      "id": "s21-13",
+      "seite": 21,
+      "abschnitt": "Zusammenfassung und Training – Vertiefen und Anwenden",
+      "nummer": 13,
+      "aufgabe": "Der Flächeninhalt eines Trapezes beträgt 100 cm², dessen Höhe 10 cm. Die kürzere der zwei parallelen Seiten ist 2 cm kürzer als die andere. Wie lang sind diese Seiten?",
+      "loesung": {
+        "variablen": "x = längere, y = kürzere Seite (in cm)",
+        "system": [
+          "x + y = 20",
+          "y = x - 2"
+        ],
+        "weg": [
+          "A = (a + c) : 2 · h, also (a + c) : 2 · 10 = 100, daher a + c = 20."
+        ],
+        "ergebnis": "Die Seiten sind 11 cm und 9 cm."
+      }
+    },
+    {
+      "id": "s21-14",
+      "seite": 21,
+      "abschnitt": "Zusammenfassung und Training – Vertiefen und Anwenden",
+      "nummer": 14,
+      "aufgabe": "Zwei Schwestern kaufen zusammen ein Moutainbike für 990 €. Die ältere zahlt 20 % mehr als die jüngere. Wie viel Euro zahlt jede?",
+      "loesung": {
+        "variablen": "x = ältere, y = jüngere Schwester (in €)",
+        "system": [
+          "x + y = 990",
+          "x = 1,2y"
+        ],
+        "ergebnis": "Die ältere zahlt 540 €, die jüngere 450 €.",
+        "probe": "540 : 450 = 1,2 ✓"
+      }
+    },
+    {
+      "id": "s21-15",
+      "seite": 21,
+      "abschnitt": "Zusammenfassung und Training – Vertiefen und Anwenden",
+      "nummer": 15,
+      "aufgabe": "Bei einem Verfolgungsfahren über 80 km starten die Radfahrer um 10 Uhr im Abstand von 1,5 min. Der erste Fahrer fährt durchschnittlich mit 38 km/h. Der fünfte Fahrer erreicht eine Durchschnittsgeschwindigkeit von 42 km/h.",
+      "teilaufgaben": [
+        {
+          "teil": "a",
+          "text": "Wann erreichen beide das Ziel?",
+          "loesung": {
+            "weg": [
+              "Der fünfte Fahrer startet 4 · 1,5 min = 6 min später (10:06 Uhr).",
+              "Erster: 80 : 38 h ≈ 2 h 6 min 19 s, Ziel um etwa 12:06:19 Uhr. Fünfter: 80 : 42 h ≈ 1 h 54 min 17 s, Ziel um etwa 12:00:17 Uhr."
+            ]
+          }
+        },
+        {
+          "teil": "b",
+          "text": "Wann überholt der fünfte Fahrer den ersten?",
+          "loesung": {
+            "variablen": "x = Stunden seit 10 Uhr, y = Weg in km",
+            "system": [
+              "y = 38x",
+              "y = 42(x - 0,1)"
+            ],
+            "ergebnis": "Der fünfte Fahrer überholt den ersten nach 1,05 h, also um 11:03 Uhr nach 39,9 km."
+          }
+        }
+      ]
+    },
+    {
+      "id": "s21-16",
+      "seite": 21,
+      "abschnitt": "Zusammenfassung und Training – Vertiefen und Anwenden",
+      "nummer": 16,
+      "aufgabe": "Vertauscht man bei einer dreistelligen Zahl mit der Quersumme 6 die linke und mittlere Ziffer, so ist die neue Zahl um 90 größer als die vorgegebene. Die mittlere Ziffer ist doppelt so groß wie die linke. Von welcher Zahl wurde ausgegangen?",
+      "loesung": {
+        "variablen": "a, b, c = Hunderter-, Zehner-, Einerziffer",
+        "weg": [
+          "I: a + b + c = 6",
+          "II: 100b + 10a + c = 100a + 10b + c + 90, also b − a = 1",
+          "III: b = 2a",
+          "II und III: 2a − a = 1, also a = 1 und b = 2. Aus I: c = 6 − 1 − 2 = 3."
+        ],
+        "ergebnis": "Die Zahl heißt 123.",
+        "probe": "213 − 123 = 90 ✓"
+      }
+    },
+    {
+      "id": "s22-1",
+      "seite": 22,
+      "abschnitt": "Testrunde",
+      "nummer": 1,
+      "aufgabe": "Bestimme die Koordinaten des Schnittpunktes S der zugehörigen Geraden. I y = 2x − 3; II y = −0,5x + 2",
+      "loesung": {
+        "variablen": "x, y = Koordinaten des Schnittpunkts",
+        "system": [
+          "y = 2x - 3",
+          "y = -0,5x + 2"
+        ],
+        "ergebnis": "S(2 | 1)"
+      }
+    },
+    {
+      "id": "s22-2",
+      "seite": 22,
+      "abschnitt": "Testrunde",
+      "nummer": 2,
+      "aufgabe": "Löse das Gleichungssystem.",
+      "teilaufgaben": [
+        {
+          "teil": "a",
+          "text": "I 2x − y = 20; II 5x + 3y = 61",
+          "loesung": {
+            "variablen": "Lösung des Systems",
+            "system": [
+              "2x - y = 20",
+              "5x + 3y = 61"
+            ],
+            "ergebnis": "x = 11, y = 2"
+          }
+        },
+        {
+          "teil": "b",
+          "text": "I 15x + 2y = 126; II 3x − 4y = 12",
+          "loesung": {
+            "variablen": "Lösung des Systems",
+            "system": [
+              "15x + 2y = 126",
+              "3x - 4y = 12"
+            ],
+            "ergebnis": "x = 8, y = 3"
+          }
+        },
+        {
+          "teil": "c",
+          "text": "I 0,5x + 3y = 2,5; II 1/3 x + 4y = 1 1/3",
+          "loesung": {
+            "variablen": "Lösung des Systems",
+            "system": [
+              "0,5x + 3y = 2,5",
+              "1/3 x + 4y = 1 1/3"
+            ],
+            "ergebnis": "x = 6, y = −1/6"
+          }
+        }
+      ]
+    },
+    {
+      "id": "s22-3",
+      "seite": 22,
+      "abschnitt": "Testrunde",
+      "nummer": 3,
+      "aufgabe": "Berechne den Schnittpunkt der beiden Geraden.",
+      "hinweis": "Aufgabe bezieht sich auf ein Diagramm mit zwei Geraden I und II (Markierungen: 3 auf der y-Achse, 5 auf der x-Achse).",
+      "loesung": {
+        "weg": [
+          "Man liest zwei Punkte jeder Geraden aus dem Diagramm ab, bestimmt die Gleichungen y = mx + b und löst das System (Gleichsetzen)."
+        ],
+        "hinweis": "Das Diagramm liegt mir nicht vor."
+      }
+    },
+    {
+      "id": "s22-4",
+      "seite": 22,
+      "abschnitt": "Testrunde",
+      "nummer": 4,
+      "aufgabe": "Vor sieben Jahren war ein Großvater dreimal so alt wie seine Enkelin. In 18 Jahren ergibt sich beim Großvater das doppelte Alter seiner Enkelin. Wie alt sind beide heute?",
+      "loesung": {
+        "variablen": "x = Großvater, y = Enkelin (Alter heute)",
+        "system": [
+          "x - 7 = 3(y - 7)",
+          "x + 18 = 2(y + 18)"
+        ],
+        "ergebnis": "Der Großvater ist 82, die Enkelin 32 Jahre alt.",
+        "probe": "Vor 7 Jahren: 75 = 3 · 25 ✓. In 18 Jahren: 100 = 2 · 50 ✓"
+      }
+    },
+    {
+      "id": "s22-5",
+      "seite": 22,
+      "abschnitt": "Testrunde",
+      "nummer": 5,
+      "aufgabe": "Hotel- und Tennisaufgabe:",
+      "teilaufgaben": [
+        {
+          "teil": "a",
+          "text": "Ein Sporthotel verfügt über 18 Doppel- und Einzelzimmer mit 30 Betten. Berechne die Anzahl der Doppel- und Einzelzimmer.",
+          "loesung": {
+            "variablen": "x = Doppelzimmer, y = Einzelzimmer",
+            "system": [
+              "x + y = 18",
+              "2x + y = 30"
+            ],
+            "ergebnis": "Es gibt 12 Doppel- und 6 Einzelzimmer."
+          }
+        },
+        {
+          "teil": "b",
+          "text": "Zu dem Hotel gehören 6 Tennisplätze. 18 Personen haben sich für die Plätze angemeldet. Wie viele Doppel- und Einzelspiele können gleichzeitig durchgeführt werden?",
+          "loesung": {
+            "variablen": "x = Doppelspiele, y = Einzelspiele",
+            "system": [
+              "x + y = 6",
+              "4x + 2y = 18"
+            ],
+            "ergebnis": "Es können 3 Doppel- und 3 Einzelspiele gleichzeitig stattfinden."
+          }
+        }
+      ]
+    },
+    {
+      "id": "s22-6",
+      "seite": 22,
+      "abschnitt": "Testrunde",
+      "nummer": 6,
+      "aufgabe": "Sabrina möchte ihr neues Mountainbike ausprobieren. Sie verabredet sich mit ihrer Freundin Melanie in der 60 km entfernten Kreisstadt. Sabrina fährt im Durchschnitt 15 km/h. Melanie fährt 30 Minuten später ab und fährt durchschnittlich 20 km/h.",
+      "teilaufgaben": [
+        {
+          "teil": "a",
+          "text": "Stelle die Aufgabe in einem Diagramm dar.",
+          "loesung": {
+            "weg": [
+              "Wertetabelle: Sabrina s = 15t, Melanie s = 20(t − 0,5) (t in h ab Sabrinas Start). Beide Geraden zeichnen."
+            ]
+          }
+        },
+        {
+          "teil": "b",
+          "text": "Lies aus dem Diagramm ab, nach welcher Zeit und nach wie vielen Kilometern sie sich treffen.",
+          "loesung": {
+            "ergebnis": "Die Geraden schneiden sich bei t = 2 h und s = 30 km."
+          }
+        },
+        {
+          "teil": "c",
+          "text": "Löse die Aufgabe b) rechnerisch mit einem Gleichungssystem.",
+          "loesung": {
+            "variablen": "x = Stunden seit Sabrinas Start, y = Weg in km",
+            "system": [
+              "y = 15x",
+              "y = 20(x - 0,5)"
+            ],
+            "ergebnis": "Melanie holt Sabrina nach 2 h (von Sabrinas Start) bzw. 1,5 h (von ihrem Start) und 30 km ein.",
+            "hinweis": "Annahme: Beide starten am selben Ort."
+          }
+        },
+        {
+          "teil": "d",
+          "text": "Das Mountainbike hat 495 € gekostet. Davon haben Sabrinas Eltern 1/5 bezahlt. Von ihrem Sparbuch konnte Sabrina 320 € hinzutun. Den Differenzbetrag hat sie von ihren Großeltern bekommen. Berechne die Kostenanteile.",
+          "loesung": {
+            "weg": [
+              "Eltern: 495 : 5 = 99 €. Sabrina: 320 €. Großeltern: 495 − 99 − 320 = 76 €."
+            ],
+            "ergebnis": "Eltern 99 €, Sabrina 320 €, Großeltern 76 €."
+          }
+        },
+        {
+          "teil": "e",
+          "text": "Stelle die in d) berechneten Anteile in einem Kreisdiagramm dar.",
+          "loesung": {
+            "weg": [
+              "Winkel = Anteil · 360°: Eltern 99/495 = 20 % → 72°, Sabrina 320/495 ≈ 64,6 % → ≈ 232,7°, Großeltern 76/495 ≈ 15,4 % → ≈ 55,3°."
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "hinweis_loesungen": "Musterlösungen ergänzt. Fehlt die Datenbasis (Diagramm, Karte, Seite 36), steht dort nur der Ansatz."
+}

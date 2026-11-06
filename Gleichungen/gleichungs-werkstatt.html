@@ -40,13 +40,15 @@ input{font:inherit;font-size:1.2rem;padding:.4em .6em;border:2px solid var(--ink
 .fb{font-weight:800;margin:8px 0;min-height:1.5em}.fb.ok{color:var(--ok)}.fb.bad{color:var(--bad);animation:sh .3s}
 @keyframes sh{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 @media(prefers-reduced-motion:reduce){.fb.bad{animation:none}}
-canvas{width:100%;height:auto;border:2px solid var(--ink);border-radius:10px;background:var(--card);margin-top:8px}
+canvas{width:100%;height:auto;border:2px solid var(--ink);border-radius:10px;background:var(--card);margin-top:8px;touch-action:none;cursor:grab}canvas:active{cursor:grabbing}.zb{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:10px;font-size:.85rem;color:var(--mut)}.zb .pill{font-size:.85rem}
 .bar{height:12px;border:2px solid var(--ink);border-radius:8px;overflow:hidden;background:var(--card)}
 .bar i{display:block;height:100%;background:var(--ok);transition:width .4s}
 .sl{display:grid;grid-template-columns:auto 1fr 3.5em;gap:8px;align-items:center}
 .sl input{padding:0;border:0}
 .hint{background:var(--tip);padding:8px 12px;border-radius:8px;margin:6px 0}
 .top{display:flex;justify-content:space-between;color:var(--mut);font-weight:800}
+html{-webkit-text-size-adjust:100%}button,input{touch-action:manipulation}
+@media(max-width:560px){body{background-size:20px 20px}.wrap{padding:10px}h1{font-size:1.5rem}header small{display:none}.acts{width:100%;justify-content:space-between}.card{padding:13px;box-shadow:3px 3px 0 var(--ink);border-radius:12px}.btn{min-height:46px;padding:.5em .8em}.row .btn{flex:1 1 40%}.pill{min-height:38px}.pills{gap:6px}nav button{flex:1;padding:.6em .2em;min-height:46px;font-size:.92rem}.eqs{font-size:1.1rem;padding:8px 12px;overflow-x:auto}.ins label{min-width:120px}.sl{grid-template-columns:7.5em 1fr 2.8em;font-size:.85rem}.sl input{height:34px}.steps{padding-left:1.1em}.steps li{overflow-wrap:anywhere}}
 </style></head><body><div class="wrap">
 <header><div><h1>📐 Gleichungs-Werkstatt</h1><small>Lineare Gleichungssysteme üben – nach den Unterlagen von Dr. Dagmar Salber</small></div>
 <div class="acts"><span class="pill" id="pts">⭐ 0</span><button class="btn" id="th" title="Hell/Dunkel">🌓</button><button class="btn main" id="fs">⛶ Vollbild</button></div></header>
@@ -73,7 +75,7 @@ if(k=='e'){const kk=ad(F(a2),mu(F(b2),m1)),r=ad(F(c2),ng(mu(F(b2),n1)));L.push(`
 if(k=='a'){L.push(`Ziel: x soll wegfallen. I mit ${P(F(a2))} und II mit ${P(F(a1))} multiplizieren:<br>I·${P(F(a2))}: ${EQ(a1*a2,b1*a2,c1*a2)}<br>II·${P(F(a1))}: ${EQ(a1*a2,b2*a1,c2*a1)}`,`Subtrahieren (I − II):<br>${EQ(0,b1*a2-b2*a1,c1*a2-c2*a1)} → <b>y = ${fs(y)}</b>`,`y in I einsetzen:<br>${a1}·x + ${b1}·${P(y)} = ${c1} → <b>x = ${fs(x)}</b>`,pb)}
 return L}
 const SH=(k,e)=>'<ol class="steps">'+steps(k,e).map(s=>`<li>${s}</li>`).join('')+'</ol>';
-function draw(cv,L,pt,x0,x1,y0,y1){cv.width=720;cv.height=440;const g=cv.getContext('2d'),W=720,H=440,cs=getComputedStyle(document.documentElement),col=n=>cs.getPropertyValue(n).trim();
+function draw(cv,L,pt,x0,x1,y0,y1){const W=innerWidth<560?400:720,H=innerWidth<560?400:440;cv.width=W;cv.height=H;const g=cv.getContext('2d'),cs=getComputedStyle(document.documentElement),col=n=>cs.getPropertyValue(n).trim();
 const X=x=>(x-x0)/(x1-x0)*W,Y=y=>H-(y-y0)/(y1-y0)*H,st=r=>{const t=r/8,p=10**Math.floor(Math.log10(t));return[1,2,5,10].map(k=>k*p).find(s=>s>=t)};
 g.font='13px Nunito,sans-serif';g.lineWidth=1;
 const sx=st(x1-x0),sy=st(y1-y0);g.strokeStyle=col('--gr');g.fillStyle=col('--mut');
@@ -82,8 +84,23 @@ for(let v=Math.ceil(y0/sy)*sy;v<=y1;v+=sy){g.beginPath();g.moveTo(0,Y(v));g.line
 g.strokeStyle=col('--ink');g.lineWidth=2;g.beginPath();g.moveTo(X(0),0);g.lineTo(X(0),H);g.moveTo(0,Y(0));g.lineTo(W,Y(0));g.stroke();
 g.lineWidth=3.5;L.forEach((l,i)=>{g.strokeStyle=col(l.c);g.beginPath();g.moveTo(X(x0),Y(l.m*x0+l.n));g.lineTo(X(x1),Y(l.m*x1+l.n));g.stroke();g.fillStyle=col(l.c);g.font='bold 15px Nunito,sans-serif';g.fillText(l.l,12,24+i*20)});
 if(pt){g.fillStyle=col('--card');g.strokeStyle=col('--ink');g.lineWidth=3;g.beginPath();g.arc(X(pt[0]),Y(pt[1]),8,0,7);g.fill();g.stroke();g.fillStyle=col('--ink');g.font='bold 15px Nunito,sans-serif';const t=`S(${+pt[0].toFixed(2)} | ${+pt[1].toFixed(2)})`;g.fillText(t,Math.min(W-g.measureText(t).width-6,X(pt[0])+12),Y(pt[1])-12)}}
+function zc(cv,L,pt,x0,x1,y0,y1){const o=[x0,x1,y0,y1];let v=[...o],ld=0;const ps=new Map(),rd=()=>draw(cv,L,pt,...v);
+cv.insertAdjacentHTML('beforebegin','<div class="zb"><button class="pill" data-z="in">＋ Zoom</button><button class="pill" data-z="out">－ Zoom</button><button class="pill" data-z="rs">⟲ Zurücksetzen</button><span>Mausrad oder zwei Finger zoomen, Ziehen verschiebt</span></div>');
+const px=e=>{const r=cv.getBoundingClientRect();return[(e.clientX-r.left)*cv.width/r.width,(e.clientY-r.top)*cv.height/r.height]};
+const dx=p=>v[0]+p[0]/cv.width*(v[1]-v[0]),dy=p=>v[3]-p[1]/cv.height*(v[3]-v[2]);
+const zm=(f,ax,ay)=>{const n=[ax-(ax-v[0])*f,ax+(v[1]-ax)*f,ay-(ay-v[2])*f,ay+(v[3]-ay)*f];if(n[1]-n[0]<.02||n[1]-n[0]>1e5)return;v=n;rd()};
+const mid=()=>[(v[0]+v[1])/2,(v[2]+v[3])/2];
+cv.previousElementSibling.querySelectorAll('[data-z]').forEach(b=>b.onclick=()=>{const k=b.dataset.z,m=mid();if(k=='rs'){v=[...o];rd()}else zm(k=='in'?.7:1/.7,m[0],m[1])});
+cv.onpointerdown=e=>{cv.setPointerCapture(e.pointerId);ps.set(e.pointerId,px(e));ld=0};
+cv.onpointermove=e=>{if(!ps.has(e.pointerId))return;const p=px(e),q=ps.get(e.pointerId);ps.set(e.pointerId,p);
+if(ps.size==1){const w=v[1]-v[0],h=v[3]-v[2];v=[v[0]-(p[0]-q[0])/cv.width*w,v[1]-(p[0]-q[0])/cv.width*w,v[2]+(p[1]-q[1])/cv.height*h,v[3]+(p[1]-q[1])/cv.height*h];rd()}
+else{const[a,b]=[...ps.values()],d=Math.hypot(a[0]-b[0],a[1]-b[1]),m=[(a[0]+b[0])/2,(a[1]+b[1])/2];if(ld&&d)zm(ld/d,dx(m),dy(m));ld=d}};
+cv.onpointerup=cv.onpointercancel=e=>{ps.delete(e.pointerId);ld=0};
+cv.addEventListener('wheel',e=>{e.preventDefault();const p=px(e);zm(e.deltaY>0?1.15:1/1.15,dx(p),dy(p))},{passive:false});
+cv.ondblclick=()=>{v=[...o];rd()};
+rd();return{upd:(L2,p2)=>{L=L2;pt=p2;rd()}}}
 function drawTask(cv,e){const[a1,b1,c1,a2,b2,c2]=e,s=sol(e),x=s.x[0]/s.x[1],y=s.y[0]/s.y[1],ax=Math.max(Math.abs(x),3)*1.5+1,ay=Math.max(Math.abs(y),3)*1.5+1;
-draw(cv,[{m:-a1/b1,n:c1/b1,c:'--l1',l:'I'},{m:-a2/b2,n:c2/b2,c:'--l2',l:'II'}],[x,y],-ax,ax,-ay,ay)}
+zc(cv,[{m:-a1/b1,n:c1/b1,c:'--l1',l:'I'},{m:-a2/b2,n:c2/b2,c:'--l2',l:'II'}],[x,y],-ax,ax,-ay,ay)}
 const MN={g:'📈 Grafisch',q:'🟰 Gleichsetzen',e:'🔁 Einsetzen',a:'➕ Addition'};
 const MS={g:'Zwei lineare Gleichungen bilden ein lineares Gleichungssystem. Die Koordinaten des Schnittpunkts der beiden Geraden sind die Lösung.',q:'Beim Gleichsetzungsverfahren werden beide Gleichungen nach derselben Variablen umgeformt. Die rechten Seiten sind gleich – übrig bleibt eine Gleichung mit nur einer Variablen.',e:'Beim Einsetzungsverfahren wird eine Gleichung nach einer Variablen aufgelöst. Der Term wird in die andere Gleichung eingesetzt – wieder bleibt nur eine Variable.',a:'Beim Additions- bzw. Subtraktionsverfahren werden die Gleichungen so umgeformt, dass beim Addieren oder Subtrahieren eine Variable wegfällt.'};
 const HT={g:['Forme beide Gleichungen nach y um (y = m·x + b).','Zeichne die Geraden: y-Achsenabschnitt b, dann Steigung m abtragen.','Lies die Koordinaten des Schnittpunkts ab.'],q:['Beide Gleichungen nach y auflösen und die rechten Seiten gleichsetzen.','Löse die entstandene Gleichung: x-Terme links, Zahlen rechts.','Setze x in eine Gleichung ein, um y zu erhalten. Dann Probe!'],e:['Suche eine Gleichung, die du leicht nach einer Variablen auflösen kannst.','Setze den Term in die andere Gleichung ein – dann steckt nur noch eine Variable drin.','Berechne die zweite Variable durch Einsetzen. Dann Probe!'],a:['Multipliziere die Gleichungen so, dass bei x (oder y) gleiche Zahlen stehen.','Subtrahiere (oder addiere) die Gleichungen – eine Variable fällt weg.','Berechne die zweite Variable durch Einsetzen. Dann Probe!']};
@@ -102,11 +119,14 @@ sp([2,1,-5,-1,1,4],'y = −2x − 5','y = x + 4'),sp([-3,1,1,-1,1,-3],'y = 3x + 
 [[-8,5,165,-9,5,130],'Herr Wendt will einen Pkw mieten. Funnycar: 33 € pro Tag + 1,60 € pro km. Suncar: 26 € pro Tag + 1,80 € pro km. Bei wie vielen km sind beide Angebote gleich teuer – und was kostet es dann?',['y = 1,6x + 33','y = 1,8x + 26'],'Strecke x (km)','Kosten y (€)'],
 [[-8,5,150,-9,5,130],'Sonderaktion: Funnycar senkt die Grundgebühr auf 30 €. Bei welcher Strecke sind beide Angebote jetzt gleichwertig?',['y = 1,6x + 30','y = 1,8x + 26'],'Strecke x (km)','Kosten y (€)'],
 [[-16,10,330,-17,10,260],'Aktionswoche: Suncar kostet nur noch 1,70 € pro km. Ab welcher Strecke ist Funnycar (33 € + 1,60 €/km) günstiger? Lohnt sich Suncar bei 50 bis 65 km?',['y = 1,6x + 33','y = 1,7x + 26'],'Strecke x (km)','Kosten y (€)'],
-[[-7,1,-21,-4,1,-12]],[[-3,1,-5,-2,1,-3]],[[-8,1,-11,-5,1,-5]],[[-4,1,-5,4,1,3]],[[-1,2,-6,1,2,2],'Löse das Gleichungssystem (beide Gleichungen vorher mit 2 multipliziert).',['y = 0,5x − 3','y = −0,5x + 1']]]},
+[[-7,1,-21,-4,1,-12]],[[-3,1,-5,-2,1,-3]],[[-8,1,-11,-5,1,-5]],[[-4,1,-5,4,1,3]],[[-1,2,-6,1,2,2],'Löse das Gleichungssystem (beide Gleichungen vorher mit 2 multipliziert).',['y = 0,5x − 3','y = −0,5x + 1']],
+[[-8,5,165,-9,5,130],'Probe zur Funnycar-Aufgabe: Setze die Lösung x = 35 km in beide Gleichungen ein. Welche Kosten ergeben sich jeweils? (Beide Ergebnisse müssen gleich sein.)',['y = 1,6·35 + 33','y = 1,8·35 + 26'],'Kosten Funnycar (€)','Kosten Suncar (€)',{x:F(89),y:F(89)}]]},
 {n:'Einsetzen',i:'🔁',m:'e',d:E,t:[[[1,1,19,-1,1,1]],[[2,1,11,-13,1,-4]],[[-7,1,-14,3,1,16]],[[-13,1,-3,5,1,15]],[[5,-1,-14,14,1,-5]],[[1,1,0,1,-1,10]],[[1,2,25,1,-6,-39]],[[1,4,30,1,-5,-24]],[[1,2,-7,1,-8,63]],[[-1,2,12,1,-14,0]],
 [[3,5,8,11,1,12],'Löse mit geschickter Umstellung einer der beiden Gleichungen.'],[[9,14,13,1,5,-2],'Löse mit geschickter Umstellung einer der beiden Gleichungen.'],[[15,-22,157,11,-1,327],'Löse mit geschickter Umstellung einer der beiden Gleichungen.'],
-[[5,6,43,-7,9,-8],'Multipliziere beide Gleichungen mit geeigneten Zahlen, sodass eine günstig in die andere eingesetzt werden kann.'],[[8,-5,11,12,-11,-15],'Multipliziere beide Gleichungen mit geeigneten Zahlen, sodass eine günstig in die andere eingesetzt werden kann.'],[[21,-16,88,28,-43,9],'Multipliziere beide Gleichungen mit geeigneten Zahlen, sodass eine günstig in die andere eingesetzt werden kann.'],[[17,-20,94,-9,25,-93],'Multipliziere beide Gleichungen mit geeigneten Zahlen, sodass eine günstig in die andere eingesetzt werden kann.']]},
-{n:'Addition',i:'➕',m:'a',d:A,t:[[[2,2,8,-4,5,22],'Forme eine Gleichung um und löse mit dem Additionsverfahren. (Das Ergebnis ist hier ein Bruch – das ist so gewollt.)'],[[3,-7,-15,1,14,44]],[[-4,-5,-18,2,-3,-2]],[[7,-8,-4,3,-2,4]],[[3,3,9,1,2,4],'Forme eine Gleichung um und löse mit dem Subtraktionsverfahren.'],[[4,-5,1,2,1,-3],'Forme eine Gleichung um und löse mit dem Subtraktionsverfahren.'],[[-8,1,20,-3,5,-11],'Forme eine Gleichung um und löse mit dem Subtraktionsverfahren.'],[[7,-8,-4,9,-1,7],'Forme eine Gleichung um und löse mit dem Subtraktionsverfahren. (Bruch als Ergebnis.)'],[[3,1,-1,4,3,2],'Löse mit allen vier Verfahren – Gleichsetzen, Einsetzen, Addition, Subtraktion.'],[[1,1,12,3,2,32],'Löse mit allen vier Verfahren – Gleichsetzen, Einsetzen, Addition, Subtraktion.']]},
+[[5,6,43,-7,9,-8],'Multipliziere beide Gleichungen mit geeigneten Zahlen, sodass eine günstig in die andere eingesetzt werden kann.'],[[8,-5,11,12,-11,-15],'Multipliziere beide Gleichungen mit geeigneten Zahlen, sodass eine günstig in die andere eingesetzt werden kann.'],[[21,-16,88,28,-43,9],'Multipliziere beide Gleichungen mit geeigneten Zahlen, sodass eine günstig in die andere eingesetzt werden kann.'],[[17,-20,94,-9,25,-93],'Multipliziere beide Gleichungen mit geeigneten Zahlen, sodass eine günstig in die andere eingesetzt werden kann.'],
+[[15,8,76,1,-2,0],'Kerstin kauft Grußkarten für 7,60 €: doppelt so viele mit Umschlag (1,50 €) wie ohne Umschlag (0,80 €). Wie viele Karten sind das jeweils?',['1,5x + 0,8y = 7,6','x = 2y'],'Karten mit Umschlag (x)','Karten ohne Umschlag (y)']]},
+{n:'Addition',i:'➕',m:'a',d:A,t:[[[2,2,8,-4,5,22],'Forme eine Gleichung um und löse mit dem Additionsverfahren. (Das Ergebnis ist hier ein Bruch – das ist so gewollt.)'],[[3,-7,-15,1,14,44]],[[-4,-5,-18,2,-3,-2]],[[7,-8,-4,3,-2,4]],[[3,3,9,1,2,4],'Forme eine Gleichung um und löse mit dem Subtraktionsverfahren.'],[[4,-5,1,2,1,-3],'Forme eine Gleichung um und löse mit dem Subtraktionsverfahren.'],[[-8,1,20,-3,5,-11],'Forme eine Gleichung um und löse mit dem Subtraktionsverfahren.'],[[7,-8,-4,9,-1,7],'Forme eine Gleichung um und löse mit dem Subtraktionsverfahren. (Bruch als Ergebnis.)'],[[3,1,-1,4,3,2],'Löse mit allen vier Verfahren – Gleichsetzen, Einsetzen, Addition, Subtraktion.'],[[1,1,12,3,2,32],'Löse mit allen vier Verfahren – Gleichsetzen, Einsetzen, Addition, Subtraktion.'],
+[[556,3375,67422,556,3450,68772],'Zwei Kunstlehrer bestellen gleich viele Leinwände (5,56 € pro Stück). Herr Breuer nimmt Metallstaffeleien (33,75 €), und zwar 3 mehr als Herr Dohmen, der Holzstaffeleien (34,50 €) bestellt. Breuer zahlt 775,47 €, Dohmen 687,72 €. Wie viele Leinwände und Holzstaffeleien bestellt Herr Dohmen? (Gleichungen mit 100 multipliziert lösen.)',['5,56x + 33,75·(y + 3) = 775,47','5,56x + 34,5y = 687,72'],'Leinwände (x)','Holzstaffeleien (y)']]},
 {n:'Zufall',i:'🎲',m:'a',g:1,d:'',t:[]}];
 const newSet=()=>{C[4].t=Array.from({length:10},gen)};newSet();
 let S={d:{}};try{S=JSON.parse(localStorage.getItem('lgs'))||S}catch(e){}
@@ -119,7 +139,7 @@ const ANNE=[1,1,8,1,2,10];
 function rLearn(){$('#learn').innerHTML=`<div class="card"><h2>Ein Beispiel, vier Wege</h2><p>Anne wechselt am Postschalter einen 10-€-Schein und erhält 8 Münzen (1 € und 2 €). Wie viele Münzen jeder Sorte?<br><b>I</b> x + y = 8 &nbsp; <b>II</b> x + 2y = 10</p>
 <div class="pills">${Object.keys(MN).map(k=>`<button class="pill ${k==lm?'on':''}" data-m="${k}">${MN[k]}</button>`).join('')}</div><div class="tip">${MS[lm]}</div>${SH(lm,ANNE)}<canvas id="lc"></canvas><p><b>Ergebnis:</b> Anne erhält sechs 1-€- und zwei 2-€-Münzen.</p></div>`;
 document.querySelectorAll('#learn [data-m]').forEach(b=>b.onclick=()=>{lm=b.dataset.m;rLearn()});drawTask($('#lc'),ANNE)}
-function rPrac(){const c=C[ci],n=c.t.length,t=c.t[Math.min(ti,n-1)],e=t[0],[a1,b1,c1,a2,b2,c2]=e,s=sol(e),key=ci+'-'+ti;used=0;hn=0;sm=c.m;
+function rPrac(){const c=C[ci],n=c.t.length,t=c.t[Math.min(ti,n-1)],e=t[0],[a1,b1,c1,a2,b2,c2]=e,s=t[5]||sol(e),key=ci+'-'+ti;used=0;hn=0;sm=c.m;
 const q=t[2]||(c.y?[LN(F(-a1,b1),F(c1,b1)),LN(F(-a2,b2),F(c2,b2))]:[EQ(a1,b1,c1),EQ(a2,b2,c2)]);
 $('#practice').innerHTML=`<div class="pills">${C.map((x,i)=>`<button class="pill ${i==ci?'on':''}" data-c="${i}">${x.i} ${x.n} (${cnt(i)}/${x.t.length})</button>`).join('')}</div>
 <div class="card"><div class="top"><span>Aufgabe ${ti+1} von ${n}</span><span>${S.d[key]?'✅ gelöst':''}</span></div>
@@ -143,14 +163,14 @@ $('#chk').onclick=ch;document.querySelectorAll('#practice input').forEach(i=>i.o
 function resetZ(){newSet();Object.keys(S.d).filter(k=>k.startsWith('4-')).forEach(k=>delete S.d[k]);save();pts()}
 function rSol(e){$('#sol').innerHTML=`<h3>Lösungsweg</h3><div class="pills">${Object.keys(MN).map(k=>`<button class="pill ${k==sm?'on':''}" data-s="${k}">${MN[k]}</button>`).join('')}</div>${SH(sm,e)}<canvas id="sc"></canvas>`;
 document.querySelectorAll('#sol [data-s]').forEach(b=>b.onclick=()=>{sm=b.dataset.s;rSol(e)});drawTask($('#sc'),e)}
-const sv={m1:1,n1:2,m2:-.5,n2:5};
+const sv={m1:1,n1:2,m2:-.5,n2:5};let lz;
 function rLab(){const f=(k,l)=>`<div class="sl"><span>${l}</span><input type="range" min="-8" max="8" step=".5" value="${sv[k]}" data-k="${k}"><b id="v${k}">${sv[k]}</b></div>`;
 $('#lab').innerHTML=`<div class="card"><h2>Grafik-Labor</h2><p>Verändere die Geraden <b style="color:var(--l1)">I</b> und <b style="color:var(--l2)">II</b> und beobachte den Schnittpunkt. Parallele Geraden haben keinen Schnittpunkt – das Gleichungssystem hat dann keine Lösung.</p>
 ${f('m1','I: Steigung m')}${f('n1','I: y-Achsenabschnitt b')}${f('m2','II: Steigung m')}${f('n2','II: y-Achsenabschnitt b')}<div class="eqs" id="le"></div><canvas id="lcv"></canvas></div>`;
-document.querySelectorAll('#lab input').forEach(i=>i.oninput=()=>{sv[i.dataset.k]=+i.value;ul()});ul()}
+lz=zc($('#lcv'),[],null,-10,10,-10,10);document.querySelectorAll('#lab input').forEach(i=>i.oninput=()=>{sv[i.dataset.k]=+i.value;ul()});ul()}
 function ul(){const{m1,n1,m2,n2}=sv;for(const k in sv)$('#v'+k).textContent=sv[k];let pt=null,t;
 if(m1==m2)t=n1==n2?'Die Geraden liegen aufeinander: unendlich viele Lösungen.':'Die Geraden sind parallel: keine Lösung.';else{const x=(n2-n1)/(m1-m2),y=m1*x+n1;pt=[x,y];t=`Schnittpunkt S(${+x.toFixed(2)} | ${+y.toFixed(2)}) → Lösung: x = ${+x.toFixed(2)}, y = ${+y.toFixed(2)}`}
-$('#le').innerHTML=`<b>I</b> y = ${m1}x + ${n1} &nbsp; <b>II</b> y = ${m2}x + ${n2}<br>${t}`;draw($('#lcv'),[{m:m1,n:n1,c:'--l1',l:'I'},{m:m2,n:n2,c:'--l2',l:'II'}],pt,-10,10,-10,10)}
+$('#le').innerHTML=`<b>I</b> y = ${m1}x + ${n1} &nbsp; <b>II</b> y = ${m2}x + ${n2}<br>${t}`;lz.upd([{m:m1,n:n1,c:'--l1',l:'I'},{m:m2,n:n2,c:'--l2',l:'II'}],pt)}
 const view=t=>{['learn','practice','lab'].forEach(i=>$('#'+i).hidden=i!=t);document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t==t));({learn:rLearn,practice:rPrac,lab:rLab})[t]()};
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>view(b.dataset.t));
 $('#fs').onclick=()=>{const on=document.body.classList.toggle('focus');try{if(on&&!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});else if(!on&&document.fullscreenElement)document.exitFullscreen()}catch(e){}$('#fs').textContent=on?'⮌ Normal':'⛶ Vollbild'};

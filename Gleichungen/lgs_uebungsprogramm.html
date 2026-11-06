@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="de" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lineare Gleichungssysteme - Lern- & Übungsprogramm</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- KaTeX CSS & JS for LaTeX Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            900: '#1e3a8a',
+                        },
+                        ostbelgien: {
+                            blue: '#003366',
+                            red: '#e30613',
+                            yellow: '#ffcc00'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .theme-dark {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a388;
+            --border-color: #334155;
+            --accent-color: #3b82f6;
+            --accent-hover: #2563eb;
+        }
+        .theme-light {
+            --bg-primary: #88badc;
+            --bg-secondary: #aaaaff;
+            --bg-card: #3333ee;
+            --text-main: #441199;
+            --text-muted: #94548b;
+            --border-color: #e2e8f0;
+            --accent-color: #3563eb;
+            --accent-hover: #1d4ed8;          
+						--text-main: #e8dafc;
+            --text-muted: #94a388;
+        }
+        .theme-ostbelgien {
+            --bg-primary: #0a192f;
+            --bg-secondary: #112240;
+            --bg-card: #1d3557;
+            --text-main: #f1faee;
+            --text-muted: #a8dadc;
+            --border-color: #457b9d;
+            --accent-color: #e63946;
+            --accent-hover: #c1121f;
+        }
+        .theme-neon {
+            --bg-primary: #050505;
+            --bg-secondary: #121212;
+            --bg-card: #1a1a1a;
+            --text-main: #00ffcc;
+            --text-muted: #ff007f;
+            --border-color: #333333;
+            --accent-color: #ff007f;
+            --accent-hover: #d6006b;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .custom-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        #graphCanvas {
+            touch-action: none;
+        }
+
+        input[type="number"] {
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body class="theme-dark min-h-screen flex flex-col font-sans selection:bg-blue-500 selection:text-white pb-6">
+
+    <!-- Top Navigation Header -->
+    <header class="sticky top-0 z-50 backdrop-blur-md bg-opacity-90 custom-card border-b border-t-0 border-x-0 px-3 sm:px-4 py-2.5 shadow-lg">
+        <div class="max-w-7xl mx-auto flex justify-between items-center gap-2">
+            <!-- Logo & Title -->
+            <div class="flex items-center space-x-2.5">
+                <div class="bg-blue-600 text-white p-2 sm:p-2.5 rounded-xl shadow-md flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-chart-line text-lg sm:text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-sm sm:text-lg leading-tight tracking-tight">Lineare Gleichungssysteme</h1>
+                    <p class="text-[10px] sm:text-xs text-slate-400">Lineare Gleichungssysteme üben – nach den Unterlagen von Dr. Dagmar Salber &bull; AHS Ostbelgien</p>
+                </div>
+            </div>
+
+            <!-- Stats & Controls -->
+            <div class="flex items-center gap-2">
+                <div class="bg-slate-900/80 border border-slate-700/60 rounded-xl px-3 py-1.5 flex items-center gap-2">
+                    <i class="fa-solid fa-trophy text-yellow-400 text-xs sm:text-sm"></i>
+                    <span id="userScore" class="font-bold text-xs sm:text-sm">0</span>
+                    <span class="text-[10px] text-slate-400 hidden sm:inline">Pkt</span>
+                </div>
+
+                <!-- Theme Switcher -->
+                <select onchange="changeTheme(this.value)" class="bg-slate-900 border border-slate-700 text-xs rounded-xl px-2 py-1.5 focus:outline-none hidden sm:block">
+                    <option value="theme-dark">Dark</option>
+                    <option value="theme-light">Light</option>
+                    <option value="theme-ostbelgien">Ostbelgien</option>
+                    <option value="theme-neon">Neon</option>
+                </select>
+
+                <!-- Fullscreen Button -->
+                <button onclick="toggleFullscreen()" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 p-2 rounded-xl text-xs sm:text-sm transition flex items-center justify-center min-w-[36px] min-h-[36px]">
+                    <i id="fullscreenIcon" class="fa-solid fa-expand"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Nav Tabs -->
+        <nav class="max-w-7xl mx-auto mt-2.5 flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
+            <button id="tab-exercises" onclick="switchTab('exercises')" class="tab-btn bg-blue-600 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition min-h-[36px]">
+                <i class="fa-solid fa-pen-to-square mr-1.5"></i>Übungen (<span id="taskCount">0</span>)
+            </button>
+            <button id="tab-plotter" onclick="switchTab('plotter')" class="tab-btn text-slate-400 hover:text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition min-h-[36px]">
+                <i class="fa-solid fa-square-root-variable mr-1.5"></i>2D Graph-Plotter
+            </button>
+            <button id="tab-theory" onclick="switchTab('theory')" class="tab-btn text-slate-400 hover:text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition min-h-[36px]">
+                <i class="fa-solid fa-book-open mr-1.5"></i>Theorie & Verfahren
+            </button>
+            <button id="tab-calculator" onclick="switchTab('calculator')" class="tab-btn text-slate-400 hover:text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition min-h-[36px]">
+                <i class="fa-solid fa-calculator mr-1.5"></i>LGS Sandbox Rechner
+            </button>
+        </nav>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto px-3 sm:px-4 pt-4 flex-1 w-full">
+
+        <!-- TAB 1: ÜBUNGEN -->
+        <section id="content-exercises" class="tab-content space-y-4">
+            <!-- Filter Bar -->
+            <div class="flex items-center justify-between gap-2 overflow-x-auto no-scrollbar py-1">
+                <div class="flex gap-1.5">
+                    <button onclick="filterTasks('all')" class="task-filter-btn bg-blue-600 text-white px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap min-h-[36px]">
+                        Alle (<span id="visibleTaskCount">0</span>)
+                    </button>
+                    <button onclick="filterTasks('text')" class="task-filter-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap border border-slate-700/60 min-h-[36px]">
+                        Textaufgaben
+                    </button>
+                    <button onclick="filterTasks('graphic')" class="task-filter-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap border border-slate-700/60 min-h-[36px]">
+                        Grafisch
+                    </button>
+                    <button onclick="filterTasks('equal')" class="task-filter-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap border border-slate-700/60 min-h-[36px]">
+                        Gleichsetzung
+                    </button>
+                    <button onclick="filterTasks('substitute')" class="task-filter-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap border border-slate-700/60 min-h-[36px]">
+                        Einsetzung
+                    </button>
+                    <button onclick="filterTasks('addition')" class="task-filter-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap border border-slate-700/60 min-h-[36px]">
+                        Addition/Subtraktion
+                    </button>
+                </div>
+            </div>
+
+            <!-- Grid container for generated exercise cards -->
+            <div id="exerciseGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Dynamically generated via JS -->
+            </div>
+        </section>
+
+        <!-- TAB 2: INTERAKTIVER GRAPH PLOTTER -->
+        <section id="content-plotter" class="tab-content hidden space-y-4">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <!-- Input Panel -->
+                <div class="custom-card p-4 rounded-2xl space-y-4">
+                    <h3 class="font-bold text-base border-b border-slate-700/60 pb-2 flex items-center justify-between">
+                        <span>Geradengleichungen</span>
+                        <span id="plotterIntersection" class="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded-md border border-emerald-500/20 font-mono">S(x|y)</span>
+                    </h3>
+
+                    <!-- Line 1 Form (Blue) -->
+                    <div class="p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl space-y-2">
+                        <div class="text-xs font-bold text-blue-400">Gerade 1 (Blau): y = m₁·x + b₁</div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-[11px] text-slate-400 block">Steigung m₁</label>
+                                <input type="number" step="any" id="plotter_m1" value="1" oninput="updatePlotter()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs min-h-[40px]">
+                            </div>
+                            <div>
+                                <label class="text-[11px] text-slate-400 block">Achsenabschnitt b₁</label>
+                                <input type="number" step="any" id="plotter_b1" value="2" oninput="updatePlotter()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs min-h-[40px]">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Line 2 Form (Amber) -->
+                    <div class="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl space-y-2">
+                        <div class="text-xs font-bold text-amber-400">Gerade 2 (Orange): y = m₂·x + b₂</div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-[11px] text-slate-400 block">Steigung m₂</label>
+                                <input type="number" step="any" id="plotter_m2" value="-1" oninput="updatePlotter()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs min-h-[40px]">
+                            </div>
+                            <div>
+                                <label class="text-[11px] text-slate-400 block">Achsenabschnitt b₂</label>
+                                <input type="number" step="any" id="plotter_b2" value="5" oninput="updatePlotter()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs min-h-[40px]">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Canvas Touch Controls -->
+                    <div class="flex gap-2 pt-2">
+                        <button onclick="plotterState.scale *= 1.2; drawGraph();" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 py-2 rounded-xl text-xs font-semibold min-h-[44px]">
+                            <i class="fa-solid fa-magnifying-glass-plus mr-1"></i> Zoom +
+                        </button>
+                        <button onclick="plotterState.scale *= 0.8; drawGraph();" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 py-2 rounded-xl text-xs font-semibold min-h-[44px]">
+                            <i class="fa-solid fa-magnifying-glass-minus mr-1"></i> Zoom -
+                        </button>
+                        <button onclick="resetPlotterZoom()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-3 py-2 rounded-xl text-xs font-semibold min-h-[44px]">
+                            <i class="fa-solid fa-rotate-left"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Canvas Display Container -->
+                <div class="lg:col-span-2 custom-card rounded-2xl p-2 relative h-[380px] sm:h-[480px] flex items-center justify-center overflow-hidden">
+                    <canvas id="graphCanvas" class="w-full h-full rounded-xl cursor-grab active:cursor-grabbing"></canvas>
+                    <div class="absolute bottom-4 left-4 bg-slate-900/90 border border-slate-700/80 backdrop-blur-sm rounded-lg px-3 py-1.5 text-[10px] text-slate-400 pointer-events-none">
+                        Wischen/Ziehen zum Verschieben | Zweifinger-Zoom oder Buttons
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: THEORIE UND VERFAHREN (ERWEITERT) -->
+        <section id="content-theory" class="tab-content hidden space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <!-- Sidebar Nav -->
+                <div class="space-y-2">
+                    <button id="btn-sec-intro" onclick="openTheorySection('sec-intro')" class="theory-nav-btn w-full text-left bg-blue-600 text-white px-3.5 py-2.5 rounded-xl text-xs font-semibold transition min-h-[44px]">
+                        1. Grundbegriffe & Geometrie
+                    </button>
+                    <button id="btn-sec-equal" onclick="openTheorySection('sec-equal')" class="theory-nav-btn w-full text-left bg-slate-800 text-slate-400 hover:text-white px-3.5 py-2.5 rounded-xl text-xs font-semibold transition min-h-[44px]">
+                        2. Gleichsetzungsverfahren
+                    </button>
+                    <button id="btn-sec-substitute" onclick="openTheorySection('sec-substitute')" class="theory-nav-btn w-full text-left bg-slate-800 text-slate-400 hover:text-white px-3.5 py-2.5 rounded-xl text-xs font-semibold transition min-h-[44px]">
+                        3. Einsetzungsverfahren
+                    </button>
+                    <button id="btn-sec-addition" onclick="openTheorySection('sec-addition')" class="theory-nav-btn w-full text-left bg-slate-800 text-slate-400 hover:text-white px-3.5 py-2.5 rounded-xl text-xs font-semibold transition min-h-[44px]">
+                        4. Additionsverfahren
+                    </button>
+                    <button id="btn-sec-special" onclick="openTheorySection('sec-special')" class="theory-nav-btn w-full text-left bg-slate-800 text-slate-400 hover:text-white px-3.5 py-2.5 rounded-xl text-xs font-semibold transition min-h-[44px]">
+                        5. Sonderfälle & Anzahl
+                    </button>
+                </div>
+
+                <!-- Theory Details Container -->
+                <div class="md:col-span-3 custom-card p-5 rounded-2xl max-h-[70vh] overflow-y-auto space-y-4">
+                    
+                    <!-- 1. Intro -->
+                    <div id="sec-intro" class="theory-content space-y-3">
+                        <h3 class="text-base font-bold text-blue-400">1. Grundbegriffe & Graphische Deutung</h3>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            Ein <strong>lineares Gleichungssystem (LGS)</strong> besteht aus zwei oder mehreren linearen Gleichungen mit mehreren Unbekannten (in der Regel $x$ und $y$). 
+                            Jede lineare Gleichung mit zwei Variablen beschreibt geometrisch eine <strong>Gerade</strong> im Koordinatensystem.
+                        </p>
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 font-mono text-xs text-slate-300 space-y-1">
+                            <div>I:  $y = m_1 \cdot x + b_1$  (Gerade 1)</div>
+                            <div>II: $y = m_2 \cdot x + b_2$  (Gerade 2)</div>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-300">
+                            Die Lösung des LGS ist der <strong>Schnittpunkt $S(x|y)$</strong> beider Geraden. Die Koordinaten $(x|y)$ erfüllen beide Gleichungen gleichzeitig.
+                        </p>
+                    </div>
+
+                    <!-- 2. Gleichsetzungsverfahren -->
+                    <div id="sec-equal" class="theory-content hidden space-y-3">
+                        <h3 class="text-base font-bold text-blue-400">2. Das Gleichsetzungsverfahren</h3>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            <strong>Wann anwenden?</strong> Wenn beide Gleichungen bereits nach derselben Variablen (z. B. $y$) aufgelöst sind oder sich sehr einfach danach auflösen lassen.
+                        </p>
+                        <div class="bg-blue-500/10 border border-blue-500/20 p-3.5 rounded-xl space-y-2 text-xs sm:text-sm">
+                            <div class="font-bold text-blue-400">Beispiel:</div>
+                            <div class="font-mono">I: $y = 3x - 5$<br>II: $y = 2x - 3$</div>
+                            <ol class="list-decimal list-inside space-y-1 text-slate-300 pt-1">
+                                <li><strong>Terme gleichsetzen</strong> (da beide gleich $y$ sind):<br>$3x - 5 = 2x - 3$</li>
+                                <li><strong>Nach $x$ auflösen:</strong><br>$-2x$ und $+5 \implies x = 2$</li>
+                                <li><strong>$x$ in eine Gleichung einsetzen</strong> (z.B. I):<br>$y = 3(2) - 5 = 6 - 5 = 1$</li>
+                                <li><strong>Lösungsmenge:</strong> $L = \{(2|1)\}$</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <!-- 3. Einsetzungsverfahren -->
+                    <div id="sec-substitute" class="theory-content hidden space-y-3">
+                        <h3 class="text-base font-bold text-blue-400">3. Das Einsetzungsverfahren (Substitutionsverfahren)</h3>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            <strong>Wann anwenden?</strong> Wenn eine Variable in einer der Gleichungen bereits isoliert ist (z. B. $x = \dots$ oder $y = \dots$).
+                        </p>
+                        <div class="bg-amber-500/10 border border-amber-500/20 p-3.5 rounded-xl space-y-2 text-xs sm:text-sm">
+                            <div class="font-bold text-amber-400">Beispiel:</div>
+                            <div class="font-mono">I: $x + y = 19$<br>II: $y = x + 1$</div>
+                            <ol class="list-decimal list-inside space-y-1 text-slate-300 pt-1">
+                                <li>Gleichung II ist bereits nach $y$ aufgelöst.</li>
+                                <li><strong>Term für $y$ in Gleichung I einsetzen:</strong><br>$x + (x + 1) = 19$</li>
+                                <li><strong>Nach $x$ auflösen:</strong><br>$2x + 1 = 19 \implies 2x = 18 \implies x = 9$</li>
+                                <li><strong>$x$ zurückeinsetzen</strong> in II:<br>$y = 9 + 1 = 10 \implies L = \{(9|10)\}$</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <!-- 4. Additionsverfahren -->
+                    <div id="sec-addition" class="theory-content hidden space-y-3">
+                        <h3 class="text-base font-bold text-blue-400">4. Das Additions- / Subtraktionsverfahren</h3>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            <strong>Wann anwenden?</strong> Wenn die Gleichungen in Standardform ($ax + by = c$) vorliegen. Ziel ist es, die Gleichungen so zu multiplizieren, dass beim Addieren/Subtrahieren eine Variable wegfällt.
+                        </p>
+                        <div class="bg-emerald-500/10 border border-emerald-500/20 p-3.5 rounded-xl space-y-2 text-xs sm:text-sm">
+                            <div class="font-bold text-emerald-400">Beispiel:</div>
+                            <div class="font-mono">I: $2x + 2y = 8$<br>II: $-4x + 5y = 22$</div>
+                            <ol class="list-decimal list-inside space-y-1 text-slate-300 pt-1">
+                                <li>Gleichung I mit $2$ multiplizieren, damit Koeffizient von $x$ entgegengesetzt ist ($4x$ und $-4x$):<br>I': $4x + 4y = 16$</li>
+                                <li><strong>Gleichungen addieren</strong> (I' + II):<br>$(4x + 4y) + (-4x + 5y) = 16 + 22$<br>$9y = 38 \implies y = \frac{38}{9} \dots$ (oder passendes System wählen)</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <!-- 5. Sonderfälle -->
+                    <div id="sec-special" class="theory-content hidden space-y-3">
+                        <h3 class="text-base font-bold text-blue-400">5. Sonderfälle bei linearen Gleichungssystemen</h3>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            Nicht jedes LGS hat genau eine eindeutige Lösung. Es gibt drei mögliche Fälle:
+                        </p>
+                        <div class="space-y-2 text-xs sm:text-sm">
+                            <div class="p-2.5 bg-slate-950 rounded-xl border border-slate-800">
+                                <strong class="text-emerald-400">1. Genau eine Lösung:</strong> Die Geraden schneiden sich in einem Punkt $S(x|y)$. (Unterschiedliche Steigungen $m_1 \neq m_2$).
+                            </div>
+                            <div class="p-2.5 bg-slate-950 rounded-xl border border-slate-800">
+                                <strong class="text-rose-400">2. Keine Lösung (Parallele Geraden):</strong> Beim Rechnen entsteht ein falscher Ausdruck wie $0 = 5$. Die Geraden haben dieselbe Steigung, aber einen anderen y-Achsenabschnitt ($m_1 = m_2$ und $b_1 \neq b_2$).
+                            </div>
+                            <div class="p-2.5 bg-slate-950 rounded-xl border border-slate-800">
+                                <strong class="text-blue-400">3. Unendlich viele Lösungen (Identische Geraden):</strong> Beim Rechnen entsteht eine wahre Identität wie $0 = 0$. Beide Gleichungen beschreiben exakt dieselbe Gerade ($m_1 = m_2$ und $b_1 = b_2$).
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: SANDBOX RECHNER -->
+        <section id="content-calculator" class="tab-content hidden space-y-4">
+            <div class="max-w-2xl mx-auto custom-card p-5 rounded-2xl space-y-4">
+                <h3 class="font-bold text-base border-b border-slate-700/60 pb-2">Beliebiges LGS lösen ($a·x + b·y = c$)</h3>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Equation 1 -->
+                    <div class="space-y-2 bg-slate-900/60 p-3 rounded-xl border border-slate-700/60">
+                        <span class="text-xs font-bold text-blue-400">Gleichung I</span>
+                        <div class="flex items-center gap-1.5 font-mono text-xs">
+                            <input type="number" id="calc_a1" value="3" class="w-16 bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-center min-h-[40px]"> x +
+                            <input type="number" id="calc_b1" value="1" class="w-16 bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-center min-h-[40px]"> y =
+                            <input type="number" id="calc_c1" value="-1" class="w-16 bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-center min-h-[40px]">
+                        </div>
+                    </div>
+
+                    <!-- Equation 2 -->
+                    <div class="space-y-2 bg-slate-900/60 p-3 rounded-xl border border-slate-700/60">
+                        <span class="text-xs font-bold text-amber-400">Gleichung II</span>
+                        <div class="flex items-center gap-1.5 font-mono text-xs">
+                            <input type="number" id="calc_a2" value="4" class="w-16 bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-center min-h-[40px]"> x +
+                            <input type="number" id="calc_b2" value="3" class="w-16 bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-center min-h-[40px]"> y =
+                            <input type="number" id="calc_c2" value="2" class="w-16 bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-center min-h-[40px]">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-2">
+                    <button onclick="solveCustomLGS()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl text-xs transition min-h-[44px]">
+                        Schritt-für-Schritt Berechnen
+                    </button>
+                    <button onclick="sendCalcToPlotter()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-4 py-2.5 rounded-xl text-xs transition min-h-[44px]">
+                        In Plotter laden
+                    </button>
+                </div>
+
+                <div id="calcResultContainer" class="hidden pt-3 border-t border-slate-700/60">
+                    <div id="calcSteps" class="bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs space-y-1 text-slate-300">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal for Solution View -->
+    <div id="modalBackdrop" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 hidden">
+        <div class="custom-card max-w-lg w-full rounded-2xl p-5 space-y-4 max-h-[85vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-slate-700/60 pb-2">
+                <h3 id="modalTitle" class="font-bold text-sm sm:text-base text-blue-400">Lösungsweg</h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div id="modalBody" class="space-y-2"></div>
+            <button onclick="closeModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold py-2.5 rounded-xl text-xs min-h-[44px]">
+                Schließen
+            </button>
+        </div>
+    </div>
+
+    <!-- CORE APPLICATION JAVASCRIPT LOGIC -->
+    <script>
+        // Global State
+        let currentScore = 0;
+        let plotterState = {
+            m1: 1, b1: 2,
+            m2: -1, b2: 5,
+            scale: 30, // pixels per unit
+            offsetX: 0,
+            offsetY: 0,
+            isDragging: false,
+            startX: 0,
+            startY: 0,
+            pinchStartDist: 0,
+            initialScale: 30
+        };
+
+        // --- VOLLSTÄNDIGE AUFGABEN-DATENBANK ---
+        const taskDatabase = [
+            {
+                id: "t_anne_10",
+                category: "text",
+                title: "Einführung: Anne wechselt 10 €",
+                description: "Anne benötigt 1€- und 2€-Münzen. Sie wechselt einen 10€-Schein am Postschalter und erhält genau 8 Münzen. Wie viele Münzen jeder Sorte erhält sie?",
+                eq1: "x + y = 8  (Anzahl Münzen)",
+                eq2: "1x + 2y = 10  (Gesamtwert in €)",
+                solutionX: 6,
+                solutionY: 2,
+                m1: -1, b1: 8,
+                m2: -0.5, b2: 5,
+                hint: "Gleichungen nach y umformen:\nI: y = -x + 8\nII: y = -0.5x + 5\n\nGleichsetzungsverfahren:\n-x + 8 = -0.5x + 5  |+x -5\n3 = 0.5x  =>  x = 6\ny = -6 + 8 = 2\n\nErgebnis: 6x 1€-Münzen und 2x 2€-Münzen."
+            },
+            {
+                id: "t_coin1",
+                category: "text",
+                title: "1. 50-Cent & 20-Cent Automatenwechsel",
+                description: "Für einen Automaten werden 50-Cent- (x) und 20-Cent-Münzen (y) benötigt. Nach dem Wechseln von 8 € wurden 31 Münzen ausgezahlt. Wie viele Münzen jeder Sorte sind das?",
+                eq1: "x + y = 31",
+                eq2: "0.50x + 0.20y = 8",
+                solutionX: 6,
+                solutionY: 25,
+                m1: -1, b1: 31,
+                m2: -2.5, b2: 40,
+                hint: "I: x + y = 31  =>  y = 31 - x\nII: 0.5x + 0.2y = 8\n\nEinsetzen:\n0.5x + 0.2(31 - x) = 8\n0.5x + 6.2 - 0.2x = 8\n0.3x = 1.8  =>  x = 6\ny = 31 - 6 = 25\n\nErgebnis: 6x 50-Cent und 25x 20-Cent Münzen."
+            },
+            {
+                id: "t_coin2_6",
+                category: "text",
+                title: "2a. 10€ in 6 Münzen gewechselt",
+                description: "Ein 10-€-Schein wird in 1-€- (x) und 2-€-Münzen (y) gewechselt. Es werden 6 Münzen ausgezahlt. Gib die Gleichungen in der Form y = mx + b an und berechne.",
+                eq1: "y = -x + 6",
+                eq2: "y = -0.5x + 5",
+                solutionX: 2,
+                solutionY: 4,
+                m1: -1, b1: 6,
+                m2: -0.5, b2: 5,
+                hint: "Gleichsetzen:\n-x + 6 = -0.5x + 5\n1 = 0.5x  =>  x = 2\ny = 6 - 2 = 4\n\nErgebnis: 2x 1€-Münzen und 4x 2€-Münzen."
+            },
+            {
+                id: "t_coin2_7",
+                category: "text",
+                title: "2b. 10€ in 7 Münzen gewechselt",
+                description: "Ein 10-€-Schein wird in 1-€- (x) und 2-€-Münzen (y) gewechselt. Es werden 7 Münzen ausgezahlt. Berechne x und y.",
+                eq1: "y = -x + 7",
+                eq2: "y = -0.5x + 5",
+                solutionX: 4,
+                solutionY: 3,
+                m1: -1, b1: 7,
+                m2: -0.5, b2: 5,
+                hint: "-x + 7 = -0.5x + 5  =>  0.5x = 2  =>  x = 4\ny = 7 - 4 = 3\n\nErgebnis: 4x 1€-Münzen und 3x 2€-Münzen."
+            },
+            {
+                id: "t_coin2_9",
+                category: "text",
+                title: "2c. 10€ in 9 Münzen gewechselt",
+                description: "Ein 10-€-Schein wird in 1-€- (x) und 2-€-Münzen (y) gewechselt. Es werden 9 Münzen ausgezahlt. Berechne x und y.",
+                eq1: "y = -x + 9",
+                eq2: "y = -0.5x + 5",
+                solutionX: 8,
+                solutionY: 1,
+                m1: -1, b1: 9,
+                m2: -0.5, b2: 5,
+                hint: "-x + 9 = -0.5x + 5  =>  0.5x = 4  =>  x = 8\ny = 9 - 8 = 1\n\nErgebnis: 8x 1€-Münzen und 1x 2€-Münze."
+            },
+            {
+                id: "t_draw_a",
+                category: "graphic",
+                title: "3a. Zeichnerische Lösung",
+                description: "Zeichne die Geraden in ein Koordinatensystem und bestimme den Schnittpunkt: I: y = -2x - 5 | II: y = x + 4",
+                eq1: "y = -2x - 5",
+                eq2: "y = x + 4",
+                solutionX: -3,
+                solutionY: 1,
+                m1: -2, b1: -5,
+                m2: 1, b2: 4,
+                hint: "Rechnerische Überprüfung:\n-2x - 5 = x + 4  =>  -3x = 9  =>  x = -3\ny = -3 + 4 = 1\nSchnittpunkt S(-3 | 1)."
+            },
+            {
+                id: "t_draw_b",
+                category: "graphic",
+                title: "3b. Zeichnerische Lösung",
+                description: "Bestimme den Schnittpunkt aus der Zeichnung: I: y = 3x + 1 | II: y = x - 3",
+                eq1: "y = 3x + 1",
+                eq2: "y = x - 3",
+                solutionX: -2,
+                solutionY: -5,
+                m1: 3, b1: 1,
+                m2: 1, b2: -3,
+                hint: "3x + 1 = x - 3  =>  2x = -4  =>  x = -2\ny = -2 - 3 = -5\nSchnittpunkt S(-2 | -5)."
+            },
+            {
+                id: "t_draw_c",
+                category: "graphic",
+                title: "3c. Zeichnerische Lösung",
+                description: "Bestimme den Schnittpunkt aus der Zeichnung: I: y = 2x - 2 | II: y = -2x + 2",
+                eq1: "y = 2x - 2",
+                eq2: "y = -2x + 2",
+                solutionX: 1,
+                solutionY: 0,
+                m1: 2, b1: -2,
+                m2: -2, b2: 2,
+                hint: "2x - 2 = -2x + 2  =>  4x = 4  =>  x = 1\ny = 2(1) - 2 = 0\nSchnittpunkt S(1 | 0)."
+            },
+            {
+                id: "t_draw_d",
+                category: "graphic",
+                title: "3d. Zeichnerische Lösung",
+                description: "Bestimme den Schnittpunkt aus der Zeichnung: I: y = x + 2 | II: y = -x + 5",
+                eq1: "y = x + 2",
+                eq2: "y = -x + 5",
+                solutionX: 1.5,
+                solutionY: 3.5,
+                m1: 1, b1: 2,
+                m2: -1, b2: 5,
+                hint: "x + 2 = -x + 5  =>  2x = 3  =>  x = 1.5\ny = 1.5 + 2 = 3.5\nSchnittpunkt S(1.5 | 3.5)."
+            },
+            {
+                id: "t_car_base",
+                category: "equal",
+                title: "Mietwagen: Funnycar vs. Suncar",
+                description: "Funnycar verlangt 33€/Tag + 1,60€/km. Suncar verlangt 26€/Tag + 1,80€/km. Bei welcher Fahrstrecke x (km) sind beide Angebote gleich teuer und wie hoch sind die Kosten y (€)?",
+                eq1: "y = 1.6x + 33  (Funnycar)",
+                eq2: "y = 1.8x + 26  (Suncar)",
+                solutionX: 35,
+                solutionY: 89,
+                m1: 1.6, b1: 33,
+                m2: 1.8, b2: 26,
+                hint: "1.6x + 33 = 1.8x + 26  |-1.6x -26\n7 = 0.2x  =>  x = 35 km\ny = 1.6(35) + 33 = 89 €\nSchnittpunkt S(35 | 89)."
+            },
+            {
+                id: "t_car_akt1",
+                category: "equal",
+                title: "Sonderaktion 1: Funnycar Rabatt",
+                description: "In einer Sonderaktion wird die Grundgebühr von Funnycar auf 30 € gesenkt (y = 1.6x + 30). Suncar bleibt bei y = 1.8x + 26. Bei welcher Fahrstrecke x sind beide gleichwertig?",
+                eq1: "y = 1.6x + 30",
+                eq2: "y = 1.8x + 26",
+                solutionX: 20,
+                solutionY: 62,
+                m1: 1.6, b1: 30,
+                m2: 1.8, b2: 26,
+                hint: "1.6x + 30 = 1.8x + 26  =>  4 = 0.2x  =>  x = 20 km\ny = 1.6(20) + 30 = 62 €.\nSchnittpunkt S(20 | 62)."
+            },
+            {
+                id: "t_car_akt2",
+                category: "equal",
+                title: "Aktionswoche 2: Suncar Rabatt (50-65 km)",
+                description: "Bei Suncar wurde der km-Preis auf 1,70 € gesenkt (y = 1.7x + 26). Funnycar bleibt bei y = 1.6x + 33. Berechne den genauen Schnittpunkt x.",
+                eq1: "y = 1.6x + 33",
+                eq2: "y = 1.7x + 26",
+                solutionX: 70,
+                solutionY: 145,
+                m1: 1.6, b1: 33,
+                m2: 1.7, b2: 26,
+                hint: "1.6x + 33 = 1.7x + 26  =>  7 = 0.1x  =>  x = 70 km.\n\nAnalyse für 50 km bis 65 km:\nDa der Schnittpunkt erst bei 70 km liegt, ist Suncar für alle Strecken unter 70 km (also auch für 50-65 km) günstiger! Es lohnt sich also."
+            },
+            {
+                id: "t_eq_3a",
+                category: "equal",
+                title: "Gleichsetzungsverfahren 3a",
+                description: "Löse das Gleichungssystem: I: y = 7x - 21 | II: y = 4x - 12",
+                eq1: "y = 7x - 21",
+                eq2: "y = 4x - 12",
+                solutionX: 3,
+                solutionY: 0,
+                m1: 7, b1: -21,
+                m2: 4, b2: -12,
+                hint: "7x - 21 = 4x - 12  =>  3x = 9  =>  x = 3\ny = 7(3) - 21 = 0\nProbe: 0 = 4(3) - 12 (stimmt!)"
+            },
+            {
+                id: "t_eq_3b",
+                category: "equal",
+                title: "Gleichsetzungsverfahren 3b",
+                description: "Löse das Gleichungssystem: I: y = 3x - 5 | II: y = 2x - 3",
+                eq1: "y = 3x - 5",
+                eq2: "y = 2x - 3",
+                solutionX: 2,
+                solutionY: 1,
+                m1: 3, b1: -5,
+                m2: 2, b2: -3,
+                hint: "3x - 5 = 2x - 3  =>  x = 2\ny = 3(2) - 5 = 1"
+            },
+            {
+                id: "t_eq_3c",
+                category: "equal",
+                title: "Gleichsetzungsverfahren 3c",
+                description: "Löse das Gleichungssystem: I: y = 8x - 11 | II: y = 4x - 5",
+                eq1: "y = 8x - 11",
+                eq2: "y = 4x - 5",
+                solutionX: 1.5,
+                solutionY: 1,
+                m1: 8, b1: -11,
+                m2: 4, b2: -5,
+                hint: "8x - 11 = 4x - 5  =>  4x = 6  =>  x = 1.5\ny = 8(1.5) - 11 = 1"
+            },
+            {
+                id: "t_eq_3d",
+                category: "equal",
+                title: "Gleichsetzungsverfahren 3d",
+                description: "Löse das Gleichungssystem: I: y = 5x - 5 | II: y = -4x + 3",
+                eq1: "y = 5x - 5",
+                eq2: "y = -4x + 3",
+                solutionX: 0.8888,
+                solutionY: -0.5555,
+                m1: 5, b1: -5,
+                m2: -4, b2: 3,
+                hint: "5x - 5 = -4x + 3  =>  9x = 8  =>  x = 8/9 ≈ 0.89\ny = 5(8/9) - 5 = -5/9 ≈ -0.56"
+            },
+            {
+                id: "t_eq_3e",
+                category: "equal",
+                title: "Gleichsetzungsverfahren 3e",
+                description: "Löse das Gleichungssystem: I: y = 0.5x - 3 | II: y = -0.5x + 1",
+                eq1: "y = 0.5x - 3",
+                eq2: "y = -0.5x + 1",
+                solutionX: 4,
+                solutionY: -1,
+                m1: 0.5, b1: -3,
+                m2: -0.5, b2: 1,
+                hint: "0.5x - 3 = -0.5x + 1  =>  x = 4\ny = 0.5(4) - 3 = -1"
+            },
+            {
+                id: "t_cards",
+                category: "substitute",
+                title: "Einführung: Kerstins Grußkarten",
+                description: "Kerstin kauft Grußkarten für 7,60 €. Sie kauft doppelt so viele Karten mit Umschlag (x, 1,50 €) wie ohne Umschlag (y, 0,80 €). Wie viele Karten jeder Sorte kauft sie?",
+                eq1: "1.50x + 0.80y = 7.60",
+                eq2: "x = 2y",
+                solutionX: 4,
+                solutionY: 2,
+                m1: -1.875, b1: 9.5,
+                m2: 0.5, b2: 0,
+                hint: "Setze II (x = 2y) in I ein:\n1.5(2y) + 0.8y = 7.6  =>  3y + 0.8y = 7.6\n3.8y = 7.6  =>  y = 2\nx = 2 * 2 = 4\n\nErgebnis: 4 Karten mit Umschlag, 2 ohne Umschlag."
+            },
+            {
+                id: "t_sub_1a",
+                category: "substitute",
+                title: "Einsetzungsverfahren 1a",
+                description: "Löse: I: x + y = 19 | II: y = x + 1",
+                eq1: "x + y = 19",
+                eq2: "y = x + 1",
+                solutionX: 9,
+                solutionY: 10,
+                m1: -1, b1: 19,
+                m2: 1, b2: 1,
+                hint: "Setze II in I ein:\nx + (x + 1) = 19  =>  2x = 18  =>  x = 9\ny = 9 + 1 = 10"
+            },
+            {
+                id: "t_sub_1b",
+                category: "substitute",
+                title: "Einsetzungsverfahren 1b",
+                description: "Löse: I: y + 2x = 11 | II: y = 13x - 4",
+                eq1: "y + 2x = 11",
+                eq2: "y = 13x - 4",
+                solutionX: 1,
+                solutionY: 9,
+                m1: -2, b1: 11,
+                m2: 13, b2: -4,
+                hint: "(13x - 4) + 2x = 11  =>  15x = 15  =>  x = 1\ny = 13(1) - 4 = 9"
+            },
+            {
+                id: "t_sub_1c",
+                category: "substitute",
+                title: "Einsetzungsverfahren 1c",
+                description: "Löse: I: y = 7x - 14 | II: 3x + y = 16",
+                eq1: "y = 7x - 14",
+                eq2: "3x + y = 16",
+                solutionX: 3,
+                solutionY: 7,
+                m1: 7, b1: -14,
+                m2: -3, b2: 16,
+                hint: "3x + (7x - 14) = 16  =>  10x = 30  =>  x = 3\ny = 7(3) - 14 = 7"
+            },
+            {
+                id: "t_sub_1d",
+                category: "substitute",
+                title: "Einsetzungsverfahren 1d",
+                description: "Löse: I: y = 13x - 3 | II: 5x + y = 15",
+                eq1: "y = 13x - 3",
+                eq2: "5x + y = 15",
+                solutionX: 1,
+                solutionY: 10,
+                m1: 13, b1: -3,
+                m2: -5, b2: 15,
+                hint: "5x + (13x - 3) = 15  =>  18x = 18  =>  x = 1\ny = 13(1) - 3 = 10"
+            },
+            {
+                id: "t_sub_1e",
+                category: "substitute",
+                title: "Einsetzungsverfahren 1e",
+                description: "Löse: I: 5x - y = -14 | II: y = -5 - 14x",
+                eq1: "5x - y = -14",
+                eq2: "y = -5 - 14x",
+                solutionX: -1,
+                solutionY: 9,
+                m1: 5, b1: 14,
+                m2: -14, b2: -5,
+                hint: "5x - (-5 - 14x) = -14  =>  19x + 5 = -14  =>  19x = -19  =>  x = -1\ny = -5 - 14(-1) = 9"
+            },
+            {
+                id: "t_sub_1f",
+                category: "substitute",
+                title: "Einsetzungsverfahren 1f",
+                description: "Löse: I: x + y = 0 | II: x - 10 = y",
+                eq1: "x + y = 0",
+                eq2: "x - 10 = y",
+                solutionX: 5,
+                solutionY: -5,
+                m1: -1, b1: 0,
+                m2: 1, b2: -10,
+                hint: "x + (x - 10) = 0  =>  2x = 10  =>  x = 5\ny = 5 - 10 = -5"
+            },
+            {
+                id: "t_sub_1g",
+                category: "substitute",
+                title: "Einsetzungsverfahren 1g",
+                description: "Löse: I: x + 2y = 25 | II: x = 6y - 39",
+                eq1: "x + 2y = 25",
+                eq2: "x = 6y - 39",
+                solutionX: 9,
+                solutionY: 8,
+                m1: -0.5, b1: 12.5,
+                m2: 0.1666, b2: 6.5,
+                hint: "(6y - 39) + 2y = 25  =>  8y = 64  =>  y = 8\nx = 6(8) - 39 = 9"
+            },
+            {
+                id: "t_sub_1h",
+                category: "substitute",
+                title: "Einsetzungsverfahren 1h",
+                description: "Löse: I: x + 4y = 30 | II: x = 5y - 24",
+                eq1: "x + 4y = 30",
+                eq2: "x = 5y - 24",
+                solutionX: 6,
+                solutionY: 6,
+                m1: -0.25, b1: 7.5,
+                m2: 0.2, b2: 4.8,
+                hint: "(5y - 24) + 4y = 30  =>  9y = 54  =>  y = 6\nx = 5(6) - 24 = 6"
+            },
+            {
+                id: "t_sub_1i",
+                category: "substitute",
+                title: "Einsetzungsverfahren 1i",
+                description: "Löse: I: -7 = x + 2y | II: x = 8y + 63",
+                eq1: "-7 = x + 2y",
+                eq2: "x = 8y + 63",
+                solutionX: 7,
+                solutionY: -7,
+                m1: -0.5, b1: -3.5,
+                m2: 0.125, b2: -7.875,
+                hint: "-7 = (8y + 63) + 2y  =>  10y = -70  =>  y = -7\nx = 8(-7) + 63 = 7"
+            },
+            {
+                id: "t_sub_1j",
+                category: "substitute",
+                title: "Einsetzungsverfahren 1j",
+                description: "Löse: I: 2y - 12 = x | II: x - 14y = 0",
+                eq1: "2y - 12 = x",
+                eq2: "x - 14y = 0",
+                solutionX: -14,
+                solutionY: -1,
+                m1: 0.5, b1: 6,
+                m2: 0.0714, b2: 0,
+                hint: "Setze I in II ein: (2y - 12) - 14y = 0  =>  -12y = 12  =>  y = -1\nx = 2(-1) - 12 = -14."
+            },
+            {
+                id: "t_sub_2a",
+                category: "substitute",
+                title: "Einsetzen mit Umstellung 2a",
+                description: "Forme eine Gleichung geschickt um und löse: I: 3x + 5y = 8 | II: 11x + y = 12",
+                eq1: "3x + 5y = 8",
+                eq2: "11x + y = 12",
+                solutionX: 1,
+                solutionY: 1,
+                m1: -0.6, b1: 1.6,
+                m2: -11, b2: 12,
+                hint: "Forme II nach y um: y = 12 - 11x\nSetze in I ein: 3x + 5(12 - 11x) = 8\n3x + 60 - 55x = 8  =>  -52x = -52  =>  x = 1\ny = 12 - 11(1) = 1"
+            },
+            {
+                id: "t_sub_2b",
+                category: "substitute",
+                title: "Einsetzen mit Umstellung 2b",
+                description: "Forme eine Gleichung geschickt um und löse: I: 9x + 14y = 13 | II: x + 5y = -2",
+                eq1: "9x + 14y = 13",
+                eq2: "x + 5y = -2",
+                solutionX: 3,
+                solutionY: -1,
+                m1: -0.6428, b1: 0.9285,
+                m2: -0.2, b2: -0.4,
+                hint: "Forme II nach x um: x = -2 - 5y\nSetze in I ein: 9(-2 - 5y) + 14y = 13\n-18 - 45y + 14y = 13  =>  -31y = 31  =>  y = -1\nx = -2 - 5(-1) = 3"
+            },
+            {
+                id: "t_sub_2c",
+                category: "substitute",
+                title: "Einsetzen mit Umstellung 2c",
+                description: "Forme eine Gleichung geschickt um und löse: I: 15x - 22y = 157 | II: 11x - y = 327",
+                eq1: "15x - 22y = 157",
+                eq2: "11x - y = 327",
+                solutionX: 31,
+                solutionY: 14,
+                m1: 0.6818, b1: -7.136,
+                m2: 11, b2: -327,
+                hint: "Forme II nach y um: y = 11x - 327\nSetze in I ein: 15x - 22(11x - 327) = 157\n15x - 242x + 7194 = 157  =>  -227x = -7037  =>  x = 31\ny = 11(31) - 327 = 14"
+            },
+            {
+                id: "t_sub_3a",
+                category: "substitute",
+                title: "Multiplikation & Einsetzen 3a",
+                description: "Multipliziere geeignet und löse: I: 5x + 6y = 43 | II: 9y = 7x - 8",
+                eq1: "5x + 6y = 43",
+                eq2: "9y = 7x - 8",
+                solutionX: 5,
+                solutionY: 3,
+                m1: -0.8333, b1: 7.1666,
+                m2: 0.7777, b2: -0.8888,
+                hint: "I nach 6y umformen: 6y = 43 - 5x. Multipliziere I mit 1.5 => 9y = 64.5 - 7.5x.\nGleichsetzen mit II: 64.5 - 7.5x = 7x - 8  =>  72.5 = 14.5x  =>  x = 5\n9y = 7(5) - 8 = 27  =>  y = 3"
+            },
+            {
+                id: "t_sub_3b",
+                category: "substitute",
+                title: "Multiplikation & Einsetzen 3b",
+                description: "Löse: I: 8x - 5y = 11 | II: 12x = 11y - 15",
+                eq1: "8x - 5y = 11",
+                eq2: "12x = 11y - 15",
+                solutionX: 7,
+                solutionY: 9,
+                m1: 1.6, b1: -2.2,
+                m2: 1.0909, b2: 1.3636,
+                hint: "Multipliziere I mit 3 (24x - 15y = 33) und II mit 2 (24x = 22y - 30).\nEinsetzen: (22y - 30) - 15y = 33  =>  7y = 63  =>  y = 9\n8x - 5(9) = 11  =>  8x = 56  =>  x = 7"
+            },
+            {
+                id: "t_sub_3c",
+                category: "substitute",
+                title: "Multiplikation & Einsetzen 3c",
+                description: "Löse: I: 21x - 16y = 88 | II: 28x = 43y + 9",
+                eq1: "21x - 16y = 88",
+                eq2: "28x = 43y + 9",
+                solutionX: 8,
+                solutionY: 5,
+                m1: 1.3125, b1: -5.5,
+                m2: 0.6511, b2: -0.2093,
+                hint: "KGV von 21 und 28 ist 84 (I * 4, II * 3).\nI': 84x - 64y = 352  =>  84x = 64y + 352\nII': 84x = 129y + 27\nGleichsetzen: 64y + 352 = 129y + 27  =>  325 = 65y  =>  y = 5\n21x - 16(5) = 88  =>  21x = 168  =>  x = 8"
+            },
+            {
+                id: "t_sub_3d",
+                category: "substitute",
+                title: "Multiplikation & Einsetzen 3d",
+                description: "Löse: I: 17x - 20y = 94 | II: 25y = 9x - 93",
+                eq1: "17x - 20y = 94",
+                eq2: "25y = 9x - 93",
+                solutionX: 2,
+                solutionY: -3,
+                m1: 0.85, b1: -4.7,
+                m2: 0.36, b2: -3.72,
+                hint: "Subtraktions-/Einsetzungsverfahren:\nx = 2, y = -3.\nProbe I: 17(2) - 20(-3) = 34 + 60 = 94 (stimmt!)."
+            },
+            {
+                id: "t_art_teachers",
+                category: "addition",
+                title: "Kunstlehrer Bestellungen",
+                description: "Herr Breuer zahlt 775,47€ für Metallstaffeleien (33,75€) + 3 extra Staffeleien. Herr Dohmen zahlt 687,72€ für Holzstaffeleien (34,50€). Beide kaufen x Leinwände (5,56€). Wie viele Leinwände x und Holzstaffeleien y wurden bestellt?",
+                eq1: "5.56x + 33.75(y + 3) = 775.47",
+                eq2: "5.56x + 34.50y = 687.72",
+                solutionX: 12,
+                solutionY: 18,
+                m1: -0.1647, b1: 20.00,
+                m2: -0.1611, b2: 19.93,
+                hint: "I vereinfachen: 5.56x + 33.75y + 101.25 = 775.47  =>  5.56x + 33.75y = 674.22\nSubtrahiere II - I:\n(5.56x + 34.5y) - (5.56x + 33.75y) = 687.72 - 674.22\n0.75y = 13.5  =>  y = 18 Holzstaffeleien\n5.56x + 34.5(18) = 687.72  =>  5.56x = 66.72  =>  x = 12 Leinwände."
+            },
+            {
+                id: "t_add_1a",
+                category: "addition",
+                title: "Additionsverfahren 1a",
+                description: "Forme um und löse mit Additionsverfahren: I: 2x + 2y = 8 | II: -4x + 5y = 22",
+                eq1: "2x + 2y = 8",
+                eq2: "-4x + 5y = 22",
+                solutionX: -1,
+                solutionY: 5,
+                m1: -1, b1: 4,
+                m2: 0.8, b2: 4.4,
+                hint: "Multipliziere I mit 2:\n 4x + 4y = 16\n-4x + 5y = 22\n---------------- Addieren:\n9y = 38 => y = 5, x = -1."
+            },
+            {
+                id: "t_add_1b",
+                category: "addition",
+                title: "Additionsverfahren 1b",
+                description: "Löse: I: 3x - 7y = -15 | II: x + 14y = 44",
+                eq1: "3x - 7y = -15",
+                eq2: "x + 14y = 44",
+                solutionX: 2,
+                solutionY: 3,
+                m1: 0.4285, b1: 2.1428,
+                m2: -0.0714, b2: 3.1428,
+                hint: "Multipliziere I mit 2:\n6x - 14y = -30\n x + 14y =  44\n---------------- Addieren:\n7x = 14  =>  x = 2\n2 + 14y = 44  =>  14y = 42  =>  y = 3"
+            },
+            {
+                id: "t_add_1c",
+                category: "addition",
+                title: "Additionsverfahren 1c",
+                description: "Löse: I: -4x - 5y = -18 | II: 2x - 3y = -2",
+                eq1: "-4x - 5y = -18",
+                eq2: "2x - 3y = -2",
+                solutionX: 2,
+                solutionY: 2,
+                m1: -0.8, b1: 3.6,
+                m2: 0.6666, b2: 0.6666,
+                hint: "Multipliziere II mit 2:\n 4x - 6y = -4\n-4x - 5y = -18\n---------------- Addieren:\n-11y = -22  =>  y = 2\n2x - 3(2) = -2  =>  2x = 4  =>  x = 2"
+            },
+            {
+                id: "t_add_1d",
+                category: "addition",
+                title: "Additionsverfahren 1d",
+                description: "Löse: I: 7x + 4 = 8y | II: 3x - 4 = y",
+                eq1: "7x - 8y = -4",
+                eq2: "3x - y = 4",
+                solutionX: 4,
+                solutionY: 4,
+                m1: 0.875, b1: 0.5,
+                m2: 3, b2: -4,
+                hint: "x = 4, y = 4."
+            },
+            {
+                id: "t_subtr_2a",
+                category: "addition",
+                title: "Subtraktionsverfahren 2a",
+                description: "Löse mit Subtraktionsverfahren: I: 3x + 3y = 9 | II: x + 2y = 4",
+                eq1: "3x + 3y = 9",
+                eq2: "x + 2y = 4",
+                solutionX: 2,
+                solutionY: 1,
+                m1: -1, b1: 3,
+                m2: -0.5, b2: 2,
+                hint: "Teile I durch 3: x + y = 3\nSubtrahiere II - I': (x + 2y) - (x + y) = 4 - 3  =>  y = 1\nx + 1 = 3  =>  x = 2"
+            },
+            {
+                id: "t_subtr_2b",
+                category: "addition",
+                title: "Subtraktionsverfahren 2b",
+                description: "Löse: I: 4x - 5y = 1 | II: 2x + y = -3",
+                eq1: "4x - 5y = 1",
+                eq2: "2x + y = -3",
+                solutionX: -1,
+                solutionY: -1,
+                m1: 0.8, b1: -0.2,
+                m2: -2, b2: -3,
+                hint: "Multipliziere II mit 2: 4x + 2y = -6\nSubtrahiere I - II': (4x - 5y) - (4x + 2y) = 1 - (-6)\n-7y = 7  =>  y = -1\n2x + (-1) = -3  =>  2x = -2  =>  x = -1"
+            },
+            {
+                id: "t_subtr_2c",
+                category: "addition",
+                title: "Subtraktionsverfahren 2c",
+                description: "Löse: I: y = 8x + 20 | II: 5y = 3x - 11",
+                eq1: "-8x + y = 20",
+                eq2: "-3x + 5y = -11",
+                solutionX: -3,
+                solutionY: -4,
+                m1: 8, b1: 20,
+                m2: 0.6, b2: -2.2,
+                hint: "Multipliziere I mit 5: 5y = 40x + 100\nGleichsetzen mit II: 40x + 100 = 3x - 11  =>  37x = -111  =>  x = -3\ny = 8(-3) + 20 = -4"
+            },
+            {
+                id: "t_subtr_2d",
+                category: "addition",
+                title: "Subtraktionsverfahren 2d",
+                description: "Löse: I: 7x + 4 = 8y | II: 7 = -y + 9x",
+                eq1: "7x - 8y = -4",
+                eq2: "9x - y = 7",
+                solutionX: 0.923,
+                solutionY: 1.307,
+                m1: 0.875, b1: 0.5,
+                m2: 9, b2: -7,
+                hint: "x ≈ 0.92, y ≈ 1.31"
+            },
+            {
+                id: "t_all_3a",
+                category: "equal",
+                title: "Alle 4 Verfahren 3a",
+                description: "Löse auf deine bevorzugte Weise: I: 3x + y = -1 | II: 4x + 3y = 2",
+                eq1: "3x + y = -1",
+                eq2: "4x + 3y = 2",
+                solutionX: -1,
+                solutionY: 2,
+                m1: -3, b1: -1,
+                m2: -1.3333, b2: 0.6666,
+                hint: "Einsetzen: y = -1 - 3x in II: 4x + 3(-1 - 3x) = 2  =>  -5x - 3 = 2  =>  x = -1\ny = -1 - 3(-1) = 2\nSchnittpunkt S(-1 | 2)."
+            },
+            {
+                id: "t_all_3b",
+                category: "equal",
+                title: "Alle 4 Verfahren 3b",
+                description: "Löse auf deine bevorzugte Weise: I: x + y = 12 | II: 3x + 2y = 32",
+                eq1: "x + y = 12",
+                eq2: "3x + 2y = 32",
+                solutionX: 8,
+                solutionY: 4,
+                m1: -1, b1: 12,
+                m2: -1.5, b2: 16,
+                hint: "Multipliziere I mit 2 => 2x + 2y = 24.\nSubtrahiere II - I': (3x + 2y) - (2x + 2y) = 32 - 24  =>  x = 8\ny = 12 - 8 = 4\nSchnittpunkt S(8 | 4)."
+            }
+        ];
+
+        // --- INITIALIZATION ---
+        window.onload = function() {
+            renderTasks();
+            initPlotterCanvas();
+            updatePlotter();
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ]
+            });
+        };
+
+        // --- NAVIGATION & TABS ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('bg-blue-600', 'text-white');
+                el.classList.add('text-slate-400');
+            });
+
+            document.getElementById(`content-${tabId}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-${tabId}`);
+            if(activeBtn) {
+                activeBtn.classList.add('bg-blue-600', 'text-white');
+                activeBtn.classList.remove('text-slate-400');
+            }
+
+            if (tabId === 'plotter') {
+                setTimeout(resizeCanvas, 100);
+            }
+        }
+
+        function openTheorySection(secId) {
+            switchTab('theory');
+            document.querySelectorAll('.theory-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.theory-nav-btn').forEach(el => {
+                el.classList.remove('bg-blue-600', 'text-white');
+                el.classList.add('bg-slate-800', 'text-slate-400');
+            });
+
+            document.getElementById(secId).classList.remove('hidden');
+            const btn = document.getElementById(`btn-${secId}`);
+            if(btn) {
+                btn.classList.add('bg-blue-600', 'text-white');
+                btn.classList.remove('bg-slate-800', 'text-slate-400');
+            }
+        }
+
+        // --- THEME SWITCHER ---
+        function changeTheme(themeName) {
+            document.body.className = themeName + ' min-h-screen flex flex-col font-sans selection:bg-blue-500 selection:text-white pb-6';
+            updatePlotter();
+        }
+
+        // --- FULLSCREEN TOGGLE ---
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => console.log(err));
+                document.getElementById('fullscreenIcon').className = 'fa-solid fa-compress';
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                    document.getElementById('fullscreenIcon').className = 'fa-solid fa-expand';
+                }
+            }
+        }
+
+        // --- RENDER EXERCISES POOL ---
+        function renderTasks(filterCategory = 'all') {
+            const grid = document.getElementById('exerciseGrid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            const filtered = filterCategory === 'all' 
+                ? taskDatabase 
+                : taskDatabase.filter(t => t.category === filterCategory);
+
+            const countEl = document.getElementById('taskCount');
+            const visCountEl = document.getElementById('visibleTaskCount');
+            if (countEl) countEl.innerText = taskDatabase.length;
+            if (visCountEl) visCountEl.innerText = filtered.length;
+
+            filtered.forEach((t) => {
+                const card = document.createElement('div');
+                card.className = "custom-card p-4 sm:p-5 rounded-2xl space-y-3.5 shadow-md flex flex-col justify-between";
+                card.innerHTML = `
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-start gap-2">
+                            <span class="text-[10px] font-bold px-2 py-1 rounded-md bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase tracking-wider">${t.category}</span>
+                            <span id="badge-${t.id}" class="text-xs font-bold text-slate-500"><i class="fa-regular fa-circle"></i> Offen</span>
+                        </div>
+                        <h4 class="font-bold text-sm sm:text-base">${t.title}</h4>
+                        <p class="text-xs text-slate-300 leading-relaxed">${t.description}</p>
+                        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 font-mono text-xs space-y-0.5">
+                            <div><strong>I:</strong> ${t.eq1}</div>
+                            <div><strong>II:</strong> ${t.eq2}</div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3 pt-1">
+                        <div class="grid grid-cols-2 gap-2.5">
+                            <div>
+                                <label class="text-[11px] text-slate-400 block mb-1">x =</label>
+                                <input type="number" inputmode="decimal" step="any" id="input_x_${t.id}" placeholder="Wert x" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]">
+                            </div>
+                            <div>
+                                <label class="text-[11px] text-slate-400 block mb-1">y =</label>
+                                <input type="number" inputmode="decimal" step="any" id="input_y_${t.id}" placeholder="Wert y" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]">
+                            </div>
+                        </div>
+
+                        <div class="flex gap-2 pt-1">
+                            <button onclick="checkAnswer('${t.id}')" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl text-xs transition min-h-[44px]">
+                                Prüfen
+                            </button>
+                            <button onclick="showSolutionModal('${t.id}')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-3.5 py-2.5 rounded-xl text-xs transition min-h-[44px]" title="Lösungsweg anzeigen">
+                                <i class="fa-solid fa-lightbulb text-yellow-500"></i>
+                            </button>
+                            <button onclick="sendToPlotter(${t.m1}, ${t.b1}, ${t.m2}, ${t.b2})" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-3.5 py-2.5 rounded-xl text-xs transition min-h-[44px]" title="Im Plotter anzeigen">
+                                <i class="fa-solid fa-chart-line text-emerald-400"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filterTasks(cat) {
+            document.querySelectorAll('.task-filter-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white');
+                btn.classList.add('bg-slate-800', 'text-slate-300');
+            });
+            event.target.classList.add('bg-blue-600', 'text-white');
+            event.target.classList.remove('bg-slate-800', 'text-slate-300');
+            renderTasks(cat);
+        }
+
+        function checkAnswer(taskId) {
+            const task = taskDatabase.find(t => t.id === taskId);
+            if (!task) return;
+
+            const userX = parseFloat(document.getElementById(`input_x_${taskId}`).value);
+            const userY = parseFloat(document.getElementById(`input_y_${taskId}`).value);
+
+            const badge = document.getElementById(`badge-${taskId}`);
+
+            if (Math.abs(userX - task.solutionX) < 0.05 && Math.abs(userY - task.solutionY) < 0.05) {
+                badge.className = "text-xs font-bold text-emerald-400";
+                badge.innerHTML = `<i class="fa-solid fa-circle-check"></i> Richtig (+10 Pkt)`;
+                currentScore += 10;
+                document.getElementById('userScore').innerText = currentScore;
+            } else {
+                badge.className = "text-xs font-bold text-rose-400";
+                badge.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> Falsch`;
+            }
+        }
+
+        function showSolutionModal(taskId) {
+            const task = taskDatabase.find(t => t.id === taskId);
+            if (!task) return;
+
+            document.getElementById('modalTitle').innerText = `Lösungsweg: ${task.title}`;
+            document.getElementById('modalBody').innerHTML = `
+                <p class="text-xs"><strong>Aufgabe:</strong> ${task.description}</p>
+                <div class="bg-slate-950 p-2.5 rounded-xl font-mono text-xs my-2 border border-slate-800">
+                    <div>${task.eq1}</div>
+                    <div>${task.eq2}</div>
+                </div>
+                <h4 class="font-bold text-emerald-400 pt-1 text-xs sm:text-sm">Exakter Schnittpunkt:</h4>
+                <p class="font-mono text-xs">S(x = ${task.solutionX} | y = ${task.solutionY})</p>
+                <h4 class="font-bold text-blue-400 pt-2 text-xs sm:text-sm">Rechnerischer Ablauf:</h4>
+                <pre class="bg-slate-950 p-3 rounded-xl text-xs font-mono whitespace-pre-wrap border border-slate-800 text-slate-300">${task.hint}</pre>
+            `;
+            document.getElementById('modalBackdrop').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modalBackdrop').classList.add('hidden');
+        }
+
+        function sendToPlotter(m1, b1, m2, b2) {
+            document.getElementById('plotter_m1').value = m1;
+            document.getElementById('plotter_b1').value = b1;
+            document.getElementById('plotter_m2').value = m2;
+            document.getElementById('plotter_b2').value = b2;
+            switchTab('plotter');
+            updatePlotter();
+        }
+
+        // --- INTERACTIVE CANVAS PLOTTER LOGIC ---
+        let canvas, ctx;
+
+        function initPlotterCanvas() {
+            canvas = document.getElementById('graphCanvas');
+            if (!canvas) return;
+            ctx = canvas.getContext('2d');
+
+            window.addEventListener('resize', resizeCanvas);
+
+            // Mouse Handlers
+            canvas.addEventListener('mousedown', (e) => {
+                plotterState.isDragging = true;
+                plotterState.startX = e.clientX - plotterState.offsetX;
+                plotterState.startY = e.clientY - plotterState.offsetY;
+            });
+
+            window.addEventListener('mouseup', () => plotterState.isDragging = false);
+
+            canvas.addEventListener('mousemove', (e) => {
+                if (!plotterState.isDragging) return;
+                plotterState.offsetX = e.clientX - plotterState.startX;
+                plotterState.offsetY = e.clientY - plotterState.startY;
+                drawGraph();
+            });
+
+            canvas.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
+                plotterState.scale *= zoomFactor;
+                drawGraph();
+            }, { passive: false });
+
+            // Mobile Touch Handlers
+            canvas.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1) {
+                    plotterState.isDragging = true;
+                    plotterState.startX = e.touches[0].clientX - plotterState.offsetX;
+                    plotterState.startY = e.touches[0].clientY - plotterState.offsetY;
+                } else if (e.touches.length === 2) {
+                    plotterState.isDragging = false;
+                    plotterState.pinchStartDist = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                    plotterState.initialScale = plotterState.scale;
+                }
+            }, { passive: true });
+
+            canvas.addEventListener('touchmove', (e) => {
+                if (e.touches.length === 1 && plotterState.isDragging) {
+                    plotterState.offsetX = e.touches[0].clientX - plotterState.startX;
+                    plotterState.offsetY = e.touches[0].clientY - plotterState.startY;
+                    drawGraph();
+                } else if (e.touches.length === 2) {
+                    const currentDist = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                    if (plotterState.pinchStartDist > 0) {
+                        const factor = currentDist / plotterState.pinchStartDist;
+                        plotterState.scale = plotterState.initialScale * factor;
+                        drawGraph();
+                    }
+                }
+            }, { passive: true });
+
+            canvas.addEventListener('touchend', () => {
+                plotterState.isDragging = false;
+                plotterState.pinchStartDist = 0;
+            });
+
+            resizeCanvas();
+        }
+
+        function resizeCanvas() {
+            if (!canvas) return;
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight || 400;
+            drawGraph();
+        }
+
+        function updatePlotter() {
+            plotterState.m1 = parseFloat(document.getElementById('plotter_m1').value) || 0;
+            plotterState.b1 = parseFloat(document.getElementById('plotter_b1').value) || 0;
+            plotterState.m2 = parseFloat(document.getElementById('plotter_m2').value) || 0;
+            plotterState.b2 = parseFloat(document.getElementById('plotter_b2').value) || 0;
+
+            const m1 = plotterState.m1, b1 = plotterState.b1;
+            const m2 = plotterState.m2, b2 = plotterState.b2;
+
+            const badge = document.getElementById('plotterIntersection');
+            if (badge) {
+                if (m1 === m2) {
+                    badge.innerText = b1 === b2 ? "Identisch (∞ Lösungen)" : "Parallel (Keine Lösung)";
+                } else {
+                    const ix = (b2 - b1) / (m1 - m2);
+                    const iy = m1 * ix + b1;
+                    badge.innerText = `S(${ix.toFixed(2)} | ${iy.toFixed(2)})`;
+                }
+            }
+
+            drawGraph();
+        }
+
+        function resetPlotterZoom() {
+            plotterState.scale = 30;
+            plotterState.offsetX = 0;
+            plotterState.offsetY = 0;
+            drawGraph();
+        }
+
+        function drawGraph() {
+            if (!ctx || !canvas) return;
+            const w = canvas.width;
+            const h = canvas.height;
+
+            ctx.clearRect(0, 0, w, h);
+
+            const originX = w / 2 + plotterState.offsetX;
+            const originY = h / 2 + plotterState.offsetY;
+            const scale = plotterState.scale;
+
+            // Draw Grid
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 0.5;
+
+            const startGridX = Math.floor(-originX / scale);
+            const endGridX = Math.ceil((w - originX) / scale);
+
+            for (let x = startGridX; x <= endGridX; x++) {
+                const posX = originX + x * scale;
+                ctx.beginPath();
+                ctx.moveTo(posX, 0);
+                ctx.lineTo(posX, h);
+                ctx.stroke();
+            }
+
+            const startGridY = Math.floor((originY - h) / scale);
+            const endGridY = Math.ceil(originY / scale);
+
+            for (let y = startGridY; y <= endGridY; y++) {
+                const posY = originY - y * scale;
+                ctx.beginPath();
+                ctx.moveTo(0, posY);
+                ctx.lineTo(w, posY);
+                ctx.stroke();
+            }
+
+            // Draw Main Axes
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = 2;
+
+            ctx.beginPath();
+            ctx.moveTo(0, originY);
+            ctx.lineTo(w, originY);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(originX, 0);
+            ctx.lineTo(originX, h);
+            ctx.stroke();
+
+            const toScreenX = (x) => originX + x * scale;
+            const toScreenY = (y) => originY - y * scale;
+
+            // Draw Line 1 (Blue)
+            ctx.strokeStyle = '#3b82f6';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            const minX = -originX / scale;
+            const maxX = (w - originX) / scale;
+            ctx.moveTo(toScreenX(minX), toScreenY(plotterState.m1 * minX + plotterState.b1));
+            ctx.lineTo(toScreenX(maxX), toScreenY(plotterState.m1 * maxX + plotterState.b1));
+            ctx.stroke();
+
+            // Draw Line 2 (Amber)
+            ctx.strokeStyle = '#f59e0b';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(toScreenX(minX), toScreenY(plotterState.m2 * minX + plotterState.b2));
+            ctx.lineTo(toScreenX(maxX), toScreenY(plotterState.m2 * maxX + plotterState.b2));
+            ctx.stroke();
+
+            // Highlight Intersection Point
+            if (plotterState.m1 !== plotterState.m2) {
+                const ix = (plotterState.b2 - plotterState.b1) / (plotterState.m1 - plotterState.m2);
+                const iy = plotterState.m1 * ix + plotterState.b1;
+
+                const screenIx = toScreenX(ix);
+                const screenIy = toScreenY(iy);
+
+                ctx.fillStyle = '#10b981';
+                ctx.beginPath();
+                ctx.arc(screenIx, screenIy, 7, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+        }
+
+        // --- GENERAL LGS SOLVER / SANDBOX ---
+        function solveCustomLGS() {
+            const a1 = parseFloat(document.getElementById('calc_a1').value);
+            const b1 = parseFloat(document.getElementById('calc_b1').value);
+            const c1 = parseFloat(document.getElementById('calc_c1').value);
+
+            const a2 = parseFloat(document.getElementById('calc_a2').value);
+            const b2 = parseFloat(document.getElementById('calc_b2').value);
+            const c2 = parseFloat(document.getElementById('calc_c2').value);
+
+            const stepsContainer = document.getElementById('calcSteps');
+            const resultBox = document.getElementById('calcResultContainer');
+            resultBox.classList.remove('hidden');
+
+            const det = a1 * b2 - a2 * b1;
+
+            if (det === 0) {
+                stepsContainer.innerHTML = `<span class="text-rose-400">Determinante D = 0. Das System hat keine oder unendlich viele Lösungen.</span>`;
+                return;
+            }
+
+            const x = (c1 * b2 - c2 * b1) / det;
+            const y = (a1 * c2 - a2 * c1) / det;
+
+            let html = `<div><strong>Cramer'sche Regel / Additionsverfahren:</strong></div>`;
+            html += `<div>I:  ${a1}x + ${b1}y = ${c1}</div>`;
+            html += `<div>II: ${a2}x + ${b2}y = ${c2}</div><br>`;
+            html += `<div>Hauptdeterminante D = (${a1} * ${b2}) - (${a2} * ${b1}) = <strong>${det}</strong></div>`;
+            html += `<div>Dx = (${c1} * ${b2}) - (${c2} * ${b1}) = ${c1*b2 - c2*b1}</div>`;
+            html += `<div>Dy = (${a1} * ${c2}) - (${a2} * ${c1}) = ${a1*c2 - a2*c1}</div><br>`;
+            html += `<div class="text-emerald-400 font-bold">Ergebnis:</div>`;
+            html += `<div class="text-emerald-400 font-bold">x = Dx / D = ${x.toFixed(2)}</div>`;
+            html += `<div class="text-emerald-400 font-bold">y = Dy / D = ${y.toFixed(2)}</div>`;
+            html += `<div class="pt-2 font-bold">Schnittpunkt S(${x.toFixed(2)} | ${y.toFixed(2)})</div>`;
+
+            stepsContainer.innerHTML = html;
+        }
+
+        function sendCalcToPlotter() {
+            const a1 = parseFloat(document.getElementById('calc_a1').value);
+            const b1 = parseFloat(document.getElementById('calc_b1').value);
+            const c1 = parseFloat(document.getElementById('calc_c1').value);
+
+            const a2 = parseFloat(document.getElementById('calc_a2').value);
+            const b2 = parseFloat(document.getElementById('calc_b2').value);
+            const c2 = parseFloat(document.getElementById('calc_c2').value);
+
+            if (b1 === 0 || b2 === 0) {
+                alert("Für den Plotter müssen die Gleichungen nach y umformbar sein (b ≠ 0).");
+                return;
+            }
+
+            const m1 = -a1 / b1;
+            const b1_val = c1 / b1;
+
+            const m2 = -a2 / b2;
+            const b2_val = c2 / b2;
+
+            sendToPlotter(m1, b1_val, m2, b2_val);
+        }
+    </script>
+</body>
+</html>
